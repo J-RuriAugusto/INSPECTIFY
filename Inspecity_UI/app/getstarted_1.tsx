@@ -1,33 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
+import Animated, { Easing, withTiming } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
+
 
 const GettingStarted = () => {
   const router = useRouter();
+  // Load custom fonts
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  });
 
-    // Load custom fonts
-    const [fontsLoaded] = useFonts({
-      'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-      'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-      'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  const scale = useSharedValue(0.8);
+  const opacity = useSharedValue(0);
 
-    });
-  
-    if (!fontsLoaded) {
-      return <AppLoading />;
-    }
+  useEffect(() => {
+    // Replace `timing` with `withTiming` for v2.
+    scale.value = withTiming(1, { duration: 800, easing: Easing.ease });
+    opacity.value = withTiming(1, { duration: 1000, easing: Easing.ease });
+  }, []);
+
+
+  if (!fontsLoaded) {
+    return null; // Show nothing until fonts are loaded
+  }
 
   const handleNavigateToGetStarted = () => {
-    router.push('/getstarted_2'); // Navigate to the dashboard when the button is pressed
+    router.push('/getstarted_2'); // Navigate to the next screen
   };
 
+  const currentStep = 1; // Update this value dynamically for progress
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container,{ opacity, transform: [{ scale }] }]}> {/* Wrap with Animated.View */}
       {/* Upper Blue Section */}
       <View style={styles.upperSection}>
-        {/* Replace this with your image */}
         <Image
           source={require('../assets/images/houseGS1.png')} // Path to your image
           style={styles.image}
@@ -37,20 +48,30 @@ const GettingStarted = () => {
 
       {/* Lower White Section */}
       <View style={styles.lowerSection}>
+        {/* Custom Progress Bar */}
+        <View style={styles.progressBar}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.progressStep,
+                index < currentStep ? styles.progressStepActive : styles.progressStepInactive,
+              ]}
+            />
+          ))}
+        </View>
+
         <Text style={styles.title1}>Welcome to</Text>
         <Text style={styles.title2}>Inspectify!</Text>
-        <Text style={styles.subtitle1}>
-          Let's get started with setting up
-        </Text>
-        <Text style={styles.subtitle2}>
-          your first home.
-        </Text>
+        <Text style={styles.subtitle1}>Let's get started with setting up</Text>
+        <Text style={styles.subtitle2}>your first home.</Text>
+
         {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted}>
           <Text style={styles.buttonText}>Start</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -59,17 +80,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 1.5,
+    flex: 2,
     backgroundColor: '#0B417D', // Blue background
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '95%', // Adjust width to your preference
-    height: 400,  // Adjust height to your preference
-    position: 'top', // Position the image at the top
-    top: 10,       // Distance from the top
-    left: 5,
+    width: '80%',
+    height: 300, // Adjust height as needed
   },
   lowerSection: {
     flex: 1,
@@ -84,7 +102,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
-
   },
   title2: {
     fontSize: 40,
@@ -94,36 +111,50 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1.5,
-
   },
   subtitle1: {
     fontSize: 15,
-    color: '#7C7C7C', // Black text to contrast with white background
+    color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
   },
   subtitle2: {
     fontSize: 15,
-    color: '#7C7C7C', // Black text to contrast with white background
+    color: '#7C7C7C',
     textAlign: 'center',
     marginBottom: 20,
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
-
+  },
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+  },
+  progressStep: {
+    width: 50,
+    height: 5,
+    borderRadius: 10,
+  },
+  progressStepActive: {
+    backgroundColor: '#0B417D', // Active color
+  },
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0', // Inactive color
   },
   button: {
-    backgroundColor: '#08294E', // Custom button color (orange)
-    paddingVertical: 12, // Vertical padding
-    paddingHorizontal: 90, // Horizontal padding
-    borderRadius: 30, // Rounded corners
-    alignItems: 'center', // Center text horizontally
+    backgroundColor: '#08294E', // Custom button color
+    paddingVertical: 12,
+    paddingHorizontal: 90,
+    borderRadius: 30,
+    alignItems: 'center',
   },
   buttonText: {
-    fontSize: 18, // Custom font size
-    color: '#FFFFFF', // White text color
+    fontSize: 18,
+    color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
-    fontWeight: 'bold',
   },
 });
 
