@@ -56,9 +56,7 @@ const GettingStarted = () => {
         </View>
 
         <Text style={styles.title1}>Tell Us About Your Home</Text>
-        <Text style={styles.subtitle1}>Enter basic details about your</Text>
-        <Text style={styles.subtitle2}>home to begin.</Text>
-
+        <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
         <View style={styles.pickerContainer}>
         <Picker
   selectedValue={selectedOption}
@@ -160,6 +158,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
+    marginBottom: 10,
   },
   subtitle2: {
     fontSize: 15,
@@ -191,7 +190,7 @@ const styles = StyleSheet.create({
 
   textBox: {
     width: '70%',
-    height: 45,
+    height: 40,
     borderColor: '#A0A0A0',
     borderWidth: 2,
     borderRadius: 25,
@@ -199,7 +198,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop:-5,
     fontFamily: 'Archivo-Regular',
-    fontSize: 14,
+    fontSize: 13,
     color: '#05173F',
     textAlign: 'center',
     backgroundColor: '#D9D9D9',
@@ -222,19 +221,22 @@ const styles = StyleSheet.create({
       height: 50,
       fontSize: 12, // Font size for the picked option
       color: '#05173F', // Color for the picked option
+      textAlignVertical: 'top',
     },
     pickerItem: {
       fontSize: 12, // Font size for options (iOS only)
       color: '#05173F', // Color for options
+      textAlignVertical: 'top',
     },
     placeholder: {
       fontSize: 14,
       color: '#BBBBBB', // Placeholder text color
+      textAlignVertical: 'top',
     },
   
   button: {
     backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 90,
     borderRadius: 30,
     alignItems: 'center',
