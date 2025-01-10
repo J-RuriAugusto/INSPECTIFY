@@ -78,17 +78,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 2,
+    flex: 1.5,
     backgroundColor: '#0B417D', // Blue background
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '80%',
-    height: 300, // Adjust height as needed
+    width: '100%',
+    height: 400, // Adjust height as needed
   },
   lowerSection: {
-    flex: 1,
+    flex: 1.05,
     backgroundColor: '#FFFFFF', // White background
     justifyContent: 'center',
     alignItems: 'center',
