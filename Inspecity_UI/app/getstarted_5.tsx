@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 
 const GettingStarted = () => {
   const router = useRouter();
-
 
   // Load custom fonts
   const [fontsLoaded] = useFonts({
@@ -26,6 +25,9 @@ const GettingStarted = () => {
 
   return (
     <View style={styles.container}>
+      {/* Hide Status Bar */}
+      <StatusBar hidden={true} />
+
       {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
@@ -50,7 +52,7 @@ const GettingStarted = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Your're All Set!</Text>
+        <Text style={styles.title1}>You're All Set!</Text>
         <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
         <Text style={styles.subtitle2}>inspect your home.</Text>
 
@@ -92,15 +94,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 5,
   },
-  title2: {
-    fontSize: 40,
-    color: '#2852AE',
-    textAlign: 'center',
-    marginTop: -10,
-    marginBottom: 15,
-    fontFamily: 'Epilogue-Black',
-    letterSpacing: 1.5,
-  },
   subtitle1: {
     fontSize: 15,
     color: '#7C7C7C',
@@ -121,8 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
-    marginTop:5,
-
+    marginTop: -75,
   },
   progressStep: {
     width: 50,
@@ -135,22 +127,6 @@ const styles = StyleSheet.create({
   progressStepInactive: {
     backgroundColor: '#E0E0E0', // Inactive color
   },
-
-  textBox: {
-    width: '80%',
-    height: 50,
-    borderColor: '#A0A0A0',
-    borderWidth: 2,
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    fontFamily: 'Archivo-Regular',
-    fontSize: 16,
-    color: '#05173F',
-    textAlign: 'center',
-    backgroundColor: '#D9D9D9',
-  },
-
   button: {
     backgroundColor: '#08294E', // Custom button color
     paddingVertical: 12,
@@ -164,6 +140,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Archivo-Bold',
   },
 });
-
 
 export default GettingStarted;

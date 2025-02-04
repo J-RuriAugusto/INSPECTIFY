@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 
-
 const GettingStarted = () => {
   const router = useRouter();
+
   // Load custom fonts
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
@@ -19,11 +19,9 @@ const GettingStarted = () => {
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    // Replace `timing` with `withTiming` for v2.
     scale.value = withTiming(1, { duration: 800, easing: Easing.ease });
     opacity.value = withTiming(1, { duration: 1000, easing: Easing.ease });
   }, []);
-
 
   if (!fontsLoaded) {
     return null; // Show nothing until fonts are loaded
@@ -36,7 +34,10 @@ const GettingStarted = () => {
   const currentStep = 1; // Update this value dynamically for progress
 
   return (
-    <Animated.View style={[styles.container,{ opacity, transform: [{ scale }] }]}> {/* Wrap with Animated.View */}
+    <Animated.View style={[styles.container, { opacity, transform: [{ scale }] }]}>
+      {/* Hide Status Bar */}
+      <StatusBar hidden={true} />
+
       {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
+    marginTop: -50,
   },
   progressStep: {
     width: 50,
