@@ -1,79 +1,136 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
+import { Image, View } from 'react-native';
+import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <Tabs
-      initialRouteName='dashboard'
+      initialRouteName="dashboard"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        tabBarInactiveTintColor: '#ccc', // Color for inactive icons
+        headerShown: false, // Hide the header for all tabs
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF', // Set the background color here
+          height: 60, // Adjust height if necessary
+        },
+        tabBarLabelStyle: {
+          fontSize: 12, // Adjust the font size of the labels
+          fontWeight: '600',
+        },
+      }}
+    >
+      {/* Dashboard Tab */}
       <Tabs.Screen
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          tabBarIcon: ({ color, focused }) => (
+            <Image
+              source={
+                require('../../assets/images/report columns.png') // Active icon
+              }
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: focused ? color : undefined, // Apply tint color if needed
+              }}
+            />
           ),
         }}
       />
+
+      {/* Awareness Tool Tab */}
       <Tabs.Screen
-        name="awareness_tool"
+        name="awareness tool"
         options={{
           title: 'Awareness Tool',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Image
+              source={
+                require('../../assets/images/test results.png')
+              }
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: focused ? color : undefined,
+              }}
+            />
+          ),
         }}
       />
-    <Tabs.Screen
-        name="assess_structure"
+
+      {/* Assess Structure Tab */}
+      <Tabs.Screen
+        name="assess structure"
         options={{
           title: 'Assess Structure',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              {/* Background Image (Big Circle) */}
+              <Image
+                source={require('../../assets/images/rectangle.png')} // Your background circle image
+                style={{
+                  width: 40, // Adjust size for the circle
+                  height: 40,
+                  position: 'absolute', // Stacks it behind the icon
+                }}
+              />
+              {/* Foreground Icon */}
+              <Image
+                source={require('../../assets/images/scan_icon.png')} // Your icon above the circle
+                style={{
+                  width: 24, // Adjust size for the icon
+                  height: 24,
+                  tintColor: focused ? color : undefined, // Apply focus color
+                }}
+              />
+            </View>
+          ),
         }}
       />
-    <Tabs.Screen
+
+      {/* Emergency Hotlines Tab */}
+      <Tabs.Screen
         name="emergency_hotlines"
         options={{
           title: 'Emergency Hotlines',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Image
+              source={
+                require('../../assets/images/duplicate contacts.png')
+              }
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: focused ? color : undefined,
+              }}
+            />
+          ),
         }}
       />
-    <Tabs.Screen
+
+      {/* Nearby Shops Tab */}
+      <Tabs.Screen
         name="nearby_shops"
         options={{
           title: 'Nearby Shops',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Image
+              source={
+                require('../../assets/images/group.png')
+              }
+              style={{
+                width: 20,
+                height: 20,
+                tintColor: focused ? color : undefined,
+              }}
+            />
+          ),
         }}
       />
     </Tabs>
