@@ -50,7 +50,7 @@ const GettingStarted = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Your're All Set!</Text>
+        <Text style={styles.title1}>You're All Set!</Text>
         <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
         <Text style={styles.subtitle2}>inspect your home.</Text>
 
