@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as Location from 'expo-location';
 
 
 const GettingStarted5 = () => {
+  const { homeName, material, age, height } = useLocalSearchParams();
+  const homeNameString = Array.isArray(homeName) ? homeName[0] : homeName;
+  const materialString = Array.isArray(material) ? material[0] : material;
+  const ageString = Array.isArray(age) ? age[0] : age;
+  const heightString = Array.isArray(height) ? height[0] : height;
+
+  console.log(homeNameString, materialString, ageString, heightString);
   const router = useRouter();
 
   // Load custom fonts
@@ -25,13 +32,13 @@ const GettingStarted5 = () => {
       Alert.alert(
         'Location Enabled',
         'You have enabled location access!',
-        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+        [{ text: 'OK', onPress: handleNavigateToGetStarted5 }] // Navigate to the next screen
       );
     } else {
       Alert.alert(
         'Location Denied',
         'You have denied location access.',
-        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+        [{ text: 'OK', onPress: handleNavigateToGetStarted5 }] // Navigate to the next screen
       );
     }
   };
@@ -40,13 +47,19 @@ const GettingStarted5 = () => {
     Alert.alert(
       'Remind Me Later',
       'You can enable location services anytime in settings.',
-      [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+      [{ text: 'OK', onPress: handleNavigateToGetStarted5 }] // Navigate to the next screen
     );
   };
 
 
   const handleNavigateToGetStarted5 = () => {
-    router.push('/getstarted_5'); // Navigate to the next screen
+    const params = new URLSearchParams();
+    params.append('homeName', homeNameString);
+    params.append('material', materialString);
+    params.append('age', ageString);
+    params.append('height', heightString);
+
+    router.push(`/getstarted_5?${params.toString()}`);
   };
 
   const currentStep = 4; // Current progress step

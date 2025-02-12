@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 
@@ -20,7 +20,14 @@ const GettingStarted2 = () => {
   }
 
   const handleNavigateToGetStarted3 = () => {
-    router.push('/getstarted_3'); // Navigate to the next screen
+    if (!homeName.trim()) {
+      Alert.alert('Error', 'Home name cannot be empty');
+      return; // Don't proceed if homeName is empty
+    }
+    router.push({
+      pathname: '/getstarted_3',
+      params: { homeName },
+    });
   };
 
   const currentStep = 2; // Current progress step

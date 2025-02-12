@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import the Picker component
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { Alert } from 'react-native';
 
 
 const GettingStarted = () => {
+  const { homeName } = useLocalSearchParams();
+  const homeNameString = Array.isArray(homeName) ? homeName[0] : homeName;
+  console.log(homeNameString);
+
   const router = useRouter();
   const [Age, setAge] = useState('');
   const [Height, setHeight] = useState('');
@@ -24,7 +29,32 @@ const GettingStarted = () => {
   }
 
   const handleNavigateToGetStarted4 = () => {
-    router.push('/getstarted_4'); // Navigate to the dashboard when the button is pressed
+    // Convert Age and Height to numbers
+    const ageNumber = parseInt(Age, 10);
+    const heightNumber = parseFloat(Height);
+  
+    if (selectedOption === "") {
+      Alert.alert('Invalid Material', 'Please select a material.');
+      return;
+    }
+
+    if (isNaN(ageNumber) || ageNumber <= 0) {
+      Alert.alert('Invalid Age', 'Please enter a valid age greater than 0.');
+      return;
+    }
+  
+    if (isNaN(heightNumber) || heightNumber <= 0) {
+      Alert.alert('Invalid Height', 'Please enter a valid height greater than 0.');
+      return;
+    }
+  
+    // If all validations pass, navigate to the next screen
+    const params = new URLSearchParams();
+    params.append('homeName', homeNameString);
+    params.append('material', selectedOption);
+    params.append('age', ageNumber.toString());  // Convert back to string for the request
+    params.append('height', heightNumber.toString());  // Convert back to string for the request
+    router.push(`/getstarted_4?${params.toString()}`);
   };
 
   const currentStep = 3;

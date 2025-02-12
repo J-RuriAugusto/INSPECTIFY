@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import 'react-native-get-random-values';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import * as Location from 'expo-location';
 
 const GettingStarted = () => {
+  const { homeName, material, age, height } = useLocalSearchParams();
+  const homeNameString = Array.isArray(homeName) ? homeName[0] : homeName;
+  const materialString = Array.isArray(material) ? material[0] : material;
+  const ageString = Array.isArray(age) ? age[0] : age;
+  const heightString = Array.isArray(height) ? height[0] : height;
+  const userId = uuid.v4(); // Generate a new unique ID
+
+  console.log(userId, homeNameString, materialString, ageString, heightString);
   const router = useRouter();
 
 
@@ -18,10 +30,72 @@ const GettingStarted = () => {
     return null; // Show nothing until fonts are loaded
   }
 
-  const handleNavigateToDashboard = () => {
-    router.push('/dashboard'); // Navigate to the next screen
+  const handleNavigateToDashboard = async () => {
+    try {
+      // Step 1: Create a homeowner
+      const homeownerResponse = await fetch('http://172.16.0.137:5000/homeowners', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          homeowner_id: userId, // Use the generated UUID
+        }),
+      });
+  
+      if (!homeownerResponse.ok) {
+        throw new Error('Failed to create homeowner');
+      }
+  
+      console.log('Homeowner created successfully');
+  
+      // Step 2: Request location permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      let latitude = null;
+      let longitude = null;
+  
+      if (status === 'granted') {
+        let location = await Location.getCurrentPositionAsync({});
+        latitude = location.coords.latitude;
+        longitude = location.coords.longitude;
+      } else {
+        console.warn('Permission to access location was denied');
+      }
+  
+      // Step 3: Create a home for the homeowner
+      const homeResponse = await fetch('http://172.16.0.137:5000/homes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          homeowner_id: userId,
+          homeName: homeNameString,
+          material: materialString,
+          age: parseInt(ageString),
+          height: parseFloat(heightString),
+          is_default: true, // Assuming this is the primary home
+          latitude, // Will be null if permission was denied
+          longitude,
+        }),
+      });
+  
+      if (!homeResponse.ok) {
+        throw new Error('Failed to create home');
+      }
+  
+      console.log('Home created successfully');
+  
+      // Step 4: Store user ID in AsyncStorage
+      await AsyncStorage.setItem('userId', userId);
+  
+      // Step 5: Navigate to the dashboard
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
-
+  
   const currentStep = 5; // Current progress step
 
   return (
