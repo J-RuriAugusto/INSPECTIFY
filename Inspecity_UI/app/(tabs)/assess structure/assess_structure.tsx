@@ -23,7 +23,7 @@ const AssessStructure = () => {
 
       {/* Button Containers */}
       <View style={styles.column}>
-        <Link href="/assess structure/wall" asChild>
+        <Link href="/assess structure/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image
@@ -34,7 +34,7 @@ const AssessStructure = () => {
             </View>
           </TouchableOpacity>
         </Link>
-        <Link href="/assess structure/roof" asChild>
+        <Link href="/assess structure/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image
@@ -45,7 +45,7 @@ const AssessStructure = () => {
             </View>
           </TouchableOpacity>
         </Link>
-        <Link href="/assess structure/floor" asChild>
+        <Link href="/assess structure/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image

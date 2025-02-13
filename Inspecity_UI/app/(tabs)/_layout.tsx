@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image, View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -12,33 +12,24 @@ export default function TabLayout() {
       initialRouteName="dashboard"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: '#ccc', // Color for inactive icons
-        headerShown: false, // Hide the header for all tabs
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF', // Set the background color here
-          height: 60, // Adjust height if necessary
-        },
-        tabBarLabelStyle: {
-          fontSize: 12, // Adjust the font size of the labels
-          fontWeight: '600',
-        },
+        tabBarInactiveTintColor: '#ccc',
+        headerShown: false,
+        tabBarStyle: styles.tabBarStyle, // Standardized height
+        tabBarShowLabel: false, // Hides text labels
       }}
     >
       {/* Dashboard Tab */}
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               source={
-                require('../../assets/images/report columns.png') // Active icon
+                focused
+                  ? require('../../assets/images/report columns.png')
+                  : require('../../assets/images/report columns.png')
               }
-              style={{
-                width: 24,
-                height: 24,
-                tintColor: focused ? color : undefined, // Apply tint color if needed
-              }}
+              style={styles.icon}
             />
           ),
         }}
@@ -48,17 +39,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="awareness tool"
         options={{
-          title: 'Awareness Tool',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               source={
-                require('../../assets/images/test results.png')
+                focused
+                  ? require('../../assets/images/test results.png')
+                  : require('../../assets/images/test results.png')
               }
-              style={{
-                width: 24,
-                height: 24,
-                tintColor: focused ? color : undefined,
-              }}
+              style={styles.icon}
             />
           ),
         }}
@@ -68,26 +56,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="assess structure"
         options={{
-          title: 'Assess Structure',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              {/* Background Image (Big Circle) */}
+          tabBarIcon: ({ focused }) => (
+            <View style={styles.centeredIcon}>
+              <Image source={require('../../assets/images/rectangle.png')} style={styles.circle} />
               <Image
-                source={require('../../assets/images/rectangle.png')} // Your background circle image
-                style={{
-                  width: 40, // Adjust size for the circle
-                  height: 40,
-                  position: 'absolute', // Stacks it behind the icon
-                }}
-              />
-              {/* Foreground Icon */}
-              <Image
-                source={require('../../assets/images/scan_icon.png')} // Your icon above the circle
-                style={{
-                  width: 24, // Adjust size for the icon
-                  height: 24,
-                  tintColor: focused ? color : undefined, // Apply focus color
-                }}
+                source={
+                  focused
+                    ? require('../../assets/images/scan_icon.png')
+                    : require('../../assets/images/scan_icon.png')
+                }
+                style={styles.icon}
               />
             </View>
           ),
@@ -98,17 +76,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="emergency_hotlines"
         options={{
-          title: 'Emergency Hotlines',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               source={
-                require('../../assets/images/duplicate contacts.png')
+                focused
+                  ? require('../../assets/images/duplicate contacts.png')
+                  : require('../../assets/images/duplicate contacts.png')
               }
-              style={{
-                width: 24,
-                height: 24,
-                tintColor: focused ? color : undefined,
-              }}
+              style={styles.icon}
             />
           ),
         }}
@@ -118,17 +93,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="nearby_shops"
         options={{
-          title: 'Nearby Shops',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Image
               source={
-                require('../../assets/images/group.png')
+                focused
+                  ? require('../../assets/images/group.png')
+                  : require('../../assets/images/group.png')
               }
-              style={{
-                width: 20,
-                height: 20,
-                tintColor: focused ? color : undefined,
-              }}
+              style={styles.icon}
             />
           ),
         }}
@@ -136,3 +108,27 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+// Styles for consistency
+const styles = StyleSheet.create({
+  tabBarStyle: {
+    backgroundColor: '#FFFFFF',
+    height: 65, // Increased height for better spacing
+    // paddingBottom: 10, // Adjust spacing
+  },
+  icon: {
+    width: 30, // Standardized icon size
+    height: 30,
+    resizeMode: 'contain',
+  },
+  centeredIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  circle: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+  },
+});
+
