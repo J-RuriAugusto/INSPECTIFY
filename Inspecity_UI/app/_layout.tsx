@@ -56,6 +56,7 @@ function RootLayoutNav() {
         <Stack.Screen name="getstarted_1" options={{ headerShown: false }} />
         <Stack.Screen name="getstarted_2" options={{ headerShown: false }} />
         <Stack.Screen name="getstarted_3" options={{ headerShown: false }} />
+        <Stack.Screen name="getstarted_3b" options={{ headerShown: false }} />
         <Stack.Screen name="getstarted_4" options={{ headerShown: false }} />
         <Stack.Screen name="getstarted_5" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

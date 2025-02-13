@@ -5,7 +5,10 @@ import { useFonts } from 'expo-font';
 
 const GettingStarted2 = () => {
   const router = useRouter();
-  const [homeName, setHomeName] = useState(''); // State to store the text input
+  const [homeName, setHomeName] = useState(''); // State to store the home name
+  const [houseAge, setHouseAge] = useState(''); // State to store the age of the house
+  const [houseUse, setHouseUse] = useState(''); // State to store the primary use of the house
+  const [renovations, setRenovations] = useState(''); // State to store if the house underwent renovations
 
 
   // Load custom fonts
@@ -40,12 +43,12 @@ const GettingStarted2 = () => {
       <View style={styles.lowerSection}>
         {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <View
               key={index}
-              style={[
-                styles.progressStep,
-                index < currentStep ? styles.progressStepActive : styles.progressStepInactive,
+              style={[ 
+                styles.progressStep, 
+                index < currentStep ? styles.progressStepActive : styles.progressStepInactive 
               ]}
             />
           ))}
@@ -55,13 +58,43 @@ const GettingStarted2 = () => {
         <Text style={styles.subtitle1}>Enter basic details about your</Text>
         <Text style={styles.subtitle2}>home to begin.</Text>
 
-        {/* Text Input Box */}
+        {/* Home Name Text Input */}
         <TextInput
-          style={styles.textBox}
+          style={[styles.textBox, styles.lowerPlaceholder]}
           placeholder="Enter your home name"
           placeholderTextColor="#BBBBBB"
           value={homeName}
           onChangeText={(text) => setHomeName(text)}
+        />
+
+        {/* House Age Text Input */}
+        <TextInput
+          style={[styles.textBox, styles.lowerPlaceholder]}
+          placeholder="Enter the age of the house"
+          placeholderTextColor="#BBBBBB"
+          value={houseAge}
+          onChangeText={(text) => setHouseAge(text)}
+        />
+
+        {/* Primary Use Text Input */}
+        <TextInput
+          style={[styles.textBox, styles.lowerPlaceholder]}
+          placeholder="Enter the primary use of the House"
+          placeholderTextColor="#BBBBBB"
+          value={houseUse}
+          onChangeText={(text) => setHouseUse(text)}
+        />
+
+        <Text style={styles.label}>Has the house undergone</Text>
+        <Text style={styles.label}>renovations or repairs?</Text>
+
+        {/* Renovations Text Input */}
+        <TextInput
+          style={[styles.textBox, styles.lowerPlaceholder]}
+          placeholder="Yes/No, if yes, specify"
+          placeholderTextColor="#BBBBBB"
+          value={renovations}
+          onChangeText={(text) => setRenovations(text)}
         />
 
         {/* Custom Button */}
@@ -78,7 +111,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 1.5,
+    flex: 1,
     backgroundColor: '#0B417D', // Blue background
     justifyContent: 'center',
     alignItems: 'center',
@@ -125,13 +158,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
+    marginTop: -10,
+  },
+  label: {
+    fontSize: 14,
+    color: '#05173F',
+    textAlign: 'center',
+    marginBottom: 10,
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+    marginTop: -15,
   },
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 20,
-    marginTop: -45,
+    marginBottom: 6,
+    marginTop: -25,
 
   },
   progressStep: {
@@ -148,7 +191,7 @@ const styles = StyleSheet.create({
 
   textBox: {
     width: '80%',
-    height: 50,
+    height: 40,
     borderColor: '#A0A0A0',
     borderWidth: 2,
     borderRadius: 25,
@@ -158,7 +201,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#05173F',
     textAlign: 'center',
+    textAlignVertical: 'center',
     backgroundColor: '#D9D9D9',
+    marginTop: -10,
   },
 
   button: {
@@ -167,12 +212,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 90,
     borderRadius: 30,
     alignItems: 'center',
+    marginTop: -10,
   },
   buttonText: {
     fontSize: 18,
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
+  lowerPlaceholder: { textAlignVertical: 'bottom', paddingBottom: 5 },
 });
 
 

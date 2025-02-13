@@ -49,7 +49,7 @@ const GettingStarted5 = () => {
     router.push('/getstarted_5'); // Navigate to the next screen
   };
 
-  const currentStep = 4; // Current progress step
+  const currentStep = 5; // Current progress step
 
   return (
     <View style={styles.container}>
@@ -66,7 +66,7 @@ const GettingStarted5 = () => {
       <View style={styles.lowerSection}>
         {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <View
               key={index}
               style={[
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 1.5,
+    flex: 1,
     backgroundColor: '#0B417D', // Blue background
     justifyContent: 'center',
     alignItems: 'center',
