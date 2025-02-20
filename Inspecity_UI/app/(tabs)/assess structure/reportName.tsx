@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 
 const ReportName = () => {
-  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -14,18 +14,57 @@ const ReportName = () => {
   });
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const router = useRouter();
 
   if (!fontsLoaded) {
     return null;
   }
 
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access gallery is required!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      router.push({
+        pathname: "/assess structure/photoDetails",
+        params: { photo: result.assets[0].uri }
+      });
+    }
+  };
+
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access camera is required!");
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      router.push({
+        pathname: "/assess structure/photoDetails",
+        params: { photo: result.assets[0].uri }
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-        <Text style={styles.backText}>Back</Text>
-      </TouchableOpacity>
-
       <Text style={styles.title1}>NAME YOUR REPORT</Text>
       <Text style={styles.title2}>Enter a report name</Text>
 
@@ -41,7 +80,6 @@ const ReportName = () => {
         <Text style={styles.nextButtonText}>Next</Text>
       </TouchableOpacity>
 
-      {/* Bottom Sheet Modal */}
       <Modal 
         isVisible={isModalVisible} 
         onBackdropPress={() => setModalVisible(false)}
@@ -49,12 +87,15 @@ const ReportName = () => {
       >
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Capture Image</Text>
-          <TouchableOpacity style={styles.modalButton} onPress={() => alert('Take Photo')}>
+          
+          <TouchableOpacity style={styles.modalButton} onPress={takePhoto}>
             <Text style={styles.modalButtonText}>Take a Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButton} onPress={() => alert('Pick from Gallery')}>
+
+          <TouchableOpacity style={styles.modalButton} onPress={pickImage}>
             <Text style={styles.modalButtonText}>Pick from Gallery</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
@@ -71,23 +112,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#002B5B',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 5,
-  },
-  backText: {
-    fontFamily: 'Epilogue-Bold',
-    fontSize: 17,
-    color: '#FFFFFF',
   },
   title1: {
     fontFamily: 'Epilogue-Black',
@@ -144,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00A8E8',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 10,
     marginVertical: 5,
     width: '80%',
     alignItems: 'center',
