@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
-  // const router = useRouter();
   const navigation = useNavigation();
   const photo = params.photo as string;
   const [notes, setNotes] = useState('Hi, test Notes');
@@ -113,6 +112,36 @@ const PhotoDetails = () => {
             </View>
           </ScrollView>
         </View>
+
+        {/* Share Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Share With</Text>
+
+              <FlatList
+                data={contacts}
+                horizontal
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity style={styles.contactItem}>
+                    <Image source={item.image} style={styles.contactImage} />
+                    <Text style={styles.contactText}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+
+              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ImageBackground>
   );  
@@ -130,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     alignItems: 'center', 
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 43, 91, 0.7)' // Transparent overlay effect
+    backgroundColor: 'rgba(0, 43, 91, 0.7)'
   },
   header: {
     position: 'absolute',
@@ -163,7 +192,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   modalContent: {
     backgroundColor: '#FFF',
@@ -203,35 +232,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  imageContainer: { alignItems: 'center', marginVertical: 10 },
-  houseImage: { width: 100, height: 100 },
+  imageContainer: {
+    position: 'absolute',
+    top: 40,
+    left: '50%',  // Move the left edge to the center of the screen
+    transform: [{ translateX: -150 }], // Adjust based on half of the image width (250 / 2)
+    zIndex: 10, // Ensure it's above the details container
+    alignItems: 'center', // Center any child elements
+  },
+  houseImage: {
+    width: 300,
+    height: 250,
+  },  
   detailsWrapper: {
-    height: '72%', // ✅ Adjust height slightly to cover gaps
+    height: '69%',
     width: '100%',
     backgroundColor: '#FFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: 'hidden',
-    position: 'absolute', // ✅ Ensure it sticks at the bottom
-    bottom: 0, // ✅ Pin to bottom
-  },  
+    position: 'absolute',
+    bottom: 0,
+    paddingTop: 15,
+  },   
   scrollContent: {
     padding: 20, 
-    // paddingBottom: 10, // Prevents content from being cut off
   },
   detailsContainer: {
     flexGrow: 1, 
   },
-  // detailsContainer: {
-  //   width: '100%', // Full width
-  //   height: '75%', // 3/4 of screen height
-  //   backgroundColor: '#FFF',
-  //   borderTopLeftRadius: 20,
-  //   borderTopRightRadius: 20,
-  //   padding: 20,
-  //   // position: 'absolute',
-  //   bottom: 40, // Stick to the bottom of the screen
-  // },
   title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   subtitle: { textAlign: 'center', color: '#888', marginBottom: 10 },
   scannedImage: { width: '100%', height: 200, borderRadius: 10, marginBottom: 10 },

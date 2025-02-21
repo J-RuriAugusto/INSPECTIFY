@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 
@@ -15,6 +15,7 @@ const ReportName = () => {
 
   const [isModalVisible, setModalVisible] = useState(false);
   const router = useRouter();
+  const navigation = useNavigation();
 
   if (!fontsLoaded) {
     return null;
@@ -65,6 +66,13 @@ const ReportName = () => {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.title1}>NAME YOUR REPORT</Text>
       <Text style={styles.title2}>Enter a report name</Text>
 
@@ -113,6 +121,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: { flexDirection: 'row', alignItems: 'center' },
+  backIcon: { width: 30, height: 30, marginRight: 5 },
+  backText: { fontSize: 17, color: '#FFFFFF' },
   title1: {
     fontFamily: 'Epilogue-Black',
     fontSize: 30,
