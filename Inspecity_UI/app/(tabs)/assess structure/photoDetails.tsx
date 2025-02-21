@@ -75,14 +75,23 @@ const PhotoDetails = () => {
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>Living Room - Left Wall</Text>
               <Text style={styles.subtitle}>December 13, 2024 • 9:00 AM</Text>
-              <Image source={{ uri: photo }} style={styles.scannedImage} />
   
-              <View style={styles.conditionContainer}>
-                <Text style={styles.conditionText}>Condition:</Text>
-                <Text style={styles.conditionBadge}>Moderate</Text>
+              <View style={styles.rowContainer}>
+              {/* Captured Image from Camera */}
+                <View style={styles.imageWrapper}>
+                  <Image source={{ uri: photo }} style={styles.capturedImage} />
+                  <Text style={styles.scannedImageText}>Scanned Image</Text>
+                </View>
+
+                {/* Condition Details */}
+                <View style={styles.conditionWrapper}>
+                  <Text style={styles.conditionText}>Condition:</Text>
+                  <Text style={styles.conditionBadge}>Moderate</Text>
+                  <Text style={styles.detailText}>Length: 5 cm</Text>
+                  <Text style={styles.detailText}>Depth: 2 cm</Text>
+                </View>
               </View>
-              <Text style={styles.detailText}>Length: 5 cm</Text>
-              <Text style={styles.detailText}>Depth: 2 cm</Text>
+
   
               <Text style={styles.sectionTitle}>Detected Issues:</Text>
               <Text style={styles.detailText}>• Crack near the center</Text>
@@ -185,7 +194,7 @@ const styles = StyleSheet.create({
   backText: { fontSize: 17, color: '#FFFFFF' },
   shareButton: { padding: 5 },
   shareIcon: { width: 30, height: 30 },
-  saveButton: { backgroundColor: '#007AFF', padding: 12, borderRadius: 8, width: '90%', alignItems: 'center' },
+  // saveButton: { backgroundColor: '#007AFF', padding: 12, borderRadius: 8, width: '90%', alignItems: 'center' },
   buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
 
   // Modal styles
@@ -235,10 +244,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'absolute',
     top: 40,
-    left: '50%',  // Move the left edge to the center of the screen
-    transform: [{ translateX: -150 }], // Adjust based on half of the image width (250 / 2)
-    zIndex: 10, // Ensure it's above the details container
-    alignItems: 'center', // Center any child elements
+    left: '50%',
+    transform: [{ translateX: -150 }],
+    zIndex: 10,
+    alignItems: 'center'
   },
   houseImage: {
     width: 300,
@@ -263,11 +272,65 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   subtitle: { textAlign: 'center', color: '#888', marginBottom: 10 },
-  scannedImage: { width: '100%', height: 200, borderRadius: 10, marginBottom: 10 },
-  conditionContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
-  conditionText: { fontSize: 16, fontWeight: 'bold' },
-  conditionBadge: { backgroundColor: '#FFD700', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, marginLeft: 10 },
-  detailText: { fontSize: 16, marginBottom: 5 },
+  // scannedImage: { width: '100%', height: 200, borderRadius: 10, marginBottom: 10 },
+  rowContainer: {
+    flexDirection: 'row',  // Places items in a row
+    alignItems: 'center',  // Aligns items vertically
+    justifyContent: 'space-between', // Ensures spacing between image and text
+    paddingHorizontal: 20,  // Adds spacing from screen edges
+  },
+  capturedImage: {
+    width: 150,  // Adjust image size
+    height: 150,
+    borderRadius: 10, // Rounded corners for better UI
+    marginRight: 20, // Space between image and text
+    backgroundColor: '#00A8E8'
+  },
+  imageWrapper: {
+    alignItems: 'center', // Centers image and text
+  },
+  scannedImageText: {
+    marginTop: 5,
+    fontFamily: 'Epilogue-Regular',
+    fontSize: 10,
+    color: '#071C34',
+    textAlign: 'center',
+  },  
+  conditionWrapper: {
+    flex: 1, // Allows text container to take remaining space
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 10, // Added padding for spacing
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5, // Android shadow
+  },
+  conditionText: {
+    fontFamily: 'Epilogue-Bold',
+    fontSize: 15,
+    // fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#071C34'
+  },
+  conditionBadge: {
+    backgroundColor: '#FFA500',
+    fontFamily: 'Epilogue-Regular',
+    textAlign: 'center',
+    paddingVertical: 5, // More height
+    // paddingHorizontal: 15, // More width
+    fontSize: 13, // Bigger text
+    borderRadius: 15,
+    marginVertical: 5,
+    // fontWeight: 'bold',
+  },
+  detailText: {
+    fontSize: 12,
+    fontFamily: 'Epilogue-Bold',
+    color: '#071C34',
+    marginBottom: 5,
+  },  
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 10 },
   shopButton: { backgroundColor: '#3B82F6', padding: 10, borderRadius: 10, marginTop: 10, alignItems: 'center' },
   shopButtonText: { color: '#FFF', fontSize: 16 },
