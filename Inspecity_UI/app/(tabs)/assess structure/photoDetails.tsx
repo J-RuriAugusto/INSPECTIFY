@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Modal, FlatList, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import * as Sharing from 'expo-sharing';
+// import Share from 'react-native-share';
 import { useNavigation } from '@react-navigation/native';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
   const navigation = useNavigation();
   const photo = params.photo as string;
-  const [notes, setNotes] = useState('Hi, test Notes');
   
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [editModalVisible, setEditNoteModalVisible] = useState(false);
+  const [notes, setNotes] = useState('');
   // Dummy contact list
   const contacts = [
     { id: '1', name: 'Alice', image: require('../../../assets/images/user1.png') },
@@ -20,6 +22,15 @@ const PhotoDetails = () => {
     { id: '4', name: 'David', image: require('../../../assets/images/user1.png') },
     { id: '5', name: 'Emma', image: require('../../../assets/images/user1.png') },
   ];
+
+
+  const sharePhoto = async () => {
+    if (!(await Sharing.isAvailableAsync())) {
+      alert("Sharing is not available on this device");
+      return;
+    }
+    await Sharing.shareAsync(photo);
+  };  
 
   if (!photo) {
     return (
@@ -33,7 +44,7 @@ const PhotoDetails = () => {
             </TouchableOpacity>
 
             {/* Share Button */}
-            <TouchableOpacity style={styles.shareButton} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
               <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
             </TouchableOpacity>
           </View>
@@ -59,7 +70,7 @@ const PhotoDetails = () => {
           </TouchableOpacity>
   
           {/* Share Button */}
-          <TouchableOpacity style={styles.shareButton} onPress={() => setModalVisible(true)}>
+          <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
             <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
           </TouchableOpacity>
         </View>
@@ -76,7 +87,6 @@ const PhotoDetails = () => {
               <Text style={styles.title}>Living Room - Left Wall</Text>
               <Text style={styles.subtitle}>December 13, 2024 • 9:00 AM</Text>
   
-              <View style={styles.rowContainer}>
               {/* Captured Image from Camera */}
                 <View style={styles.imageWrapper}>
                   <Image source={{ uri: photo }} style={styles.capturedImage} />
@@ -87,10 +97,7 @@ const PhotoDetails = () => {
                 <View style={styles.conditionWrapper}>
                   <Text style={styles.conditionText}>Condition:</Text>
                   <Text style={styles.conditionBadge}>Moderate</Text>
-                  <Text style={styles.detailText}>Length: 5 cm</Text>
-                  <Text style={styles.detailText}>Depth: 2 cm</Text>
                 </View>
-              </View>
 
   
               <Text style={styles.sectionTitle}>Detected Issues:</Text>
@@ -105,25 +112,69 @@ const PhotoDetails = () => {
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
   
-              <View style={styles.notesContainer}>
+              <View style={styles.rowContainer}>
                 <Text style={styles.sectionTitle}>Notes</Text>
-                <TextInput
-                  style={styles.notesInput}
-                  value={notes}
-                  onChangeText={setNotes}
-                  placeholder="Enter your notes here"
-                  placeholderTextColor="#A0A0A0"
-                />
-                <TouchableOpacity style={styles.editButton}>
+                <TouchableOpacity style={styles.editButton} onPress={() => setEditNoteModalVisible(true)}>
                   <Text style={styles.editButtonText}>Edit Note</Text>
                 </TouchableOpacity>
               </View>
+                <TextInput
+                  style={styles.notesInput}
+                  placeholder="Click edit note to add/edit a note..."
+                  placeholderTextColor="#A0A0A0"
+                  value={notes}
+                  editable={false}
+                  multiline
+                />
             </View>
           </ScrollView>
         </View>
 
-        {/* Share Modal */}
+        {/* Edit Note Modal */}
         <Modal
+          animationType="slide"
+          transparent={true}
+          visible={editModalVisible}
+          onRequestClose={() => setEditNoteModalVisible(false)}
+        >
+          <View style={styles.modalEditContainer}>
+            
+            {/* Floating Close Button */}
+            <TouchableOpacity 
+              style={styles.closeEditButton} 
+              onPress={() => setEditNoteModalVisible(false)}
+            >
+              <Image 
+                source={require('../../../assets/images/close-icon.png')}  // Change the path to your image
+                style={styles.closeEditButtonImage}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.modalEditContent}>
+              <Text style={styles.modalEditTitle}>Edit Note</Text>
+              
+              <TextInput
+                style={styles.editNotesInput}
+                value={notes} 
+                onChangeText={setNotes}
+                placeholder="Enter your note here..."
+                placeholderTextColor="#A0A0A0"
+                multiline
+              />
+              
+              <TouchableOpacity 
+                style={styles.saveButton} 
+                onPress={() => setEditNoteModalVisible(false)}
+              >
+                <Text style={styles.saveButtonText}>Save Note</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+
+        {/* Share Modal */}
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={modalVisible}
@@ -138,7 +189,7 @@ const PhotoDetails = () => {
                 horizontal
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <TouchableOpacity style={styles.contactItem}>
+                  <TouchableOpacity style={styles.contactItem} onPress={sharePhoto}>
                     <Image source={item.image} style={styles.contactImage} />
                     <Text style={styles.contactText}>{item.name}</Text>
                   </TouchableOpacity>
@@ -150,7 +201,7 @@ const PhotoDetails = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </View>
     </ImageBackground>
   );  
@@ -194,10 +245,9 @@ const styles = StyleSheet.create({
   backText: { fontSize: 17, color: '#FFFFFF' },
   shareButton: { padding: 5 },
   shareIcon: { width: 30, height: 30 },
-  // saveButton: { backgroundColor: '#007AFF', padding: 12, borderRadius: 8, width: '90%', alignItems: 'center' },
   buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
 
-  // Modal styles
+  // Share Modal styles
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -272,45 +322,41 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
   subtitle: { textAlign: 'center', color: '#888', marginBottom: 10 },
-  // scannedImage: { width: '100%', height: 200, borderRadius: 10, marginBottom: 10 },
-  rowContainer: {
-    flexDirection: 'row',  // Places items in a row
-    alignItems: 'center',  // Aligns items vertically
-    justifyContent: 'space-between', // Ensures spacing between image and text
-    paddingHorizontal: 20,  // Adds spacing from screen edges
-  },
   capturedImage: {
-    width: 150,  // Adjust image size
-    height: 150,
-    borderRadius: 10, // Rounded corners for better UI
-    marginRight: 20, // Space between image and text
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    borderRadius: 10,
     backgroundColor: '#00A8E8'
   },
   imageWrapper: {
-    alignItems: 'center', // Centers image and text
+    alignSelf: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
   scannedImageText: {
     marginTop: 5,
     fontFamily: 'Epilogue-Regular',
     fontSize: 10,
     color: '#071C34',
-    textAlign: 'center',
+    textAlign: 'center'
   },  
   conditionWrapper: {
-    flex: 1, // Allows text container to take remaining space
+    width: '40%',
+    alignSelf: 'center',
     backgroundColor: '#FFF',
-    borderRadius: 10,
-    padding: 10, // Added padding for spacing
+    borderRadius: 15,
+    padding: 5,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 5, // Android shadow
+    elevation: 5
   },
   conditionText: {
     fontFamily: 'Epilogue-Bold',
     fontSize: 15,
-    // fontWeight: 'bold',
     textAlign: 'center',
     color: '#071C34'
   },
@@ -318,26 +364,120 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFA500',
     fontFamily: 'Epilogue-Regular',
     textAlign: 'center',
-    paddingVertical: 5, // More height
-    // paddingHorizontal: 15, // More width
-    fontSize: 13, // Bigger text
+    fontSize: 13,
     borderRadius: 15,
-    marginVertical: 5,
-    // fontWeight: 'bold',
+    marginVertical: 3,
   },
   detailText: {
-    fontSize: 12,
-    fontFamily: 'Epilogue-Bold',
-    color: '#071C34',
-    marginBottom: 5,
+    fontSize: 15,
+    fontFamily: 'Epilogue-Medium',
+    color: '#000',
+    marginBottom: 10,
   },  
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 10 },
-  shopButton: { backgroundColor: '#3B82F6', padding: 10, borderRadius: 10, marginTop: 10, alignItems: 'center' },
-  shopButtonText: { color: '#FFF', fontSize: 16 },
-  notesContainer: { marginTop: 20 },
-  notesInput: { backgroundColor: '#EEE', padding: 10, borderRadius: 10, marginTop: 5 },
-  editButton: { backgroundColor: '#22C55E', padding: 10, borderRadius: 10, marginTop: 10, alignItems: 'center' },
-  editButtonText: { color: '#FFF', fontSize: 16 }
+  sectionTitle: {
+    color: '#FFF',
+    fontSize: 15,
+    fontFamily: 'Epilogue-Bold',
+    marginBottom: 5,
+    backgroundColor: '#0B417D',
+    borderRadius: 15,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    alignSelf: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5
+  },  
+  shopButton: { backgroundColor: '#ACD3FF', borderRadius: 15, alignSelf: 'center', paddingHorizontal: 9, paddingVertical: 5, width: '60%', marginBottom: 5,   // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5},
+  shopButtonText: { color: '#0B417D', fontSize: 15, fontFamily: 'Epilogue-Bold', textAlign: 'center' },
+  rowContainer: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between', // Pushes "Edit Note" to the right
+    alignItems: 'center', // Align items in the same row
+    marginBottom: 10
+  },
+  notesInput: { backgroundColor: '#FFF', borderRadius: 15,  // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    flex: 1,
+    fontSize: 16,
+    color: '#32373E',
+    fontFamily: 'Epilogue-Regular',
+  },
+  editNotesInput: {
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    flex: 1,
+    fontSize: 16,
+    color: '#32373E',
+    fontFamily: 'Epilogue-Regular',
+    textAlignVertical: 'top',
+  },
+  editButton: { backgroundColor: '#B0EDEB', padding: 10, borderRadius: 15, paddingHorizontal: 9, paddingVertical: 5,   // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  editButtonText: { color: '#05173F', fontSize: 15, fontFamily: 'Epilogue-Bold' },
+  modalEditContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    position: 'relative'
+  },
+  modalEditContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    height: '60%',
+    width: '90%',
+    alignSelf: 'center'
+  },
+  modalEditTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
+  closeEditButton: {
+    position: 'absolute',
+    top: 100,
+    right: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeEditButtonImage: {
+    width: 35,  // Adjust based on your image size
+    height: 35,
+    resizeMode: 'contain',  // Ensures it fits well
+  },
+  saveButton: {
+    position: 'absolute',
+    bottom: -50,
+    right: 0,
+    backgroundColor: '#ADE792',
+    borderRadius: 8,
+    width: '40%',
+    alignItems: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 5
+  },
+  saveButtonText: {
+    color: '#05173F',
+    fontSize: 18,
+    fontFamily: 'Epilogue-Bold',
+  },  
 });
 
 export default PhotoDetails;
