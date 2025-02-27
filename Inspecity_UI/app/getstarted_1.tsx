@@ -98,14 +98,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title1: {
-    fontSize: 25,
+    fontSize: 30,
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
   },
   title2: {
-    fontSize: 40,
+    fontSize: 50,
     color: '#2852AE',
     textAlign: 'center',
     marginTop: -10,
@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 20,
-    marginTop: -50,
+    marginBottom: 50,
+    marginTop: -45,
   },
   progressStep: {
     width: 50,
@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 90,
     borderRadius: 30,
     alignItems: 'center',
+    marginTop: 50
   },
   buttonText: {
     fontSize: 18,

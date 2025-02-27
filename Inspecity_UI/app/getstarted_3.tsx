@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -52,7 +52,9 @@ const GettingStarted = () => {
 
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
-
+        {/* Scrollable form */}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+                
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
             <Picker.Item label="Type of House" value="" enabled={false} />
@@ -108,6 +110,8 @@ const GettingStarted = () => {
           />
         </View>
 
+        </ScrollView>
+
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
@@ -127,14 +131,17 @@ const styles = StyleSheet.create({
   progressStep: { width: 50, height: 5, borderRadius: 10 },
   progressStepActive: { backgroundColor: '#0B417D' },
   progressStepInactive: { backgroundColor: '#E0E0E0' },
-  textBox1: { width: '70%', height: 40, borderColor: '#A0A0A0', borderWidth: 2, borderRadius: 25, paddingHorizontal: 10, fontFamily: 'Archivo-Regular', fontSize: 13, color: '#05173F', textAlign: 'center', backgroundColor: '#D9D9D9', marginLeft:10, marginBottom:5 },
-  textBox: { width: '30%', height: 40, borderColor: '#A0A0A0', borderWidth: 2, borderRadius: 25, paddingHorizontal: 10, fontFamily: 'Archivo-Regular', fontSize: 13, color: '#05173F', textAlign: 'center', backgroundColor: '#D9D9D9', marginLeft:10 },
-  pickerContainer: { width: '60%', backgroundColor: '#D9D9D9', borderRadius: 25, borderWidth: 2, borderColor: '#A0A0A0', overflow: 'hidden', marginBottom: 10, height: 50 },
-  picker: { height: 50, fontSize: 12, color: '#05173F' },
-  button: { backgroundColor: '#08294E', paddingVertical: 10, paddingHorizontal: 90, borderRadius: 30, alignItems: 'center' },
+  textBox1: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
+  textBox: { width: '40%', padding: 10, borderRadius: 25, fontFamily: 'Archivo-Regular', fontSize: 13, textAlign: 'center',textAlignVertical:'center', backgroundColor: '#D9D9D9', marginLeft:10 },
+  pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
+  picker: { height: 55, fontSize: 12, color: '#05173F', textAlign: 'center', textAlignVertical:'top' },
+  button: {width:'70%', height: '12%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 20, marginHorizontal: 75 },
   buttonText: { fontSize: 18, color: '#FFFFFF', fontFamily: 'Archivo-Bold' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', marginBottom: 10, marginLeft: -20 },
-  label: { fontSize: 14, color: '#05173F', fontFamily: 'Archivo-Regular', textAlign: 'auto' }
+  inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', marginBottom: 10, marginLeft: -45 },
+  label: { fontSize: 14, color: '#05173F', fontFamily: 'Archivo-Regular', textAlign: 'auto' },
+  scrollView: { width: '100%' },
+  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
+  
 });
 
 export default GettingStarted;

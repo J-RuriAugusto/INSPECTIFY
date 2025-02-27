@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
-    marginTop:-5,
+    marginTop:-50,
 
   },
   progressStep: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     marginBottom: 5,
-    marginTop: 10,
+    marginTop: 55,
   },
   button1: {
     backgroundColor: '#38516D', // Custom button color

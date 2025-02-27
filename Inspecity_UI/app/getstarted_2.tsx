@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#05173F',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
-    marginTop: -15,
+    marginTop: -10,
   },
   progressBar: {
     flexDirection: 'row',
@@ -189,22 +189,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0', // Inactive color
   },
 
-  textBox: {
-    width: '80%',
-    height: 40,
-    borderColor: '#A0A0A0',
-    borderWidth: 2,
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    fontFamily: 'Archivo-Regular',
-    fontSize: 16,
-    color: '#05173F',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: '#D9D9D9',
-    marginTop: -10,
-  },
+  textBox: { width: '80%', height: 35, padding: 3, borderRadius: 25, fontFamily: 'Archivo-Regular', fontSize: 15, textAlign: 'center',textAlignVertical:'center', backgroundColor: '#D9D9D9', marginBottom: 10 },
+
 
   button: {
     backgroundColor: '#08294E', // Custom button color
@@ -212,7 +198,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 90,
     borderRadius: 30,
     alignItems: 'center',
-    marginTop: -10,
+  
   },
   buttonText: {
     fontSize: 18,
