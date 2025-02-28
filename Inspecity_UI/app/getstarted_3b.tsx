@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 
 const GettingStarted = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
   const [selectedHouseType, setSelectedHouseType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState("");
@@ -28,8 +30,38 @@ const GettingStarted = () => {
     return null;
   }
 
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
   const handleNavigateToGetStarted4 = () => {
-    router.push('/getstarted_4');
+    const updatedHomeData = {
+      ...parsedHomeData,
+      selectedHouseType: selectedHouseType === "others" 
+        ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+        : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+
+      selectedMaterial: selectedMaterial === "others" 
+        ? (otherMaterial.trim() !== "" ? otherMaterial : null) 
+        : (selectedMaterial.trim() !== "" ? selectedMaterial : null),
+
+      selectedFlooring: selectedFlooring === "others" 
+        ? (otherFlooring.trim() !== "" ? otherFlooring : null) 
+        : (selectedFlooring.trim() !== "" ? selectedFlooring : null),
+
+      selectedWall: selectedWall === "others" 
+        ? (otherWall.trim() !== "" ? otherWall : null) 
+        : (selectedWall.trim() !== "" ? selectedWall : null),
+
+      selectedCeiling: selectedCeiling === "others" 
+        ? (otherCeiling.trim() !== "" ? otherCeiling : null) 
+        : (selectedCeiling.trim() !== "" ? selectedCeiling : null),
+        };
+  
+    router.push({
+      pathname: '/getstarted_4',
+      params: { homeData: JSON.stringify(updatedHomeData) },
+    });
   };
   
   const currentStep = 4;

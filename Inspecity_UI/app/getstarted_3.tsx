@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 
 const GettingStarted = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
   const [age, setAge] = useState(''); // Separate state for Age
-  const [height, setHeight] = useState(''); // Separate state for Height
+  const [numFloor, setNumFloor] = useState(''); // Separate state for Height
   const [lotArea, setLotArea] = useState(''); // Separate state for lot area
   const [floorArea, setFloorArea] = useState(''); // Separate state for floor area
   const [selectedHouseType, setSelectedHouseType] = useState(""); // Separate state for house type
@@ -25,9 +27,42 @@ const GettingStarted = () => {
     return null;
   }
 
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
   const handleNavigateToGetStarted3b = () => {
-    router.push('/getstarted_3b');
+    if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
+      alert("Number of house floors must be a positive whole number.");
+      return;
+    }
+  
+    if (lotArea.trim() !== "" && (isNaN(parseFloat(lotArea)) || parseFloat(lotArea) <= 0)) {
+      alert("Estimated lot area must be a positive number.");
+      return;
+    }
+  
+    if (floorArea.trim() !== "" && (isNaN(parseFloat(floorArea)) || parseFloat(floorArea) <= 0)) {
+      alert("Estimated floor area must be a positive number.");
+      return;
+    }
+  
+    const updatedHomeData = {
+      ...parsedHomeData,
+      typeOfHouse: selectedHouseType === "others" 
+    ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+    : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+      numFloor: numFloor.trim() !== "" ? parseInt(numFloor) : null,
+      lotArea: lotArea.trim() !== "" ? parseFloat(lotArea) : null,
+      floorArea: floorArea.trim() !== "" ? parseFloat(floorArea) : null,
+    };
+  
+    router.push({
+      pathname: "/getstarted_3b",
+      params: { homeData: JSON.stringify(updatedHomeData) },
+    });
   };
+  
 
   const currentStep = 3;
 
@@ -78,13 +113,13 @@ const GettingStarted = () => {
         )}
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>Enter the Height of the House</Text>
+          <Text style={styles.label}>Number of house floors</Text>
           <TextInput 
             style={styles.textBox} 
             placeholder="(1, 2, 3, etc.)" 
             placeholderTextColor="#BBBBBB" 
-            value={height} 
-            onChangeText={(text) => setHeight(text)} 
+            value={numFloor} 
+            onChangeText={(text) => setNumFloor(text)} 
           />
         </View>
 

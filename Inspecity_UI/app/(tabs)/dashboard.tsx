@@ -1,17 +1,72 @@
-import React from 'react';
-import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler } from 'react-native';
 import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
+import useUserID from "../useUserID";
+import * as Location from 'expo-location';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Dashboard = () => {
   const [search, setSearch] = React.useState('');
-  
+  const userId = useUserID();
+  const [houseName, setHouseName] = useState('NAME OF HOUSE');
+  const [location, setLocation] = useState('LOCATION');
+
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../assets/fonts/Archivo-Regular.ttf'),
     'Epilogue-Bold': require('../../assets/fonts/Epilogue-Bold.ttf'),
   });
+
+  useEffect(() => {
+    if (userId) {
+      fetchHouseDetails(userId);
+    }
+  }, [userId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction
+      );
+
+      return () => backHandler.remove();
+    }, [])
+  );
+
+  const fetchHouseDetails = async (userId: String) => {
+    try {
+      const response = await fetch(`http://172.16.0.137:5000/homeowners/${userId}/default_home`);
+      const data = await response.json();
+      setHouseName(data.homeName && data.homeName.trim() ? data.homeName : "NAME OF HOUSE");
+      if (data.latitude && data.longitude) {
+        // Use reverse geocoding to get the address from latitude and longitude
+        let reverseGeocode = await Location.reverseGeocodeAsync({ latitude: data.latitude, longitude: data.longitude });
+  
+        // Extract the relevant parts of the address
+        if (reverseGeocode.length > 0) {
+          const { city, district, region, country, street, name } = reverseGeocode[0];
+  
+          // Format the address as Baranggay, Municipality/District, Province/City
+          const formattedLocation = `${city || district || ''}, ${region || ''}`;
+          setLocation(formattedLocation.trim());
+        } else {
+          setLocation("LOCATION");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching house details:", error);
+      setHouseName("NAME OF HOUSE");  // Ensure default values on failure
+      setLocation("LOCATION");
+    }
+  };
 
   if (!fontsLoaded) {
     return null; 
@@ -57,8 +112,8 @@ const Dashboard = () => {
       </View>
 
       {/* Main Content */}
-      <Text style={styles.title1}>NAME OF HOUSE</Text>
-      <Text style={styles.title2}>Location</Text>
+      <Text style={styles.title1}>{houseName}</Text>
+      <Text style={styles.title2}>{location}</Text>
 
       {/* Search Bar */}
       <TextInput

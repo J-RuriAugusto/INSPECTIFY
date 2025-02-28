@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 
@@ -23,8 +23,37 @@ const GettingStarted2 = () => {
   }
 
   const handleNavigateToGetStarted3 = () => {
-    router.push('/getstarted_3'); // Navigate to the next screen
+    if (!homeName.trim()) {
+      Alert.alert('Error', 'Home name is required.');
+      return;
+    }
+  
+    let age = houseAge.trim() !== "" ? parseInt(houseAge, 10) : null;
+  
+    if (age !== null && (isNaN(age) || age <= 0)) {
+      Alert.alert('Error', 'Please enter a valid positive integer for the house age.');
+      return;
+    }
+  
+    if (age !== null) {
+      setHouseAge(age.toString()); // Ensure UI reflects parsed value
+    }
+  
+    const homeData = JSON.stringify({ 
+      homeName, 
+      houseAge: age,
+      houseUse: houseUse.trim() !== "" ? houseUse : null, 
+      renovations: renovations.trim() !== "" ? renovations : null
+    });
+  
+    router.push({
+      pathname: '/getstarted_3',
+      params: { homeData },
+    });
   };
+  
+  
+  
 
   const currentStep = 2; // Current progress step
 
