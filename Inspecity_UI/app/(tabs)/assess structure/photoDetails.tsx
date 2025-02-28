@@ -84,17 +84,14 @@ const PhotoDetails = () => {
                 <View style={styles.conditionWrapper}>
                   <Text style={styles.conditionText}>Condition:</Text>
                   <Text style={styles.conditionBadge}>Moderate</Text>
+                  <View style={styles.rowContainer}>
+                    <Text style={styles.ageText}>Age:</Text><Text style={styles.ageNumText}>20 years</Text>
+                  </View>
                 </View>
 
   
               <Text style={styles.sectionTitle}>Detected Issues:</Text>
               <Text style={styles.detailText}>• Crack near the center</Text>
-  
-              <Text style={styles.sectionTitle}>Material:</Text>
-              <View style={styles.rowContainer}>
-                <Text style={styles.concText}>• Concrete </Text><Text style={styles.ageText}>Age:</Text><Text style={styles.ageNumText}>20 years</Text>
-              </View>
-  
               <Text style={styles.sectionTitle}>Recommendations:</Text>
               <Text style={styles.detailText}>• Seal cracks using epoxy.</Text>
               <TouchableOpacity style={styles.shopButton}>
@@ -231,8 +228,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#FFF',
     borderRadius: 15,
-    padding: 5,
-    marginBottom: 10,
+    padding: 10,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -265,23 +262,16 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5
   },
-  concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000' },  
-  ageText: {
+  ageNumText: {
     backgroundColor: '#B7B7B7',
     color: '#FFF',
-    fontFamily: 'Epilogue-Bold',
+    fontFamily: 'Epilogue-Medium',
     fontSize: 15,
     borderRadius: 15,
     paddingHorizontal: 9,
-    paddingVertical: 5,
-    right: -10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
+    paddingVertical: 2,
   }, 
-  ageNumText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000', right: 55 },
+  ageText: { fontSize: 15, fontFamily: 'Epilogue-Bold', color: '#071C34' },
   shopButton: {
     backgroundColor: '#ACD3FF',
     borderRadius: 15,
@@ -297,7 +287,7 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   shopButtonText: { color: '#0B417D', fontSize: 15, fontFamily: 'Epilogue-Bold', textAlign: 'center' },
-  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 },
   notesInput: {
     backgroundColor: '#FFF',
     borderRadius: 15,
@@ -310,6 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#32373E',
     fontFamily: 'Epilogue-Regular',
+    marginTop: 10
   },
   editNotesInput: {
     backgroundColor: '#FFF',
