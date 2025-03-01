@@ -12,6 +12,7 @@ const Dashboard = () => {
   const userId = useUserID();
   const [houseName, setHouseName] = useState('NAME OF HOUSE');
   const [location, setLocation] = useState('LOCATION');
+  const API_KEY = 'insert API KEY here';
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
@@ -41,19 +42,27 @@ const Dashboard = () => {
     }, [])
   );
 
-  const fetchHouseDetails = async (userId: String) => {
+  const fetchHouseDetails = async (userId: string) => {
     try {
-      const response = await fetch(`http://172.16.0.137:5000/homeowners/${userId}/default_home`);
+      const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homeowners/${userId}/default_home`, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': API_KEY, // Add the API key header
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch house details');
+      }
       const data = await response.json();
-      setHouseName(data.homeName && data.homeName.trim() ? data.homeName : "NAME OF HOUSE");
+      setHouseName(data.home_name && data.home_name.trim() ? data.home_name : "NAME OF HOUSE");
       if (data.latitude && data.longitude) {
         // Use reverse geocoding to get the address from latitude and longitude
         let reverseGeocode = await Location.reverseGeocodeAsync({ latitude: data.latitude, longitude: data.longitude });
-  
+
         // Extract the relevant parts of the address
         if (reverseGeocode.length > 0) {
           const { city, district, region, country, street, name } = reverseGeocode[0];
-  
+
           // Format the address as Baranggay, Municipality/District, Province/City
           const formattedLocation = `${city || district || ''}, ${region || ''}`;
           setLocation(formattedLocation.trim());
@@ -67,6 +76,7 @@ const Dashboard = () => {
       setLocation("LOCATION");
     }
   };
+
 
   if (!fontsLoaded) {
     return null; 

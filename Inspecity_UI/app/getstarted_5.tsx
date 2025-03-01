@@ -12,6 +12,7 @@ const GettingStarted = () => {
   const [longitude, setLongitude] = useState<number | null>(null);
   const { homeData } = useLocalSearchParams();
   const userId = uuid.v4();
+  const API_KEY = 'insert API KEY here';
   console.log(homeData)
 
   const router = useRouter();
@@ -71,11 +72,12 @@ const GettingStarted = () => {
       is_default: true,
     };
 
-    try{
-      const homeownerResponse = await fetch('http://172.16.0.137:5000/homeowners', {
+    try {
+      const homeownerResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homeowners', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY, // Add the API key header
         },
         body: JSON.stringify({
           homeowner_id: userId, // Use the generated UUID
@@ -86,10 +88,11 @@ const GettingStarted = () => {
       }
       console.log('Homeowner created successfully');
     
-      const homeResponse = await fetch('http://172.16.0.137:5000/homes', {
+      const homeResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY, // Add the API key header
         },
         body: JSON.stringify(updatedHomeData),
       });
@@ -106,8 +109,6 @@ const GettingStarted = () => {
     } catch (error) {
       console.error('Error:', error);
     }
-
-
   };
 
   if (!fontsLoaded) {
