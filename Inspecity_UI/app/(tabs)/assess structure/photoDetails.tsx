@@ -94,7 +94,10 @@ const PhotoDetails = () => {
               <Text style={styles.detailText}>• Crack near the center</Text>
               <Text style={styles.sectionTitle}>Recommendations:</Text>
               <Text style={styles.detailText}>• Seal cracks using epoxy.</Text>
-              <TouchableOpacity style={styles.shopButton}>
+              <TouchableOpacity 
+                style={styles.shopButton} 
+                onPress={() => navigation.navigate('nearby_shops')}
+              >
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
   
