@@ -63,7 +63,7 @@ const NearbyShops = () => {
 
   // Fetch Nearby Stores from Google Places API
   const fetchNearbyStores = async (latitude: number, longitude: number) => {
-    const radius = 3000;
+    const radius = 2000;
     const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
     const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
 
@@ -116,7 +116,7 @@ const NearbyShops = () => {
 
   return (
     <View style={styles.container}>
-      {/* Map */}
+      {/* Map View takes 2/3 of the screen */}
       <MapView
         style={styles.map}
         ref={mapRef}
@@ -142,65 +142,73 @@ const NearbyShops = () => {
         ))}
       </MapView>
 
-      {/* Store List */}
-      <FlatList
-        horizontal
-        data={stores}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => {
-              setSelectedCard(item.name);
-              mapRef.current?.animateToRegion(
-                {
-                  latitude: item.coordinates.latitude,
-                  longitude: item.coordinates.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                },
-                1000
-              );
-            }}
-            style={[
-              styles.card,
-              item.name === selectedCard && styles.activeCard,
-            ]}
-          >
-            <Image source={{ uri: item.image }} style={styles.image} />
-            <View style={styles.cardContent}>
-              <Text style={styles.name} numberOfLines={1}>
-                {item.name}
-              </Text>
-              <Text style={styles.rating}>⭐ {item.rating}</Text>
-              <Text style={styles.address} numberOfLines={1}>
-                {item.address}
-              </Text>
-              {item.phone && (
-                <Text style={styles.phone} numberOfLines={1}>
-                  📞 {item.phone}
+      {/* Store List at the Bottom */}
+      <View style={styles.storeList}>
+        <FlatList
+          horizontal
+          data={stores}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => {
+                setSelectedCard(item.name);
+                mapRef.current?.animateToRegion(
+                  {
+                    latitude: item.coordinates.latitude,
+                    longitude: item.coordinates.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  },
+                  1000
+                );
+              }}
+              style={[
+                styles.card,
+                item.name === selectedCard && styles.activeCard,
+              ]}
+            >
+              <Image source={{ uri: item.image }} style={styles.image} />
+              <View style={styles.cardContent}>
+                <Text style={styles.name} numberOfLines={1}>
+                  {item.name}
                 </Text>
-              )}
-            </View>
-          </Pressable>
-        )}
-        showsHorizontalScrollIndicator={false}
-      />
+                <Text style={styles.rating}>⭐ {item.rating}</Text>
+                <Text style={styles.address} numberOfLines={1}>
+                  {item.address}
+                </Text>
+                {item.phone && (
+                  <Text style={styles.phone} numberOfLines={1}>
+                    📞 {item.phone}
+                  </Text>
+                )}
+              </View>
+            </Pressable>
+          )}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 18 },
+  map: {
+    flex: 5, // Takes up 2/3 of the screen
+  },
+  storeList: {
+    flex: 1, // Takes up 1/3 of the screen
+    paddingVertical: 30,
+  },
   card: {
     backgroundColor: "#fff",
-    padding: 10,
+    padding: 12,
     borderRadius: 10,
-    marginHorizontal: 5,
+    marginHorizontal: 6,
     flexDirection: "row",
     alignItems: "center",
-    width: 260, // Smaller size
-    height: 180, // Shorter height
+    width: 280, // Adjust width
+    height: 100, // Adjust height for consistency
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -211,8 +219,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#E7E3AC",
   },
   image: {
-    width: 120, // Smaller image
-    height: 120,
+    width: 80,
+    height: 80,
     borderRadius: 8,
     marginRight: 10,
   },
@@ -221,21 +229,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 2,
   },
   rating: {
     fontSize: 12,
     color: "#555",
-    marginBottom: 2,
   },
   address: {
     fontSize: 12,
     color: "#777",
-    marginBottom: 2,
   },
   phone: {
     fontSize: 12,
-    color: "#777",
+    color: "#555",
+    marginTop: 2,
   },
 });
 
