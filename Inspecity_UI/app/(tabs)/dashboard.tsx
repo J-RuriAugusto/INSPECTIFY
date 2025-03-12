@@ -6,13 +6,14 @@ import { Text } from '@/components/Themed';
 import useUserID from "../useUserID";
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
+import HomeDetails from '../../constants/HomeDetails'
 
 const Dashboard = () => {
   const [search, setSearch] = React.useState('');
   const userId = useUserID();
   const [houseName, setHouseName] = useState('NAME OF HOUSE');
   const [location, setLocation] = useState('LOCATION');
-  const API_KEY = 'insert API KEY here';
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
@@ -44,6 +45,7 @@ const Dashboard = () => {
 
   const fetchHouseDetails = async (userId: string) => {
     try {
+      console.log(`IT is: ${userId}`)
       const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homeowners/${userId}/default_home`, {
         method: 'GET',
         headers: {
@@ -55,7 +57,9 @@ const Dashboard = () => {
       }
       const data = await response.json();
       setHouseName(data.home_name && data.home_name.trim() ? data.home_name : "NAME OF HOUSE");
+      HomeDetails.setHomeId(data.home_id)
       if (data.latitude && data.longitude) {
+        HomeDetails.setHomeLocation(data.latitude, data.longitude);
         // Use reverse geocoding to get the address from latitude and longitude
         let reverseGeocode = await Location.reverseGeocodeAsync({ latitude: data.latitude, longitude: data.longitude });
 

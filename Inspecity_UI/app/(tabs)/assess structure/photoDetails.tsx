@@ -1,15 +1,175 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Modal, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
+import Modal from 'react-native-modal'; // Only import Modal from react-native-modal
+import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
   const navigation = useNavigation();
+  const router = useRouter();
   const photo = params.photo as string;
+  const reportName = params.reportName as string;
+  const homeId = params.homeId as string;
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
+  console.log("ReportName: ")
+  console.log(reportName)
+  console.log("HomeID: ")
+  console.log(homeId)
+  console.log("Photo URI: ");
+  console.log(photo);
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
+  const [reportID, setReportID] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [condition, setCondition] = useState('');
+  const [annotatedImage, setAnnotatedImage] = useState('');
+  const [material, setMaterial] = useState('');
+  const [recommendations, setRecommendations] = useState('');
+  const [damageTypes, setDamageTypes] = useState<string[]>([]); // State for detected issues
+  const [isImageModalVisible, setImageModalVisible] = useState(false); // State for full-screen image modal
+  const [dateCreated, setDateCreated] = useState('');
+
+  useEffect(() => {
+    if (photo) {
+      uploadImageToCloudinary(photo);
+    }
+  }, [photo]);
+  
+  useEffect(() => {
+    if (reportID) {
+      fetchReportDetails(reportID);
+    }
+  }, [reportID]);
+
+  const fetchReportDetails = async (reportId:number) => {
+    try {
+      const response = await axios.get(`https://flask-railway-sample-production.up.railway.app/reports/${reportId}`, {
+        headers: {
+          'X-API-KEY': API_KEY,
+        },
+      });
+
+      if (response.data) {
+        setAnnotatedImage(response.data.annotated_image);
+        setCondition(response.data.condition);
+        setMaterial(response.data.material);
+        setRecommendations(response.data.recommendations);
+        setDamageTypes(response.data.damage_types || []);
+        setDateCreated(response.data.date_created);
+      }
+    } catch (error) {
+      console.error('Error fetching report details: ', error);
+      Alert.alert('Error', 'Failed to fetch report details');
+    }
+  };
+
+
+  const uploadImageToCloudinary = async (uri: string) => {
+    try {
+      setIsUploading(true);
+
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      if (!fileInfo.exists) {
+        throw new Error(`File does not exist at path: ${uri}`);
+      }
+
+      const fileBase64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+
+      const formData = new FormData();
+      formData.append('file', `data:image/jpeg;base64,${fileBase64}`);
+      formData.append('upload_preset', 'Inspectify_images');
+      formData.append('cloud_name', 'dyk1pt3m0');
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dyk1pt3m0/image/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const imageUrl = response.data.secure_url;
+      await createReport(imageUrl);
+      setIsUploading(false);
+    } catch (error) {
+      console.error('Error uploading image: ', error);
+      setIsUploading(false);
+      Alert.alert('Error', 'Failed to upload image');
+    }
+  };
+
+  const createReport = async (imageUrl: string) => {
+    try {
+      // Convert homeId to a number
+      const homeIdNumber = parseInt(homeId, 10);
+  
+      // Log the data being sent
+      console.log("Sending data:", {
+        home_id: homeIdNumber,
+        report_name: reportName,
+        url: imageUrl,
+      });
+  
+      const response = await axios.post('https://flask-railway-sample-production.up.railway.app/createReport', {
+        home_id: homeIdNumber,
+        report_name: reportName,
+        url: imageUrl,
+      }, {
+        headers: {
+          'Content-Type': 'application/json', // Ensure the correct content type
+          'X-API-KEY': API_KEY,
+        },
+      });
+  
+      console.log("Response:", response.data);
+  
+      if (response.status === 200) {
+        setReportID(Number(response.data.report_id));
+        Alert.alert('Success', 'Report created successfully');
+      } else {
+        Alert.alert('Error', 'Failed to create report');
+      }
+    } catch (error) {
+      console.error('Error creating report: ', error);
+      Alert.alert('Error', 'An error occurred while creating the report');
+    }
+  };
+
+  const updateNote = async () => {
+    if (!reportID) {
+      Alert.alert("Error", "Report ID is missing.");
+      return;
+    }
+  
+    try {
+      const response = await axios.put(
+        `https://flask-railway-sample-production.up.railway.app/report/${reportID}/note`,
+        { note: notes },
+        {
+          headers: {
+            'X-API-KEY': API_KEY,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        Alert.alert("Success", "Note updated successfully");
+        setEditNoteModalVisible(false);
+      } else {
+        Alert.alert("Error", "Failed to update note");
+      }
+    } catch (error) {
+      console.error("Error updating note:", error);
+      Alert.alert("Error", "An error occurred while updating the note");
+    }
+  };
 
   const sharePhoto = async () => {
     if (!(await Sharing.isAvailableAsync())) {
@@ -46,6 +206,8 @@ const PhotoDetails = () => {
     );
   }
 
+  
+
   return (
     <ImageBackground source={require('../../../assets/images/background.png')} style={styles.background}>
       <View style={styles.container}>
@@ -72,31 +234,37 @@ const PhotoDetails = () => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>Living Room - Left Wall</Text>
-              <Text style={styles.subtitle}>December 13, 2024 • 9:00 AM</Text>
+              <Text style={styles.subtitle}>{dateCreated || 'Loading date...'}</Text>
   
               {/* Captured Image from Camera */}
-                <View style={styles.imageWrapper}>
-                  <Image source={{ uri: photo }} style={styles.capturedImage} />
-                  <Text style={styles.scannedImageText}>Scanned Image</Text>
-                </View>
+              <View style={styles.imageWrapper}>
+                <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+                  <Image source={{ uri: annotatedImage }} style={styles.capturedImage} />
+                </TouchableOpacity>
+                <Text style={styles.scannedImageText}>Scanned Image</Text>
+              </View>
 
                 {/* Condition Details */}
                 <View style={styles.conditionWrapper}>
-                  <Text style={styles.conditionText}>Condition:</Text>
-                  <Text style={styles.conditionBadge}>Moderate</Text>
+                  <Text style={styles.conditionText}>Overall Condition:</Text>
+                  <Text style={styles.conditionBadge}>{condition}</Text>
                 </View>
 
   
+              {/* Detected Issues */}
               <Text style={styles.sectionTitle}>Detected Issues:</Text>
-              <Text style={styles.detailText}>• Crack near the center</Text>
-  
+              {damageTypes.map((damage, index) => (
+                <Text key={index} style={styles.detailText}>• {damage}</Text>
+              ))}
+
+
               <Text style={styles.sectionTitle}>Material:</Text>
               <View style={styles.rowContainer}>
-                <Text style={styles.concText}>• Concrete </Text><Text style={styles.ageText}>Age:</Text><Text style={styles.ageNumText}>20 years</Text>
+                <Text style={styles.concText}>• {material} </Text>
               </View>
   
               <Text style={styles.sectionTitle}>Recommendations:</Text>
-              <Text style={styles.detailText}>• Seal cracks using epoxy.</Text>
+              <Text style={styles.detailText}>• {recommendations}</Text>
               <TouchableOpacity style={styles.shopButton}>
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
@@ -117,14 +285,31 @@ const PhotoDetails = () => {
                 />
             </View>
           </ScrollView>
+          
         </View>
+
+        {/* Full Screen Image Modal */}
+        <Modal 
+          isVisible={isImageModalVisible} 
+          onBackdropPress={() => setImageModalVisible(false)} 
+          style={{ margin: 0, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <View style={{ backgroundColor: 'white', padding: 10, borderRadius: 10 }}>
+            <TouchableOpacity onPress={() => setImageModalVisible(false)}>
+              <Text style={{ alignSelf: 'flex-end', padding: 10, fontSize: 18 }}>Close</Text>
+            </TouchableOpacity>
+            <Image 
+              source={{ uri: annotatedImage }} 
+              style={{ width: 300, height: 400, resizeMode: 'contain' }} 
+            />
+          </View>
+        </Modal>
 
         {/* Edit Note Modal */}
         <Modal
-          animationType="slide"
-          transparent={true}
-          visible={editModalVisible}
-          onRequestClose={() => setEditNoteModalVisible(false)}
+          isVisible={editModalVisible} // Use isVisible instead of visible
+          onBackdropPress={() => setEditNoteModalVisible(false)}
+          style={styles.modalEditContainer}
         >
           <View style={styles.modalEditContainer}>
             
@@ -153,13 +338,25 @@ const PhotoDetails = () => {
               
               <TouchableOpacity 
                 style={styles.saveButton} 
-                onPress={() => setEditNoteModalVisible(false)}
+                onPress={updateNote}
               >
                 <Text style={styles.saveButtonText}>Save Note</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+
+        {/* Uploading Modal */}
+          <Modal 
+            isVisible={isUploading} 
+            backdropOpacity={0.5}
+            style={styles.uploadingModal}
+          >
+            <View style={styles.uploadingModalContent}>
+              <ActivityIndicator size="large" color="#00A8E8" />
+              <Text style={styles.uploadingText}>Uploading...</Text>
+            </View>
+          </Modal>
       </View>
     </ImageBackground>
   );  
@@ -367,6 +564,66 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},  
+  uploadingModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadingModalContent: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  uploadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: 'Epilogue-Bold',
+    color: '#002B5B',
+  },
+  fullScreenModal: {
+    margin: 0, // Ensures full width and height
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImageContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 10,
+    borderRadius: 20,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  fullscreenModal: {
+    margin: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    width: '100%',
+    height: '100%',
+  },
 });
 
 export default PhotoDetails;

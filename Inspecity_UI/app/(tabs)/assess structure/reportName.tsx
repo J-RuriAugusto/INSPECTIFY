@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
+import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
+import HomeDetails from '../../../constants/HomeDetails'
 
 const ReportName = () => {
   const [fontsLoaded] = useFonts({
@@ -14,12 +17,37 @@ const ReportName = () => {
   });
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [reportName, setReportName] = useState('');
   const router = useRouter();
   const navigation = useNavigation();
 
   if (!fontsLoaded) {
     return null;
   }
+
+  const saveImageToStorage = async (uri: string) => {
+    const filename = uri.split('/').pop();
+    
+    // Check if documentDirectory is not null
+    if (!FileSystem.documentDirectory) {
+      console.error('Document directory is not available');
+      return uri; // Fallback to the original URI
+    }
+  
+    const newPath = FileSystem.documentDirectory + filename;
+  
+    try {
+      await FileSystem.moveAsync({
+        from: uri,
+        to: newPath,
+      });
+      return newPath;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      return uri; // Fallback to the original URI
+    }
+  };
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -35,11 +63,19 @@ const ReportName = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
+    // Check if result.assets is not null and contains at least one asset
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setIsUploading(true);
+      const savedUri = await saveImageToStorage(result.assets[0].uri);
       router.push({
         pathname: "/assess structure/photoDetails",
-        params: { photo: result.assets[0].uri }
+        params: { 
+          photo: savedUri,
+          reportName: reportName,
+          homeId: HomeDetails.homeId
+        }
       });
+      setIsUploading(false);
     }
   };
 
@@ -56,11 +92,19 @@ const ReportName = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
+    // Check if result.assets is not null and contains at least one asset
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setIsUploading(true);
+      const savedUri = await saveImageToStorage(result.assets[0].uri);
       router.push({
         pathname: "/assess structure/photoDetails",
-        params: { photo: result.assets[0].uri }
+        params: { 
+          photo: savedUri,
+          reportName: reportName,
+          homeId: HomeDetails.homeId
+        }
       });
+      setIsUploading(false);
     }
   };
 
@@ -81,6 +125,8 @@ const ReportName = () => {
           style={styles.input}
           placeholder="Report Name"
           placeholderTextColor="#A0A0A0"
+          onChangeText={setReportName}
+          value={reportName}
         />
       </View>
 
@@ -107,6 +153,18 @@ const ReportName = () => {
           <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Uploading Modal */}
+      <Modal 
+        isVisible={isUploading} 
+        backdropOpacity={0.5}
+        style={styles.uploadingModal}
+      >
+        <View style={styles.uploadingModalContent}>
+          <ActivityIndicator size="large" color="#00A8E8" />
+          <Text style={styles.uploadingText}>Uploading...</Text>
         </View>
       </Modal>
     </View>
@@ -203,6 +261,22 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 16,
+    color: '#002B5B',
+  },
+  uploadingModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadingModalContent: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  uploadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: 'Epilogue-Bold',
     color: '#002B5B',
   },
 });

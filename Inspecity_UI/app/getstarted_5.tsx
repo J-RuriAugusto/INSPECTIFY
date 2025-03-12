@@ -12,7 +12,7 @@ const GettingStarted = () => {
   const [longitude, setLongitude] = useState<number | null>(null);
   const { homeData } = useLocalSearchParams();
   const userId = uuid.v4();
-  const API_KEY = 'insert API KEY here';
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
   console.log(homeData)
 
   const router = useRouter();
