@@ -7,15 +7,33 @@ import {
   FlatList,
   Pressable,
   Image,
+  Linking,
 } from "react-native";
 import * as Location from "expo-location";
-import markers from "../../assets/markers";
+
+const GOOGLE_MAPS_API_KEY = "AlzaSy1VIPkKSPBIhjOptL3b4xlFqI9ADUoRsNr";
+
+type Store = {
+  id: string;
+  name: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  image: string;
+  rating: number;
+  address: string;
+  phone?: string;
+  openingHours?: string[];
+};
 
 const NearbyShops = () => {
   const mapRef = useRef<MapView>(null);
-  const [selectedCard, setSelectedCard] = useState("");
+  const [selectedCard, setSelectedCard] = useState<string>("");
   const [userLocation, setUserLocation] = useState<Region | null>(null);
+  const [stores, setStores] = useState<Store[]>([]);
 
+  // Get User Location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -32,112 +50,193 @@ const NearbyShops = () => {
         longitudeDelta: 0.01,
       });
 
-      // Move the map to the user's location
       mapRef.current?.animateToRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+
+      fetchNearbyStores(location.coords.latitude, location.coords.longitude);
     })();
   }, []);
 
+  // Fetch Nearby Stores from Google Places API
+  const fetchNearbyStores = async (latitude: number, longitude: number) => {
+    const radius = 3000;
+    const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
+    const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === "OK") {
+        const formattedStores = await Promise.all(
+          data.results.map(async (place: any) => {
+            // Fetch additional place details (like phone, opening hours, etc.)
+            const detailsUrl = `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${place.place_id}&key=${GOOGLE_MAPS_API_KEY}`;
+            const detailsResponse = await fetch(detailsUrl);
+            const detailsData = await detailsResponse.json();
+
+            return {
+              id: place.place_id,
+              name: place.name,
+              coordinates: {
+                latitude: place.geometry.location.lat,
+                longitude: place.geometry.location.lng,
+              },
+              image:
+                place.photos && place.photos.length > 0
+                  ? `https://maps.gomaps.pro/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
+                  : "https://via.placeholder.com/400",
+              rating: place.rating || "No rating",
+              address: place.vicinity || "No address available",
+              phone: detailsData.result.formatted_phone_number || "No phone available",
+              openingHours:
+                detailsData.result.opening_hours?.weekday_text || ["No hours available"],
+            };
+          })
+        );
+
+        setStores(formattedStores);
+      } else {
+        console.error("Error fetching places:", data.status);
+      }
+    } catch (error) {
+      console.error("Error fetching places:", error);
+    }
+  };
+
+  // Open Google Maps for Directions
+  const openGoogleMaps = (latitude: number, longitude: number) => {
+    const url = `https://maps.gomaps.pro/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    Linking.openURL(url);
+  };
+
   return (
     <View style={styles.container}>
+      {/* Map */}
       <MapView
         style={styles.map}
         ref={mapRef}
         initialRegion={
-          userLocation || { latitude: 37.7749, longitude: -122.4194, latitudeDelta: 0.05, longitudeDelta: 0.05 }
+          userLocation || {
+            latitude: 37.7749,
+            longitude: -122.4194,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }
         }
+        showsUserLocation={true}
       >
-        {userLocation && (
+        {stores.map((store) => (
           <Marker
-            coordinate={{
-              latitude: userLocation.latitude,
-              longitude: userLocation.longitude,
-            }}
-            title="Your Location"
-            pinColor="blue"
+            key={store.id}
+            coordinate={store.coordinates}
+            title={store.name}
+            onPress={() =>
+              openGoogleMaps(store.coordinates.latitude, store.coordinates.longitude)
+            }
           />
-        )}
-        {markers.map((marker, index) => (
-          <Marker key={index} title={marker.name} coordinate={marker.coordinates} />
         ))}
       </MapView>
-      <View style={styles.markerListContainer}>
-        <FlatList
-          horizontal
-          data={markers}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item: marker }) => (
-            <Pressable
-              onPress={() => {
-                setSelectedCard(marker.name);
-                mapRef.current?.animateToRegion(marker.coordinates, 1000);
-              }}
-              style={
-                marker.name === selectedCard
-                  ? styles.activeMarkerButton
-                  : styles.markerButton
-              }
-            >
-              <Image source={{ uri: marker.image }} style={styles.markerImage} />
-              <View style={styles.markerInfo}>
-                <Text style={styles.markerName}>{marker.name}</Text>
-                <Text style={styles.markerDescription}>{marker.description}</Text>
-              </View>
-            </Pressable>
-          )}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
+
+      {/* Store List */}
+      <FlatList
+        horizontal
+        data={stores}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => {
+              setSelectedCard(item.name);
+              mapRef.current?.animateToRegion(
+                {
+                  latitude: item.coordinates.latitude,
+                  longitude: item.coordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                },
+                1000
+              );
+            }}
+            style={[
+              styles.card,
+              item.name === selectedCard && styles.activeCard,
+            ]}
+          >
+            <Image source={{ uri: item.image }} style={styles.image} />
+            <View style={styles.cardContent}>
+              <Text style={styles.name} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={styles.rating}>⭐ {item.rating}</Text>
+              <Text style={styles.address} numberOfLines={1}>
+                {item.address}
+              </Text>
+              {item.phone && (
+                <Text style={styles.phone} numberOfLines={1}>
+                  📞 {item.phone}
+                </Text>
+              )}
+            </View>
+          </Pressable>
+        )}
+        showsHorizontalScrollIndicator={false}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f0f0f0" },
-  map: { flex: 1 },
-  markerListContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 10,
-  },
-  activeMarkerButton: {
-    backgroundColor: "#E7E3AC",
-    borderRadius: 10,
-    padding: 10,
-    marginHorizontal: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    width: 250,
-  },
-  markerButton: {
+  container: { flex: 1 },
+  map: { flex: 18 },
+  card: {
     backgroundColor: "#fff",
-    borderRadius: 10,
     padding: 10,
+    borderRadius: 10,
     marginHorizontal: 5,
     flexDirection: "row",
     alignItems: "center",
+    width: 260, // Smaller size
+    height: 180, // Shorter height
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    width: 250,
   },
-  markerImage: { width: 55, height: 55, borderRadius: 10, marginRight: 10 },
-  markerInfo: { flex: 1 },
-  markerName: { fontSize: 16, fontWeight: "bold", color: "#333" },
-  markerDescription: { fontSize: 12, color: "#666", marginTop: 5 },
+  activeCard: {
+    backgroundColor: "#E7E3AC",
+  },
+  image: {
+    width: 120, // Smaller image
+    height: 120,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  cardContent: { flex: 1 },
+  name: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 2,
+  },
+  rating: {
+    fontSize: 12,
+    color: "#555",
+    marginBottom: 2,
+  },
+  address: {
+    fontSize: 12,
+    color: "#777",
+    marginBottom: 2,
+  },
+  phone: {
+    fontSize: 12,
+    color: "#777",
+  },
 });
 
 export default NearbyShops;
