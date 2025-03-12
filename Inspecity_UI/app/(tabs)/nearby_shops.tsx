@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 
-const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+const GOOGLE_MAPS_API_KEY = "AlzaSy1VIPkKSPBIhjOptL3b4xlFqI9ADUoRsNr";
 
 type Store = {
   id: string;
@@ -63,9 +63,9 @@ const NearbyShops = () => {
 
   // Fetch Nearby Stores from Google Places API
   const fetchNearbyStores = async (latitude: number, longitude: number) => {
-    const radius = 5000; // 5 km radius
-    const type = "hardware_store|home_repair|home_improvement";
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
+    const radius = 3000;
+    const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
+    const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
 
     try {
       const response = await fetch(url);
@@ -75,7 +75,7 @@ const NearbyShops = () => {
         const formattedStores = await Promise.all(
           data.results.map(async (place: any) => {
             // Fetch additional place details (like phone, opening hours, etc.)
-            const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&key=${GOOGLE_MAPS_API_KEY}`;
+            const detailsUrl = `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${place.place_id}&key=${GOOGLE_MAPS_API_KEY}`;
             const detailsResponse = await fetch(detailsUrl);
             const detailsData = await detailsResponse.json();
 
@@ -88,8 +88,8 @@ const NearbyShops = () => {
               },
               image:
                 place.photos && place.photos.length > 0
-                  ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
-                  : "https://via.placeholder.com/600",
+                  ? `https://maps.gomaps.pro/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
+                  : "https://via.placeholder.com/400",
               rating: place.rating || "No rating",
               address: place.vicinity || "No address available",
               phone: detailsData.result.formatted_phone_number || "No phone available",
@@ -110,7 +110,7 @@ const NearbyShops = () => {
 
   // Open Google Maps for Directions
   const openGoogleMaps = (latitude: number, longitude: number) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    const url = `https://maps.gomaps.pro/maps/dir/?api=1&destination=${latitude},${longitude}`;
     Linking.openURL(url);
   };
 
@@ -161,22 +161,29 @@ const NearbyShops = () => {
                 1000
               );
             }}
-            style={
-              item.name === selectedCard ? styles.activeCard : styles.card
-            }
+            style={[
+              styles.card,
+              item.name === selectedCard && styles.activeCard,
+            ]}
           >
             <Image source={{ uri: item.image }} style={styles.image} />
             <View style={styles.cardContent}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.rating}>⭐ {item.rating}</Text>
-              <Text style={styles.address}>{item.address}</Text>
-              <Text style={styles.phone}>{item.phone}</Text>
-              <Text style={styles.hours}>
-                {item.openingHours ? item.openingHours.join("\n") : "No hours available"}
+              <Text style={styles.name} numberOfLines={1}>
+                {item.name}
               </Text>
+              <Text style={styles.rating}>⭐ {item.rating}</Text>
+              <Text style={styles.address} numberOfLines={1}>
+                {item.address}
+              </Text>
+              {item.phone && (
+                <Text style={styles.phone} numberOfLines={1}>
+                  📞 {item.phone}
+                </Text>
+              )}
             </View>
           </Pressable>
         )}
+        showsHorizontalScrollIndicator={false}
       />
     </View>
   );
@@ -184,15 +191,16 @@ const NearbyShops = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
+  map: { flex: 18 },
   card: {
     backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 12,
-    marginHorizontal: 10,
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
     flexDirection: "row",
     alignItems: "center",
-    width: 350,
+    width: 260, // Smaller size
+    height: 180, // Shorter height
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -203,17 +211,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#E7E3AC",
   },
   image: {
-    width: 100, // Bigger image
-    height: 100, // Bigger image
+    width: 120, // Smaller image
+    height: 120,
     borderRadius: 8,
-    marginRight: 15,
+    marginRight: 10,
   },
   cardContent: { flex: 1 },
-  name: { fontSize: 18, fontWeight: "bold", color: "#333" },
-  rating: { fontSize: 14, color: "#666" },
-  address: { fontSize: 14, color: "#777" },
-  phone: { fontSize: 14, color: "#555", marginTop: 5 },
-  hours: { fontSize: 12, color: "#999", marginTop: 5 },
+  name: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 2,
+  },
+  rating: {
+    fontSize: 12,
+    color: "#555",
+    marginBottom: 2,
+  },
+  address: {
+    fontSize: 12,
+    color: "#777",
+    marginBottom: 2,
+  },
+  phone: {
+    fontSize: 12,
+    color: "#777",
+  },
 });
 
 export default NearbyShops;
