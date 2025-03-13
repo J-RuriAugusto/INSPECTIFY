@@ -17,6 +17,7 @@ export default function EmergencyHotlines() {
   const [location, setLocation] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [hotlines, setHotlines] = React.useState([]);
+  const [favorites, setFavorites] = React.useState([]);
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
@@ -58,14 +59,37 @@ export default function EmergencyHotlines() {
     setLoading(false);
   };
 
+  // Toggle favorite (add or remove)
+  const toggleFavorite = (item) => {
+    const isFavorite = favorites.some((fav) => fav.id === item.id);
+    if (isFavorite) {
+      setFavorites((prevFavorites) => prevFavorites.filter((fav) => fav.id !== item.id));
+    } else {
+      setFavorites((prevFavorites) => [...prevFavorites, item]);
+    }
+  };
+
+  // Favorites Tab Content
   const FavoritesRoute = () => (
-    <View style={styles.scene}>
-      <Text>Favorites Content Here (Saved Hotlines)</Text>
+    <View style={styles.allContainer}>
+      {favorites.length === 0 ? (
+        <Text style={{ textAlign: 'center', marginTop: 20, fontFamily: 'Epilogue-Regular', color: '#071C34' }}>
+          No favorites yet. Add hotlines by tapping the heart icon.
+        </Text>
+      ) : (
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem} // Reuse same renderItem to maintain consistency
+        />
+      )}
     </View>
   );
 
   // Render each hotline card with swipeable action
   const renderItem = ({ item }) => {
+    const isFavorite = favorites.some((fav) => fav.id === item.id); // Check if in favorites
+
     // Left swipe (Message)
     const renderLeftActions = () => (
       <TouchableOpacity
@@ -73,7 +97,7 @@ export default function EmergencyHotlines() {
         onPress={() => Linking.openURL(`sms:${item.phone}`)}
       >
         <Image
-          source={require('../../assets/images/message_icon.png')} // Your custom message icon
+          source={require('../../assets/images/message_icon.png')}
           style={styles.icon}
         />
       </TouchableOpacity>
@@ -86,7 +110,7 @@ export default function EmergencyHotlines() {
         onPress={() => Linking.openURL(`tel:${item.phone}`)}
       >
         <Image
-          source={require('../../assets/images/call_icon.png')} // Your custom call icon
+          source={require('../../assets/images/call_icon.png')}
           style={styles.icon}
         />
       </TouchableOpacity>
@@ -104,8 +128,13 @@ export default function EmergencyHotlines() {
               <Text style={styles.hotlineName}>{item.name}</Text>
               <Text style={styles.hotlinePhone}>{item.phone}</Text>
             </View>
-            <TouchableOpacity>
-              <Ionicons name="heart-outline" size={24} color="#071C34" />
+            {/* Heart icon button */}
+            <TouchableOpacity onPress={() => toggleFavorite(item)}>
+              <Ionicons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                size={24}
+                color={isFavorite ? 'red' : '#071C34'}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -113,6 +142,7 @@ export default function EmergencyHotlines() {
     );
   };
 
+  // All Hotlines Tab
   const AllRoute = () => (
     <View style={styles.allContainer}>
       {loading ? (
@@ -266,11 +296,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     flexDirection: 'row',
     gap: 10,
-  },
-  actionText: {
-    color: '#fff',
-    fontFamily: 'Epilogue-Bold',
-    marginLeft: 10,
   },
   icon: {
     width: 50, // Adjust size based on your icon

@@ -1,13 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import MapView, { Marker, Region } from "react-native-maps";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Pressable,
-  Image,
-} from "react-native";
+import MapView, { Marker, Region, PROVIDER_GOOGLE } from "react-native-maps";
+import { StyleSheet, Text, View, FlatList, Pressable, Image } from "react-native";
 import * as Location from "expo-location";
 import markers from "../../assets/markers";
 
@@ -32,7 +25,7 @@ const NearbyShops = () => {
         longitudeDelta: 0.01,
       });
 
-      // Move the map to the user's location
+      // Move map to user's location
       mapRef.current?.animateToRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -45,11 +38,14 @@ const NearbyShops = () => {
   return (
     <View style={styles.container}>
       <MapView
+        provider={PROVIDER_GOOGLE} // <-- Use Google Maps provider
         style={styles.map}
         ref={mapRef}
         initialRegion={
           userLocation || { latitude: 37.7749, longitude: -122.4194, latitudeDelta: 0.05, longitudeDelta: 0.05 }
         }
+        showsUserLocation={true} // Show user's current location
+        showsMyLocationButton={true} // Show button to center map on user
       >
         {userLocation && (
           <Marker
@@ -65,6 +61,7 @@ const NearbyShops = () => {
           <Marker key={index} title={marker.name} coordinate={marker.coordinates} />
         ))}
       </MapView>
+
       <View style={styles.markerListContainer}>
         <FlatList
           horizontal
