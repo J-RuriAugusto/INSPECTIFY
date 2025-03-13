@@ -18,7 +18,7 @@ const GettingStarted = () => {
   }
 
   const handleNavigateToDashboard = () => {
-    router.push('/dashboard'); // Navigate to the next screen
+    router.push('/dashboard/dashboard'); // Navigate to the next screen
   };
 
   const currentStep = 6; // Current progress step
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
     marginBottom: 5,
+    marginTop: 50
   },
   subtitle1: {
     fontSize: 15,
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
-    marginTop: -100,
+    marginTop: -40,
   },
   progressStep: {
     width: 50,
