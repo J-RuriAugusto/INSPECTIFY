@@ -14,6 +14,14 @@ export default function EmergencyHotlines() {
     { key: 'all', title: 'All' },
   ]);
 
+  const [subIndex, setSubIndex] = React.useState(0);
+  const [subRoutes] = React.useState([
+    { key: '911', title: '911' },
+    { key: 'disaster', title: 'Disaster Response' },
+    { key: 'medical', title: 'Medical Services' },
+    { key: 'police', title: 'Police Hotlines' },
+  ]);
+
   const [location, setLocation] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [hotlines, setHotlines] = React.useState([]);
@@ -24,11 +32,8 @@ export default function EmergencyHotlines() {
     'Archivo-Regular': require('../../assets/fonts/Archivo-Regular.ttf'),
     'Epilogue-Bold': require('../../assets/fonts/Epilogue-Bold.ttf'),
   });
-  if (!fontsLoaded) {
-    return null; 
-  }
+  if (!fontsLoaded) return null;
 
-  // Request location and fetch hotlines
   React.useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -40,26 +45,21 @@ export default function EmergencyHotlines() {
 
       let loc = await Location.getCurrentPositionAsync({});
       setLocation(loc);
-      fetchHotlines(loc); // Mock fetching hotlines based on location
+      fetchHotlines(loc);
     })();
   }, []);
 
-  // Mock function to fetch hotlines based on location
   const fetchHotlines = (loc) => {
-    console.log('Fetching hotlines for:', loc.coords.latitude, loc.coords.longitude);
-
-    // Example static list, replace with API call based on loc.coords
     const hotlineList = [
-      { id: '1', name: 'Electric Emergency', phone: '123-456-7890', icon: <Ionicons name="flash" size={24} color="#071C34" /> },
-      { id: '2', name: 'Police Emergency', phone: '987-654-3210', icon: <FontAwesome5 name="shield-alt" size={24} color="#071C34" /> },
-      { id: '3', name: 'Fire Department', phone: '555-123-4567', icon: <MaterialIcons name="fire-extinguisher" size={24} color="#071C34" /> },
+      { id: '1', name: '911 General Emergency', phone: '911', category: '911', icon: <Ionicons name="alert-circle" size={24} color="#071C34" /> },
+      { id: '2', name: 'Disaster Hotline', phone: '123-456-7891', category: 'disaster', icon: <FontAwesome5 name="water" size={24} color="#071C34" /> },
+      { id: '3', name: 'Medical Emergency', phone: '123-456-7892', category: 'medical', icon: <MaterialIcons name="local-hospital" size={24} color="#071C34" /> },
+      { id: '4', name: 'Police Emergency', phone: '123-456-7893', category: 'police', icon: <FontAwesome5 name="shield-alt" size={24} color="#071C34" /> },
     ];
-
     setHotlines(hotlineList);
     setLoading(false);
   };
 
-  // Toggle favorite (add or remove)
   const toggleFavorite = (item) => {
     const isFavorite = favorites.some((fav) => fav.id === item.id);
     if (isFavorite) {
@@ -69,58 +69,23 @@ export default function EmergencyHotlines() {
     }
   };
 
-  // Favorites Tab Content
-  const FavoritesRoute = () => (
-    <View style={styles.allContainer}>
-      {favorites.length === 0 ? (
-        <Text style={{ textAlign: 'center', marginTop: 20, fontFamily: 'Epilogue-Regular', color: '#071C34' }}>
-          No favorites yet. Add hotlines by tapping the heart icon.
-        </Text>
-      ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem} // Reuse same renderItem to maintain consistency
-        />
-      )}
-    </View>
-  );
-
-  // Render each hotline card with swipeable action
   const renderItem = ({ item }) => {
-    const isFavorite = favorites.some((fav) => fav.id === item.id); // Check if in favorites
+    const isFavorite = favorites.some((fav) => fav.id === item.id);
 
-    // Left swipe (Message)
     const renderLeftActions = () => (
-      <TouchableOpacity
-        style={styles.leftAction}
-        onPress={() => Linking.openURL(`sms:${item.phone}`)}
-      >
-        <Image
-          source={require('../../assets/images/message_icon.png')}
-          style={styles.icon}
-        />
+      <TouchableOpacity style={styles.leftAction} onPress={() => Linking.openURL(`sms:${item.phone}`)}>
+        <Image source={require('../../assets/images/message_icon.png')} style={styles.icon} />
       </TouchableOpacity>
     );
 
-    // Right swipe (Call)
     const renderRightActions = () => (
-      <TouchableOpacity
-        style={styles.rightAction}
-        onPress={() => Linking.openURL(`tel:${item.phone}`)}
-      >
-        <Image
-          source={require('../../assets/images/call_icon.png')}
-          style={styles.icon}
-        />
+      <TouchableOpacity style={styles.rightAction} onPress={() => Linking.openURL(`tel:${item.phone}`)}>
+        <Image source={require('../../assets/images/call_icon.png')} style={styles.icon} />
       </TouchableOpacity>
     );
 
     return (
-      <Swipeable
-        renderLeftActions={renderLeftActions}
-        renderRightActions={renderRightActions}
-      >
+      <Swipeable renderLeftActions={renderLeftActions} renderRightActions={renderRightActions}>
         <View style={styles.card}>
           <View style={styles.cardContent}>
             <View style={styles.iconContainer}>{item.icon}</View>
@@ -128,13 +93,8 @@ export default function EmergencyHotlines() {
               <Text style={styles.hotlineName}>{item.name}</Text>
               <Text style={styles.hotlinePhone}>{item.phone}</Text>
             </View>
-            {/* Heart icon button */}
             <TouchableOpacity onPress={() => toggleFavorite(item)}>
-              <Ionicons
-                name={isFavorite ? 'heart' : 'heart-outline'}
-                size={24}
-                color={isFavorite ? 'red' : '#071C34'}
-              />
+              <Ionicons name={isFavorite ? 'heart' : 'heart-outline'} size={24} color={isFavorite ? 'red' : '#071C34'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -142,33 +102,81 @@ export default function EmergencyHotlines() {
     );
   };
 
-  // All Hotlines Tab
-  const AllRoute = () => (
+  const FavoritesRoute = () => (
     <View style={styles.allContainer}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0A4D95" />
+      {favorites.length === 0 ? (
+        <Text style={{ textAlign: 'center', marginTop: 20, fontFamily: 'Epilogue-Regular', color: '#071C34' }}>
+          No favorites yet. Add hotlines by tapping the heart icon.
+        </Text>
       ) : (
-        <FlatList
-          data={hotlines}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-        />
+        <FlatList data={favorites} keyExtractor={(item) => item.id} renderItem={renderItem} />
       )}
     </View>
   );
 
-  const renderScene = SceneMap({
-    favorites: FavoritesRoute,
-    all: AllRoute,
-  });
+  // Sub-category Routes
+  // const CategoryRoute = (categoryKey) => () => (
+  //   <View style={styles.allContainer}>
+  //     {loading ? <ActivityIndicator size="large" color="#0A4D95" /> :
+  //       <FlatList
+  //         data={hotlines.filter((item) => item.category === categoryKey)}
+  //         keyExtractor={(item) => item.id}
+  //         renderItem={renderItem}
+  //       />}
+  //   </View>
+  // );
+
+  const AllRoute = () => (
+    <View style={{ flex: 1 }}>
+      {/* Sub-category buttons */}
+      <View style={styles.subCategoryContainer}>
+        {subRoutes.map((route, idx) => (
+          <TouchableOpacity
+            key={route.key}
+            style={[
+              styles.subCategoryButton,
+              subIndex === idx && styles.subCategoryButtonActive,
+            ]}
+            onPress={() => setSubIndex(idx)}
+          >
+            <Text
+              style={[
+                styles.subCategoryText,
+                subIndex === idx && styles.subCategoryTextActive,
+              ]}
+            >
+              {route.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+  
+      {/* Hotline List */}
+      <View style={styles.allContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0A4D95" />
+        ) : (
+          <FlatList
+            data={hotlines.filter(
+              (item) => item.category === subRoutes[subIndex].key
+            )}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+          />
+        )}
+      </View>
+    </View>
+  );  
 
   return (
     <View style={{ flex: 1, paddingTop: 70, backgroundColor: '#fff' }}>
       <Text style={styles.title}>Emergency Hotlines</Text>
-
       <TabView
         navigationState={{ index, routes }}
-        renderScene={renderScene}
+        renderScene={SceneMap({
+          favorites: FavoritesRoute,
+          all: AllRoute,
+        })}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
         renderTabBar={(props) => (
@@ -177,16 +185,7 @@ export default function EmergencyHotlines() {
             indicatorStyle={styles.indicator}
             style={styles.tabBar}
             tabStyle={styles.tabStyle}
-            renderLabel={({ route, focused }) => (
-              <Text
-                style={[
-                  styles.label,
-                  { color: focused ? '#000' : '#071C34' },
-                ]}
-              >
-                {route.title}
-              </Text>
-            )}
+            labelStyle={styles.label}
           />
         )}
       />
@@ -195,50 +194,47 @@ export default function EmergencyHotlines() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    color: '#071C34',
-    fontFamily: 'Epilogue-Bold',
-    textAlign: 'center',
-    marginBottom: 5,
+  subCategoryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
   },
-  scene: {
+  
+  subCategoryButton: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  tabBar: {
-    backgroundColor: '#F1F1F1',
+    // paddingVertical: 8,
+    paddingHorizontal: 10,
     borderRadius: 20,
-    marginHorizontal: 60,
-    marginBottom: 10,
-    height: 50,
-    overflow: 'hidden',
+    backgroundColor: '#E0E0E0',
   },
-  indicator: {
-    backgroundColor: '#0A4D95',
-    height: '100%',
-    borderRadius: 20,
+  
+  subCategoryButtonActive: {
+    backgroundColor: '#004A8E',
   },
-  tabStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    padding: 0,
-    margin: 0,
-  },
-  label: {
+  
+  subCategoryText: {
+    color: '#000',
+    fontSize: 12,
     fontFamily: 'Epilogue-Regular',
-    fontSize: 14,
-    margin: 0,
-    padding: 0,
-    textAlign: 'center',
+    textAlign: 'center'
   },
-  allContainer: {
-    flex: 1,
-    paddingHorizontal: 25,
-    paddingTop: 10,
+  
+  subCategoryTextActive: {
+    color: '#fff',
+    fontFamily: 'Epilogue-Bold',
+  },  
+  title: { fontSize: 20, color: '#071C34', fontFamily: 'Epilogue-Bold', textAlign: 'center', marginBottom: 5 },
+  indicator: { backgroundColor: '#004A8E', height: '100%', borderRadius: 25 },
+  tabBar: { backgroundColor: '#F1F1F1', borderRadius: 25, marginHorizontal: 60, marginBottom: 10, height: 45 },
+  tabStyle: { justifyContent: 'center' },
+  allContainer: { flex: 1, paddingHorizontal: 25, paddingTop: 10 },
+  label: {
+    color: '#000',
+    fontFamily: 'Epilogue-Regular',
+    fontSize: 10,
+    textAlign: 'center',
+    marginBottom: 5
   },
   card: {
     backgroundColor: '#fff',
@@ -298,7 +294,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   icon: {
-    width: 50, // Adjust size based on your icon
+    width: 50,
     height: 50,
     resizeMode: 'contain',
   },
