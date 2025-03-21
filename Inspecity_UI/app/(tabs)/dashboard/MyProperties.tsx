@@ -92,14 +92,14 @@ const MyProperties = () => {
             renderRightActions={() => renderRightActions(item)}
           >
             <TouchableOpacity onPress={() => router.push(`/dashboard/dashboard`)}>
-  <View style={styles.propertyItem}>
-    <Image source={item.image} style={styles.propertyImage} />
-    <View style={styles.propertyInfo}>
-      <Text style={styles.propertyText}>{item.name}</Text>
-      <Text style={styles.propertyLocation}>{item.location}</Text>
-    </View>
-  </View>
-</TouchableOpacity>
+              <View style={styles.propertyItem}>
+                <Image source={item.image} style={styles.propertyImage} />
+                <View style={styles.propertyInfo}>
+                  <Text style={styles.propertyText}>{item.name}</Text>
+                  <Text style={styles.propertyLocation}>{item.location}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
 
           </Swipeable>
         )}
