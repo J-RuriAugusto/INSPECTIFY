@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Modal
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { Swipeable } from 'react-native-gesture-handler';
-import { useNavigation } from 'expo-router';
+// import { useNavigation } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 
 const MyProperties = () => {
   const router = useRouter();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);

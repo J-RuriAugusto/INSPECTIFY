@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Modal, ScrollView } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, Modal, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,19 @@ const PhotoDetails = () => {
   const photo = params.photo as string;
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+
+  const saveReport = () => {
+    // Implement save logic (e.g., saving to AsyncStorage or backend)
+    alert("Report Saved!");
+    setReportModalVisible(false);
+  };
+
+  const deleteReport = () => {
+    // Implement delete logic
+    alert("Report Deleted!");
+    setReportModalVisible(false);
+  };
 
   const sharePhoto = async () => {
     if (!(await Sharing.isAvailableAsync())) {
@@ -30,6 +43,11 @@ const PhotoDetails = () => {
               <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
 
+            {/* Save/Delete Report Button */}
+            <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+              <Image source={require('../../../assets/images/save.png')} style={styles.reportIcon} />
+            </TouchableOpacity>
+            
             {/* Share Button */}
             <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
               <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
@@ -54,6 +72,11 @@ const PhotoDetails = () => {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
+
+          {/* Save/Delete Report Button */}
+          <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+            <Image source={require('../../../assets/images/save.png')} style={styles.reportIcon} />
           </TouchableOpacity>
   
           {/* Share Button */}
@@ -119,6 +142,53 @@ const PhotoDetails = () => {
           </ScrollView>
         </View>
 
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={reportModalVisible}
+          onRequestClose={() => setReportModalVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setReportModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Manage Report</Text>
+
+                {/* Save Report Button */}
+                <TouchableOpacity 
+                  style={styles.modalButton} 
+                  onPress={() => {
+                    saveReport();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.modalButtonText}>Save Report</Text>
+                </TouchableOpacity>
+
+                {/* Delete Report Button */}
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: 'red' }]} 
+                  onPress={() => {
+                    deleteReport();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.modalButtonText}>Delete Report</Text>
+                </TouchableOpacity>
+
+                {/* Close Button */}
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={() => setReportModalVisible(false)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+
         {/* Edit Note Modal */}
         <Modal
           animationType="slide"
@@ -170,9 +240,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 43, 91, 0.7)' },
   header: {
     position: 'absolute',
-    top: 40,
-    left: 20,
-    right: 20,
+    top: '4%',
+    zIndex: 10,
+    // left: 20,
+    right: '3%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -187,7 +258,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: 'white',
   },
-  backButton: { flexDirection: 'row', alignItems: 'center' },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: '152%' },
   backIcon: { width: 30, height: 30, marginRight: 5 },
   backText: { fontSize: 17, color: '#FFFFFF' },
   shareButton: { padding: 5 },
@@ -195,10 +266,10 @@ const styles = StyleSheet.create({
   buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   imageContainer: {
     position: 'absolute',
-    top: 40,
+    top: '3.5%',
     left: '50%',
     transform: [{ translateX: -150 }],
-    zIndex: 10,
+    zIndex: 9,
     alignItems: 'center'
   },
   houseImage: { width: 300, height: 250 },  
@@ -360,7 +431,60 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 5
   },
-  saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},  
+  saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},
+  /** 🔹 Save/Delete Report Button */
+  reportIcon: {
+    width: 30,
+    height: 30,
+  },
+
+  /** 🔹 Modal Container */
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: '#002B5B',
+    padding: 12,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  /** 🔹 Close Button */
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
 });
 
 export default PhotoDetails;
