@@ -13,13 +13,11 @@ const PhotoDetails = () => {
   const [reportModalVisible, setReportModalVisible] = useState(false);
 
   const saveReport = () => {
-    // Implement save logic (e.g., saving to AsyncStorage or backend)
     alert("Report Saved!");
     setReportModalVisible(false);
   };
 
   const deleteReport = () => {
-    // Implement delete logic
     alert("Report Deleted!");
     setReportModalVisible(false);
   };
@@ -242,31 +240,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '4%',
     zIndex: 10,
-    // left: 20,
     right: '3%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  input: {
-    width: '90%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: 'white',
-  },
-  backButton: { flexDirection: 'row', alignItems: 'center', right: '152%' },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: '142%' },
   backIcon: { width: 30, height: 30, marginRight: 5 },
-  backText: { fontSize: 17, color: '#FFFFFF' },
+  backText: { fontSize: 17, fontFamily: 'Epilogue-Bold', color: '#FFFFFF' },
   shareButton: { padding: 5 },
   shareIcon: { width: 30, height: 30 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   imageContainer: {
     position: 'absolute',
-    top: '3.5%',
+    top: '5%',
     left: '50%',
     transform: [{ translateX: -150 }],
     zIndex: 9,
@@ -432,30 +419,27 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},
-  /** 🔹 Save/Delete Report Button */
   reportIcon: {
     width: 30,
     height: 30,
   },
-
-  /** 🔹 Modal Container */
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
+    backgroundColor: '#fff',
+    padding: 10,
     borderRadius: 10,
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
+    fontFamily: 'Epilogue-Bold',
+    marginBottom: 5,
   },
   modalButton: {
     backgroundColor: '#002B5B',
@@ -468,21 +452,17 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Epilogue-Bold',
   },
-
-  /** 🔹 Close Button */
   closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#ddd',
+    padding: 5,
     borderRadius: 8,
     width: '80%',
     alignItems: 'center',
   },
   closeButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Epilogue-Medium',
     color: '#333',
   },
 });

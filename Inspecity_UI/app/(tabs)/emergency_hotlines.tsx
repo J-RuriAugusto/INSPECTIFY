@@ -226,16 +226,16 @@ const styles = StyleSheet.create({
   },  
   title: { fontSize: 20, color: '#071C34', fontFamily: 'Epilogue-Bold', textAlign: 'center', marginBottom: 5 },
   indicator: { backgroundColor: '#004A8E', height: '100%', borderRadius: 25 },
-  tabBar: { backgroundColor: '#F1F1F1', borderRadius: 25, marginHorizontal: 60, marginBottom: 10, height: 45 },
+  tabBar: { backgroundColor: '#E0E0E0', borderRadius: 25, marginHorizontal: 60, marginBottom: 10, height: 45 },
   tabStyle: { justifyContent: 'center' },
   allContainer: { flex: 1, paddingHorizontal: 25, paddingTop: 10 },
-  label: {
-    color: '#000',
-    fontFamily: 'Epilogue-Regular',
-    fontSize: 10,
-    textAlign: 'center',
-    marginBottom: 5
-  },
+  // label: {
+  //   color: '#000',
+  //   fontFamily: 'Epilogue-Regular',
+  //   fontSize: 10,
+  //   textAlign: 'center',
+  //   marginBottom: 5
+  // },
   card: {
     backgroundColor: '#fff',
     borderColor: '#000',

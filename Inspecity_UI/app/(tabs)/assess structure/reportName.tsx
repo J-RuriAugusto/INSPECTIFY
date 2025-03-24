@@ -15,7 +15,7 @@ const ReportName = () => {
 
   const [isModalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   if (!fontsLoaded) {
     return null;
@@ -37,7 +37,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/photoDetails",
+        pathname: "/assess structure/scanning",
         params: { photo: result.assets[0].uri }
       });
     }
@@ -58,7 +58,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/photoDetails",
+        pathname: "/assess structure/scanning",
         params: { photo: result.assets[0].uri }
       });
     }
@@ -68,10 +68,10 @@ const ReportName = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        {/* <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
           <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <Text style={styles.title1}>NAME YOUR REPORT</Text>
       <Text style={styles.title2}>Enter a report name</Text>
@@ -130,9 +130,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  backButton: { flexDirection: 'row', alignItems: 'center' },
-  backIcon: { width: 30, height: 30, marginRight: 5 },
-  backText: { fontSize: 17, color: '#FFFFFF' },
+  // backButton: { flexDirection: 'row', alignItems: 'center' },
+  // backIcon: { width: 30, height: 30, marginRight: 5 },
+  // backText: { fontSize: 17, color: '#FFFFFF' },
   title1: {
     fontFamily: 'Epilogue-Black',
     fontSize: 30,

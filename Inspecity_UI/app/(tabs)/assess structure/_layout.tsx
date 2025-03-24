@@ -19,12 +19,12 @@ export default function AsessStructureLayout() {
     >
       {/* Default screen for the Awareness Tool route */}
       <Stack.Screen
-        name="assess_structure" // This file should be named `index.js` under `awareness tool/`
-        options={{ title: 'Assess Structure' }} // Title for the index screen
+        name="reportName" // This file should be named `index.js` under `awareness tool/`
+        options={{ title: 'Report Name' }} // Title for the index screen
       />
 
       {/* Example of dynamic child routes (e.g., flood, earthquake, etc.) */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name="wall"
         options={{ title: 'Flood Preparedness' }} // Title for Flood screen
       />
@@ -35,7 +35,7 @@ export default function AsessStructureLayout() {
       <Stack.Screen
         name="floor"
         options={{ title: 'Typhoon Preparedness' }} // Title for Typhoon screen
-      />
+      /> */}
     </Stack>
   );
 }
