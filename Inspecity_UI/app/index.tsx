@@ -80,7 +80,7 @@ const LoadingScreen = () => {
           await AsyncStorage.removeItem('userId');
           console.log('userId removed from AsyncStorage');
         } else {
-          router.replace('/dashboard');
+          router.replace('../dashboard/dashboard');
         }
       } catch (error) {
         console.error('Failed to check userId in database:', error);
