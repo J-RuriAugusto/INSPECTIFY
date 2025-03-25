@@ -3,11 +3,11 @@ import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, Scroll
 import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
-import useUserID from "../useUserID";
+import useUserID from "../../useUserID";
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import HomeDetails from '../../constants/HomeDetails'
+import HomeDetails from '../../../constants/HomeDetails'
 import { Link } from 'expo-router';
 import NetInfo from '@react-native-community/netinfo';
 interface Report {
@@ -26,9 +26,9 @@ const Dashboard = () => {
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../assets/fonts/Archivo-Regular.ttf'),
-    'Epilogue-Bold': require('../../assets/fonts/Epilogue-Bold.ttf'),
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -177,10 +177,10 @@ const Dashboard = () => {
   }
 
   const savedShops = [
-    { id: '1', image: require('../../assets/images/shop1.png') },
-    { id: '2', image: require('../../assets/images/shop2.png') },
-    { id: '3', image: require('../../assets/images/shop2.png') },
-    { id: '4', image: require('../../assets/images/shop2.png') },
+    { id: '1', image: require('../../../assets/images/shop1.png') },
+    { id: '2', image: require('../../../assets/images/shop2.png') },
+    { id: '3', image: require('../../../assets/images/shop2.png') },
+    { id: '4', image: require('../../../assets/images/shop2.png') },
   ];
 
   const handleShopPress = (id: string) => {
@@ -200,13 +200,17 @@ const Dashboard = () => {
       <View style={styles.container}>
         {/* Header with House and Settings Icons */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => Alert.alert('House Icon Pressed!')}>
-            <Image source={require('../../assets/images/houseicon.png')} style={styles.headerIcon} />
-          </TouchableOpacity>
+          <Link href="/dashboard/MyProperties" asChild>
+            <TouchableOpacity>
+              <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </Link>
 
-          <TouchableOpacity onPress={() => Alert.alert('Settings Icon Pressed!')}>
-            <Image source={require('../../assets/images/settings_icon.png')} style={styles.headerIcon} />
-          </TouchableOpacity>
+          <Link href="/dashboard/settings" asChild>
+          <TouchableOpacity>            
+            <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </Link>
         </View>
 
         {/* Main Content */}
@@ -253,7 +257,7 @@ const Dashboard = () => {
                         >
                           <View style={styles.reportContent}>
                             <Image 
-                              source={require('../../assets/images/report_icon.png')} 
+                              source={require('../../../assets/images/report_icon.png')} 
                               style={styles.reportIcon}
                             />
                             <Text style={styles.reportText}>{report.report_name}</Text>

@@ -3,109 +3,112 @@ import { Image, View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Import this!
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      initialRouteName="dashboard"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: '#ccc',
-        headerShown: false,
-        tabBarStyle: styles.tabBarStyle, // Standardized height
-        tabBarShowLabel: false, // Hides text labels
-      }}
-    >
-      {/* Dashboard Tab */}
-      <Tabs.Screen
-        name="dashboard"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={
-                focused
-                  ? require('../../assets/images/report columns.png')
-                  : require('../../assets/images/report columns.png')
-              }
-              style={styles.icon}
-            />
-          ),
+    <GestureHandlerRootView style={{ flex: 1 }}> {/* Wrap the whole Tabs inside this */}
+      <Tabs
+        initialRouteName="dashboard"
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          tabBarInactiveTintColor: '#ccc',
+          headerShown: false,
+          tabBarStyle: styles.tabBarStyle, // Standardized height
+          tabBarShowLabel: false, // Hides text labels
         }}
-      />
-
-      {/* Awareness Tool Tab */}
-      <Tabs.Screen
-        name="awareness tool"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={
-                focused
-                  ? require('../../assets/images/test results.png')
-                  : require('../../assets/images/test results.png')
-              }
-              style={styles.icon}
-            />
-          ),
-        }}
-      />
-
-      {/* Assess Structure Tab */}
-      <Tabs.Screen
-        name="assess structure"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={styles.centeredIcon}>
-              <Image source={require('../../assets/images/rectangle.png')} style={styles.circle} />
+      >
+        {/* Dashboard Tab */}
+        <Tabs.Screen
+          name="dashboard"
+          options={{
+            tabBarIcon: ({ focused }) => (
               <Image
                 source={
                   focused
-                    ? require('../../assets/images/scan_icon.png')
-                    : require('../../assets/images/scan_icon.png')
+                    ? require('../../assets/images/report columns.png')
+                    : require('../../assets/images/report columns.png')
                 }
                 style={styles.icon}
               />
-            </View>
-          ),
-        }}
-      />
+            ),
+          }}
+        />
 
-      {/* Emergency Hotlines Tab */}
-      <Tabs.Screen
-        name="emergency_hotlines"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={
-                focused
-                  ? require('../../assets/images/duplicate contacts.png')
-                  : require('../../assets/images/duplicate contacts.png')
-              }
-              style={styles.icon}
-            />
-          ),
-        }}
-      />
+        {/* Awareness Tool Tab */}
+        <Tabs.Screen
+          name="awareness tool"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/images/test results.png')
+                    : require('../../assets/images/test results.png')
+                }
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
 
-      {/* Nearby Shops Tab */}
-      <Tabs.Screen
-        name="nearby_shops"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={
-                focused
-                  ? require('../../assets/images/group.png')
-                  : require('../../assets/images/group.png')
-              }
-              style={styles.icon}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+        {/* Assess Structure Tab */}
+        <Tabs.Screen
+          name="assess structure"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.centeredIcon}>
+                <Image source={require('../../assets/images/rectangle.png')} style={styles.circle} />
+                <Image
+                  source={
+                    focused
+                      ? require('../../assets/images/scan_icon.png')
+                      : require('../../assets/images/scan_icon.png')
+                  }
+                  style={styles.icon}
+                />
+              </View>
+            ),
+          }}
+        />
+
+        {/* Emergency Hotlines Tab */}
+        <Tabs.Screen
+          name="emergency_hotlines"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/images/duplicate contacts.png')
+                    : require('../../assets/images/duplicate contacts.png')
+                }
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+
+        {/* Nearby Shops Tab */}
+        <Tabs.Screen
+          name="nearby_shops"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={
+                  focused
+                    ? require('../../assets/images/group.png')
+                    : require('../../assets/images/group.png')
+                }
+                style={styles.icon}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </GestureHandlerRootView>
   );
 }
 
@@ -131,4 +134,3 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
 });
-

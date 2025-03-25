@@ -105,7 +105,7 @@ const GettingStarted = () => {
   
       await AsyncStorage.setItem('userId', userId);
   
-      router.push('/dashboard');
+      router.push('../dashboard/dashboard');
     } catch (error) {
       Alert.alert(
         'Error',
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
     marginBottom: 5,
+    marginTop: 50
   },
   subtitle1: {
     fontSize: 15,
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
-    marginTop: -100,
+    marginTop: -40,
   },
   progressStep: {
     width: 50,
