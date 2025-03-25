@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSy1VIPkKSPBIhjOptL3b4xlFqI9ADUoRsNr";
+const GOOGLE_MAPS_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz";
 
 type Store = {
   id: string;
