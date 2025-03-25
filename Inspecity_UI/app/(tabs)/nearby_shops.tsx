@@ -11,11 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 
-<<<<<<< HEAD
-const GOOGLE_MAPS_API_KEY = "AlzaSyrYeoyenSoyRNqkQO5HrjXTpbgmBYNf2yY";
-=======
-const GOOGLE_MAPS_API_KEY = "AlzaSy1VIPkKSPBIhjOptL3b4xlFqI9ADUoRsNr";
->>>>>>> origin/Bazer
+const GOOGLE_MAPS_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz";
 
 type Store = {
   id: string;
@@ -70,21 +66,10 @@ const NearbyShops = () => {
     const radius = 2000;
     const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
     const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
-<<<<<<< HEAD
-    console.log("Fetching URL:", url);
-
-    try {
-      const response = await fetch(url);
-      console.log("Response: ", response);
-      
-      const data = await response.json();
-      console.log("data: ", data);
-=======
 
     try {
       const response = await fetch(url);
       const data = await response.json();
->>>>>>> origin/Bazer
 
       if (data.status === "OK") {
         const formattedStores = await Promise.all(
