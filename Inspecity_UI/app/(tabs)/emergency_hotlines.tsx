@@ -1,97 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, Linking } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { 
+  View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, Linking 
+} from "react-native";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const GOOGLE_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz"; // Replace with your API key
+const GOOGLE_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz"; // Replace with your actual Google API key
+
+const emergencyKeywords = [
+  "emergency rescue",
+  "hospital",
+  "fire station",
+  "police station",
+  "Red Cross",
+  "volunteer fire brigade",
+  "Cebu City Command Center",
+];
 
 const EmergencyHotlines = () => {
   const [hotlines, setHotlines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [location, setLocation] = useState(null);
+  const [error, setError] = useState(null);
 
-  const emergencyKeywords = [
-    "emergency rescue",
-    "hospital",
-    "fire station",
-    "police station",
-    "Red Cross",
-    "volunteer fire brigade",
-    "Cebu City Command Center",
-  ];
-
-  const fetchPlaceDetails = async (placeId) => {
-    try {
-      const response = await fetch(
-        `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${GOOGLE_API_KEY}`
-      );
-      const data = await response.json();
-      if (data.status === "OK") {
-        return data.result;
-      }
-    } catch (error) {
-      console.error("Error fetching place details:", error);
-    }
-    return null;
-  };
-
-  const fetchHotlines = async (loc) => {
-    const { latitude, longitude } = loc.coords;
-    const cacheKey = `hotlines-${latitude}-${longitude}`;
-
-    // Check if data is cached
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-    if (cachedData) {
-      setHotlines(JSON.parse(cachedData));
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      let allHotlines = [];
-
-      for (const keyword of emergencyKeywords) {
-        const response = await fetch(
-          `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=10000&keyword=${encodeURIComponent(
-            keyword
-          )}&key=${GOOGLE_API_KEY}&maxResults=3`
-        );
-        const data = await response.json();
-
-        if (data.status === "OK") {
-          const detailsPromises = data.results.map((place) => fetchPlaceDetails(place.place_id));
-          const detailsResults = await Promise.all(detailsPromises);
-
-          const hotlineList = detailsResults.map((details, index) => ({
-            id: data.results[index].place_id,
-            name: data.results[index].name,
-            phone: details?.formatted_phone_number || "N/A",
-            address: data.results[index].vicinity || "No address available",
-            type: keyword,
-            icon: getIcon(keyword),
-          }));
-
-          allHotlines = [...allHotlines, ...hotlineList];
-        }
-      }
-
-      const uniqueHotlines = allHotlines.filter(
-        (hotline, index, self) => index === self.findIndex((h) => h.id === hotline.id)
-      );
-
-      setHotlines(uniqueHotlines);
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(uniqueHotlines)); // Cache the results
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch emergency hotlines.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getIcon = (type) => {
+  // Memoize the icon getter function
+  const getIcon = useCallback((type) => {
     switch (type) {
       case "hospital":
         return <MaterialIcons name="local-hospital" size={24} color="red" />;
@@ -107,30 +39,142 @@ const EmergencyHotlines = () => {
       default:
         return <MaterialIcons name="emergency" size={24} color="black" />;
     }
-  };
+  }, []);
 
-  const requestLocationPermission = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Location permission is required to get nearby hotlines.");
-      return false;
+  // Memoize the place details fetcher
+  const fetchPlaceDetails = useCallback(async (placeId) => {
+    try {
+      const response = await fetch(
+        `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      return data.status === "OK" ? data.result : null;
+    } catch (error) {
+      console.error("Error fetching place details:", error);
+      return null;
     }
-    return true;
-  };
+  }, []);
+
+  // Optimized hotline fetcher with parallel requests
+  const fetchHotlines = useCallback(async (loc) => {
+    const { latitude, longitude } = loc.coords;
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Process all keywords in parallel
+      const keywordRequests = emergencyKeywords.map(async (keyword) => {
+        try {
+          const response = await fetch(
+            `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=10000&keyword=${encodeURIComponent(
+              keyword
+            )}&key=${GOOGLE_API_KEY}`
+          );
+          const data = await response.json();
+          
+          if (data.status !== "OK" || !data.results?.length) return [];
+
+          // Process place details in parallel
+          const placeDetails = await Promise.all(
+            data.results.map(place => fetchPlaceDetails(place.place_id))
+          );
+
+          return data.results.map((place, index) => ({
+            id: place.place_id,
+            name: place.name,
+            phone: placeDetails[index]?.formatted_phone_number || "N/A",
+            address: place.vicinity || "No address available",
+            type: keyword,
+            icon: getIcon(keyword),
+          }));
+        } catch (err) {
+          console.error(`Error fetching ${keyword}:`, err);
+          return [];
+        }
+      });
+
+      const results = await Promise.all(keywordRequests);
+      const allHotlines = results.flat();
+
+      // Remove duplicates efficiently
+      const uniqueHotlines = allHotlines.reduce((acc, current) => {
+        if (!acc.some(item => item.id === current.id)) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      setHotlines(uniqueHotlines);
+    } catch (error) {
+      console.error("Error fetching hotlines:", error);
+      setError("Failed to fetch emergency hotlines. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchPlaceDetails, getIcon]);
 
   useEffect(() => {
-    (async () => {
-      const hasPermission = await requestLocationPermission();
-      if (!hasPermission) {
-        setLoading(false);
-        return;
-      }
+    let isMounted = true;
+    
+    const getLocationAndHotlines = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          throw new Error("Location permission denied");
+        }
 
-      let loc = await Location.getCurrentPositionAsync({});
-      setLocation(loc);
-      fetchHotlines(loc);
-    })();
-  }, []);
+        const loc = await Location.getCurrentPositionAsync({});
+        if (isMounted) {
+          await fetchHotlines(loc);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(
+            err.message === "Location permission denied"
+              ? "Location permission is required to get nearby hotlines."
+              : "Failed to get your location. Please try again later."
+          );
+          setLoading(false);
+        }
+      }
+    };
+
+    getLocationAndHotlines();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchHotlines]);
+
+  const renderItem = useCallback(({ item }) => (
+    <TouchableOpacity
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 15,
+        backgroundColor: "#fff",
+        marginBottom: 10,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      }}
+      onPress={() =>
+        item.phone !== "N/A"
+          ? Linking.openURL(`tel:${item.phone}`)
+          : Alert.alert("No Phone Number Available", "Please visit the location for assistance.")
+      }
+    >
+      {item.icon}
+      <View style={{ marginLeft: 15 }}>
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
+        <Text style={{ fontSize: 14, color: "gray" }}>{item.address}</Text>
+        <Text style={{ fontSize: 16, color: "blue" }}>📞 {item.phone}</Text>
+      </View>
+    </TouchableOpacity>
+  ), []);
 
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: "#f8f9fa" }}>
@@ -140,41 +184,17 @@ const EmergencyHotlines = () => {
 
       {loading ? (
         <ActivityIndicator size="large" color="#071C34" />
+      ) : error ? (
+        <Text style={{ textAlign: "center", fontSize: 16, color: "red" }}>{error}</Text>
       ) : hotlines.length > 0 ? (
         <FlatList
-            data={hotlines}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 15,
-                  backgroundColor: "#fff",
-                  marginBottom: 10,
-                  borderRadius: 10,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 3,
-                }}
-                onPress={() =>
-                  item.phone !== "N/A"
-                    ? Linking.openURL(`tel:${item.phone}`)
-                    : Alert.alert("No Phone Number Available", "Please visit the location for assistance.")
-                }
-              >
-                {getIcon(item.type)} {/* ✅ Call function directly here */}
-                <View style={{ marginLeft: 15 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
-                  <Text style={{ fontSize: 14, color: "gray" }}>{item.address}</Text>
-                  <Text style={{ fontSize: 16, color: "blue" }}>📞 {item.phone}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-
+          data={hotlines}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={11}
+        />
       ) : (
         <Text style={{ textAlign: "center", fontSize: 16, color: "gray" }}>
           No emergency hotlines found near you.
