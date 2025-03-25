@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StatusBar, ActivityIndicator } from 'react-native';
+import { View, Text, Button, StatusBar, ActivityIndicator, Alert, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 import useUserID from "./useUserID"
 
@@ -10,6 +11,23 @@ const LoadingScreen = () => {
   const [loading, setLoading] = useState(true); // Tracks if userId is being fetched
   const [userIdFetched, setUserIdFetched] = useState(false); // Tracks if userId fetch is complete
   const userId = useUserID();
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        Alert.alert(
+          "No Internet Connection",
+          "Please check your internet connection and try again.",
+          [
+            { text: "OK", onPress: () => BackHandler.exitApp() }
+          ]
+        );
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Automatically remove userId when the component mounts
   // useEffect(() => {
@@ -26,17 +44,69 @@ const LoadingScreen = () => {
   // }, []); // Empty dependency array ensures this runs only once when the component mounts
 
   useEffect(() => {
-    if (userId !== undefined) {
-      // userId has been fetched (could be valid or invalid)
-      setUserIdFetched(true);
-      if (userId) {
-        router.replace('/dashboard'); // Navigate to dashboard if userId is valid
-      } else {
-        setLoading(false); // Stop loading if userId is invalid
+    const checkUserIdInDatabase = async (userId: string) => {
+      try {
+        setLoading(true);
+  
+        const response = await fetch(
+          `https://flask-railway-sample-production.up.railway.app/check_homeowner/${userId}`,
+          {
+            method: 'GET',
+            headers: {
+              'X-API-KEY': API_KEY,
+            },
+          }
+        );
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            // Backend is not available
+            Alert.alert(
+              "Service Unavailable",
+              "The service is currently unavailable. Please try again later.",
+              [
+                { text: "OK", onPress: () => BackHandler.exitApp() }
+              ]
+            );
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(data);
+        
+        if (!data.exists) {
+          await AsyncStorage.removeItem('userId');
+          console.log('userId removed from AsyncStorage');
+        } else {
+          router.replace('/dashboard');
+        }
+      } catch (error) {
+        console.error('Failed to check userId in database:', error);
+        // Don't remove userId here - just alert the user
+        Alert.alert(
+          "Error",
+          "Failed to verify user. Please check your internet connection and try again.",
+          [
+            { text: "OK", onPress: () => BackHandler.exitApp() }
+          ]
+        );
+      } finally {
+        setUserIdFetched(true);
+        setLoading(false);
       }
+    };
+  
+    // Only proceed if userId is defined and not null/empty
+    if (userId) {
+      checkUserIdInDatabase(userId);
+    } else {
+      // If userId is null or empty, mark fetch as complete and stop loading
+      setUserIdFetched(true);
+      setLoading(false);
     }
-  }, [userId, router]);
-
+  }, [userId, router]); // Add userId and router as dependencies
 
   const handleNavigateToGetStarted = () => {
     router.push('/getstarted_1'); // Navigate to the dashboard when the button is pressed

@@ -233,7 +233,9 @@ const PhotoDetails = () => {
         <View style={styles.detailsWrapper}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.detailsContainer}>
-              <Text style={styles.title}>Living Room - Left Wall</Text>
+              <Text style={styles.title}>
+                {reportName ? reportName : "Living Room - Left Wall"}
+              </Text>
               <Text style={styles.subtitle}>{dateCreated || 'Loading date...'}</Text>
   
               {/* Captured Image from Camera */}
@@ -412,7 +414,7 @@ const styles = StyleSheet.create({
   },   
   scrollContent: { padding: 20 },
   detailsContainer: { flexGrow: 1 },
-  title: { fontFamily: 'Epilogue-Bold', fontSize: 25, color: '#2B3C62', textAlign: 'center' },
+  title: { fontFamily: 'Epilogue-Bold', fontSize: 25, color: '#2B3C62', textAlign: 'center', marginTop: 30 },
   subtitle: { fontFamily: 'Epilogue-Regular', fontSize: 12, textAlign: 'center', color: '#32373E', marginTop: 3, marginBottom: 10 },
   capturedImage: {
     width: 200,

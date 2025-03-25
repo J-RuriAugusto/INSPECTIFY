@@ -28,16 +28,19 @@ const GettingStarted2 = () => {
       return;
     }
   
-    let age = houseAge.trim() !== "" ? parseInt(houseAge, 10) : null;
+    if (!houseAge.trim()) {
+      Alert.alert('Error', 'House age is required.');
+      return;
+    }
   
-    if (age !== null && (isNaN(age) || age <= 0)) {
+    let age = parseInt(houseAge, 10);
+  
+    if (isNaN(age) || age <= 0) {
       Alert.alert('Error', 'Please enter a valid positive integer for the house age.');
       return;
     }
   
-    if (age !== null) {
-      setHouseAge(age.toString()); // Ensure UI reflects parsed value
-    }
+    setHouseAge(age.toString()); // Ensure UI reflects parsed value
   
     const homeData = JSON.stringify({ 
       homeName, 
@@ -51,6 +54,7 @@ const GettingStarted2 = () => {
       params: { homeData },
     });
   };
+  
   
   
   

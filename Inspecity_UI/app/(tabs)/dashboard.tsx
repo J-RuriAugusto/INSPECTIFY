@@ -1,19 +1,29 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler } from 'react-native';
+import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler, RefreshControl } from 'react-native';
 import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
 import useUserID from "../useUserID";
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import HomeDetails from '../../constants/HomeDetails'
+import { Link } from 'expo-router';
+import NetInfo from '@react-native-community/netinfo';
+interface Report {
+  report_id: string;
+  report_name: string;
+}
 
 const Dashboard = () => {
   const [search, setSearch] = React.useState('');
   const userId = useUserID();
   const [houseName, setHouseName] = useState('NAME OF HOUSE');
   const [location, setLocation] = useState('LOCATION');
+  const [reportsTitleID, setReportsTitleID] = useState<Report[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
+  const router = useRouter();
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
@@ -22,10 +32,35 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        Alert.alert(
+          "No Internet Connection",
+          "Please check your internet connection and try again.",
+          [
+            { text: "OK", onPress: () => BackHandler.exitApp() }
+          ]
+        );
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+    
+  useEffect(() => {
     if (userId) {
       fetchHouseDetails(userId);
     }
   }, [userId]);
+
+  useEffect(() => {
+    const homeId = HomeDetails.homeId;
+    if (homeId) {
+      fetchReportTitles(homeId).then(reports => {
+        setReportsTitleID(reports);
+      });
+    }
+  }, [HomeDetails.homeId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,29 +80,41 @@ const Dashboard = () => {
 
   const fetchHouseDetails = async (userId: string) => {
     try {
-      console.log(`IT is: ${userId}`)
-      const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homeowners/${userId}/default_home`, {
-        method: 'GET',
-        headers: {
-          'X-API-KEY': API_KEY, // Add the API key header
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch house details');
+      console.log(`Fetching details for user: ${userId}`);
+  
+      const response = await fetch(
+        `https://flask-railway-sample-production.up.railway.app/homeowners/${userId}/default_home`,
+        {
+          method: 'GET',
+          headers: {
+            'X-API-KEY': API_KEY,
+          },
+        }
+      );
+  
+      if (response.status === 404) {
+        console.log("No default home found.");
+        Alert.alert("Failed to fetch house details", "No default home found.");
+        setHouseName("NAME OF HOUSE");
+        setLocation("LOCATION");
+        return; // Stop execution here
       }
+  
+      if (!response.ok) {
+        throw new Error("Backend is not accessible.");
+      }
+  
       const data = await response.json();
+  
       setHouseName(data.home_name && data.home_name.trim() ? data.home_name : "NAME OF HOUSE");
-      HomeDetails.setHomeId(data.home_id)
+      HomeDetails.setHomeId(data.home_id);
+  
       if (data.latitude && data.longitude) {
         HomeDetails.setHomeLocation(data.latitude, data.longitude);
-        // Use reverse geocoding to get the address from latitude and longitude
         let reverseGeocode = await Location.reverseGeocodeAsync({ latitude: data.latitude, longitude: data.longitude });
-
-        // Extract the relevant parts of the address
+  
         if (reverseGeocode.length > 0) {
-          const { city, district, region, country, street, name } = reverseGeocode[0];
-
-          // Format the address as Baranggay, Municipality/District, Province/City
+          const { city, district, region } = reverseGeocode[0];
           const formattedLocation = `${city || district || ''}, ${region || ''}`;
           setLocation(formattedLocation.trim());
         } else {
@@ -75,13 +122,56 @@ const Dashboard = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching house details:", error);
-      setHouseName("NAME OF HOUSE");  // Ensure default values on failure
+      console.log("Error fetching house details:", error.message);
+      Alert.alert("Error fetching house details", "Backend is not accessible.");
+      setHouseName("NAME OF HOUSE");
       setLocation("LOCATION");
     }
   };
+  
 
+  const fetchReportTitles = async (homeId: string) => {
+    try {
+      const response = await fetch(`https://flask-railway-sample-production.up.railway.app/reportNamesIDs?home_id=${homeId}`, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': API_KEY,
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch report titles');
+      }
+
+      const data = await response.json();
+      return data.reports;
+    } catch (error) {
+      Alert.alert("Error fetching report titles.");
+      return [];
+    }
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true); // Start refresh animation
+  
+    try {
+      if (!userId) throw new Error("User ID not available");
+  
+      await fetchHouseDetails(userId);
+  
+      const homeId = HomeDetails.homeId;
+      if (homeId) {
+        const reports = await fetchReportTitles(homeId);
+        setReportsTitleID(reports);
+      }
+    } catch (error) {
+      console.error("Refresh failed.");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [userId]);
+  
+  
   if (!fontsLoaded) {
     return null; 
   }
@@ -93,90 +183,91 @@ const Dashboard = () => {
     { id: '4', image: require('../../assets/images/shop2.png') },
   ];
 
-  const reportsData = [
-    { id: '1', title: 'Report 1' },
-    { id: '2', title: 'Report 2' },
-    { id: '3', title: 'Report 3' },
-    { id: '4', title: 'Report 4' },
-    { id: '5', title: 'Report 5' },
-    { id: '6', title: 'Report 6' },
-    { id: '7', title: 'Report 7' },
-    { id: '8', title: 'Report 8' },
-  ];
-
   const handleShopPress = (id: string) => {
     Alert.alert(`Shop ${id} Pressed!`);
   };
 
   const handleReportPress = (id: string) => {
-    Alert.alert(`Report ${id} Pressed!`);
+    router.push({ pathname: '../assess structure/reportDetails', params: {report_id: id } });
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header with House and Settings Icons */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => Alert.alert('House Icon Pressed!')}>
-          <Image source={require('../../assets/images/houseicon.png')} style={styles.headerIcon} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => Alert.alert('Settings Icon Pressed!')}>
-          <Image source={require('../../assets/images/settings_icon.png')} style={styles.headerIcon} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Main Content */}
-      <Text style={styles.title1}>{houseName}</Text>
-      <Text style={styles.title2}>{location}</Text>
-
-      {/* Search Bar */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search here..."
-        placeholderTextColor="#AFAFAF"
-        value={search}
-        onChangeText={setSearch}
-      />
-
-      {/* Saved Shops (Horizontal Scroll) */}
-      <Text style={styles.title3}>Saved Shops</Text>
-      <FlatList
-        data={savedShops}
-        horizontal
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleShopPress(item.id)}>
-            <Image source={item.image} style={styles.shopImage} />
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.container}>
+        {/* Header with House and Settings Icons */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => Alert.alert('House Icon Pressed!')}>
+            <Image source={require('../../assets/images/houseicon.png')} style={styles.headerIcon} />
           </TouchableOpacity>
-        )}
-      />
 
-    {/* Reports Section (Vertical Scroll) */}
-    <Text style={styles.title4}>Reports</Text>
-    <ScrollView contentContainerStyle={styles.reportsContainer}>
-      {reportsData.map((report) => (
-        <TouchableOpacity 
-          key={report.id} 
-          onPress={() => handleReportPress(report.id)} 
-          style={styles.reportItem}
-        >
-          <View style={styles.reportContent}>
-            {/* Icon before the report title */}
-            <Image 
-              source={require('../../assets/images/report_icon.png')} 
-              style={styles.reportIcon}
-            />
-            
-            {/* Report Title */}
-            <Text style={styles.reportText}>{report.title}</Text>
-          </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-    </View>
-  );
-};
+          <TouchableOpacity onPress={() => Alert.alert('Settings Icon Pressed!')}>
+            <Image source={require('../../assets/images/settings_icon.png')} style={styles.headerIcon} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Main Content */}
+        <Text style={styles.title1}>{houseName}</Text>
+        <Text style={styles.title2}>{location}</Text>
+
+        {/* Search Bar */}
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search here..."
+          placeholderTextColor="#AFAFAF"
+          value={search}
+          onChangeText={setSearch}
+        />
+
+        {/* Saved Shops (Horizontal Scroll) */}
+        <Text style={styles.title3}>Saved Shops</Text>
+        <FlatList
+          data={savedShops}
+          horizontal
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleShopPress(item.id)}>
+              <Image source={item.image} style={styles.shopImage} />
+            </TouchableOpacity>
+          )}
+        />
+
+        {/* Reports Section (Vertical Scroll) */}
+        <Text style={styles.title4}>Reports</Text>
+                <View style={{ flex: 1, backgroundColor: 'FFFFFF' }}>
+                  <ScrollView contentContainerStyle={styles.reportsContainer}>
+                    {reportsTitleID.length === 0 ? (
+                      <View style={styles.noReportsContainer}>
+                        <Text style={styles.noReportsText}>No reports yet</Text>
+                      </View>
+                    ) : (
+                      reportsTitleID.map((report) => (
+                        <TouchableOpacity 
+                          key={report.report_id} 
+                          onPress={() => handleReportPress(report.report_id)} 
+                          style={styles.reportItem}
+                        >
+                          <View style={styles.reportContent}>
+                            <Image 
+                              source={require('../../assets/images/report_icon.png')} 
+                              style={styles.reportIcon}
+                            />
+                            <Text style={styles.reportText}>{report.report_name}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              </View>
+            </ScrollView>
+          );
+        };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -245,8 +336,19 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   reportsContainer: {
-    paddingBottom: 10, // Add some padding at the bottom to avoid cutoff
+    paddingBottom: 256, // Add some padding at the bottom to avoid cutoff
     width: '100%'
+  },
+  noReportsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  noReportsText: {
+    fontSize: 18,
+    color: '#AFAFAF',
+    fontFamily: 'Archivo-Regular',
   },
   reportItem: {
     padding: 15,

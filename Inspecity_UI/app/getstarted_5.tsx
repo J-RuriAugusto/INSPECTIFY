@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, Alert, BackHandler } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import 'react-native-get-random-values';
@@ -107,7 +107,11 @@ const GettingStarted = () => {
   
       router.push('/dashboard');
     } catch (error) {
-      console.error('Error:', error);
+      Alert.alert(
+        'Error',
+        'Failed to create homeowner. Try again later.',
+        [{ text: 'OK', onPress: () => BackHandler.exitApp() }]
+      );
     }
   };
 
