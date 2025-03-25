@@ -142,38 +142,39 @@ const EmergencyHotlines = () => {
         <ActivityIndicator size="large" color="#071C34" />
       ) : hotlines.length > 0 ? (
         <FlatList
-          data={hotlines}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                padding: 15,
-                backgroundColor: "#fff",
-                marginBottom: 10,
-                borderRadius: 10,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-              }}
-              onPress={() =>
-                item.phone !== "N/A"
-                  ? Linking.openURL(`tel:${item.phone}`)
-                  : Alert.alert("No Phone Number Available", "Please visit the location for assistance.")
-              }
-            >
-              {item.icon}
-              <View style={{ marginLeft: 15 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
-                <Text style={{ fontSize: 14, color: "gray" }}>{item.address}</Text>
-                <Text style={{ fontSize: 16, color: "blue" }}>📞 {item.phone}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+            data={hotlines}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 15,
+                  backgroundColor: "#fff",
+                  marginBottom: 10,
+                  borderRadius: 10,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+                onPress={() =>
+                  item.phone !== "N/A"
+                    ? Linking.openURL(`tel:${item.phone}`)
+                    : Alert.alert("No Phone Number Available", "Please visit the location for assistance.")
+                }
+              >
+                {getIcon(item.type)} {/* ✅ Call function directly here */}
+                <View style={{ marginLeft: 15 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
+                  <Text style={{ fontSize: 14, color: "gray" }}>{item.address}</Text>
+                  <Text style={{ fontSize: 16, color: "blue" }}>📞 {item.phone}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+
       ) : (
         <Text style={{ textAlign: "center", fontSize: 16, color: "gray" }}>
           No emergency hotlines found near you.
