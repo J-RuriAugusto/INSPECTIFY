@@ -1,280 +1,186 @@
-import * as React from 'react';
-import { View, Text, Image, useWindowDimensions, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Alert, Linking } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import * as Location from 'expo-location';
-import { useFonts } from 'expo-font';
-import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import { Swipeable } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, Linking } from "react-native";
+import * as Location from "expo-location";
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function EmergencyHotlines() {
-  const layout = useWindowDimensions();
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'favorites', title: 'Favorites' },
-    { key: 'all', title: 'All' },
-  ]);
+const GOOGLE_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz"; // Replace with your API key
 
-  const [location, setLocation] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [hotlines, setHotlines] = React.useState([]);
+const EmergencyHotlines = () => {
+  const [hotlines, setHotlines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState(null);
 
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../assets/fonts/Archivo-Regular.ttf'),
-    'Epilogue-Bold': require('../../assets/fonts/Epilogue-Bold.ttf'),
-  });
-  if (!fontsLoaded) {
-    return null; 
-  }
+  const emergencyKeywords = [
+    "emergency rescue",
+    "hospital",
+    "fire station",
+    "police station",
+    "Red Cross",
+    "volunteer fire brigade",
+    "Cebu City Command Center",
+  ];
 
-  // Request location and fetch hotlines
-  React.useEffect(() => {
+  const fetchPlaceDetails = async (placeId) => {
+    try {
+      const response = await fetch(
+        `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      if (data.status === "OK") {
+        return data.result;
+      }
+    } catch (error) {
+      console.error("Error fetching place details:", error);
+    }
+    return null;
+  };
+
+  const fetchHotlines = async (loc) => {
+    const { latitude, longitude } = loc.coords;
+    const cacheKey = `hotlines-${latitude}-${longitude}`;
+
+    // Check if data is cached
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+    if (cachedData) {
+      setHotlines(JSON.parse(cachedData));
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      let allHotlines = [];
+
+      for (const keyword of emergencyKeywords) {
+        const response = await fetch(
+          `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=10000&keyword=${encodeURIComponent(
+            keyword
+          )}&key=${GOOGLE_API_KEY}&maxResults=3`
+        );
+        const data = await response.json();
+
+        if (data.status === "OK") {
+          const detailsPromises = data.results.map((place) => fetchPlaceDetails(place.place_id));
+          const detailsResults = await Promise.all(detailsPromises);
+
+          const hotlineList = detailsResults.map((details, index) => ({
+            id: data.results[index].place_id,
+            name: data.results[index].name,
+            phone: details?.formatted_phone_number || "N/A",
+            address: data.results[index].vicinity || "No address available",
+            type: keyword,
+            icon: getIcon(keyword),
+          }));
+
+          allHotlines = [...allHotlines, ...hotlineList];
+        }
+      }
+
+      const uniqueHotlines = allHotlines.filter(
+        (hotline, index, self) => index === self.findIndex((h) => h.id === hotline.id)
+      );
+
+      setHotlines(uniqueHotlines);
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(uniqueHotlines)); // Cache the results
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch emergency hotlines.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIcon = (type) => {
+    switch (type) {
+      case "hospital":
+        return <MaterialIcons name="local-hospital" size={24} color="red" />;
+      case "fire station":
+      case "volunteer fire brigade":
+        return <MaterialIcons name="local-fire-department" size={24} color="orange" />;
+      case "police station":
+        return <MaterialIcons name="local-police" size={24} color="blue" />;
+      case "Red Cross":
+        return <MaterialIcons name="volunteer-activism" size={24} color="red" />;
+      case "Cebu City Command Center":
+        return <MaterialIcons name="support-agent" size={24} color="purple" />;
+      default:
+        return <MaterialIcons name="emergency" size={24} color="black" />;
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Denied", "Location permission is required to get nearby hotlines.");
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Location permission is required to get nearby hotlines.');
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
         setLoading(false);
         return;
       }
 
       let loc = await Location.getCurrentPositionAsync({});
       setLocation(loc);
-      fetchHotlines(loc); // Mock fetching hotlines based on location
+      fetchHotlines(loc);
     })();
   }, []);
 
-  // Mock function to fetch hotlines based on location
-  const fetchHotlines = (loc) => {
-    console.log('Fetching hotlines for:', loc.coords.latitude, loc.coords.longitude);
+  return (
+    <View style={{ flex: 1, padding: 20, backgroundColor: "#f8f9fa" }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
+        Emergency Hotlines
+      </Text>
 
-    // Example static list, replace with API call based on loc.coords
-    const hotlineList = [
-      { id: '1', name: 'Electric Emergency', phone: '123-456-7890', icon: <Ionicons name="flash" size={24} color="#071C34" /> },
-      { id: '2', name: 'Police Emergency', phone: '987-654-3210', icon: <FontAwesome5 name="shield-alt" size={24} color="#071C34" /> },
-      { id: '3', name: 'Fire Department', phone: '555-123-4567', icon: <MaterialIcons name="fire-extinguisher" size={24} color="#071C34" /> },
-    ];
-
-    setHotlines(hotlineList);
-    setLoading(false);
-  };
-
-  const FavoritesRoute = () => (
-    <View style={styles.scene}>
-      <Text>Favorites Content Here (Saved Hotlines)</Text>
-    </View>
-  );
-
-  // Render each hotline card with swipeable action
-  const renderItem = ({ item }) => {
-    // Left swipe (Message)
-    const renderLeftActions = () => (
-      <TouchableOpacity
-        style={styles.leftAction}
-        onPress={() => Linking.openURL(`sms:${item.phone}`)}
-      >
-        <Image
-          source={require('../../assets/images/message_icon.png')} // Your custom message icon
-          style={styles.icon}
-        />
-      </TouchableOpacity>
-    );
-
-    // Right swipe (Call)
-    const renderRightActions = () => (
-      <TouchableOpacity
-        style={styles.rightAction}
-        onPress={() => Linking.openURL(`tel:${item.phone}`)}
-      >
-        <Image
-          source={require('../../assets/images/call_icon.png')} // Your custom call icon
-          style={styles.icon}
-        />
-      </TouchableOpacity>
-    );
-
-    return (
-      <Swipeable
-        renderLeftActions={renderLeftActions}
-        renderRightActions={renderRightActions}
-      >
-        <View style={styles.card}>
-          <View style={styles.cardContent}>
-            <View style={styles.iconContainer}>{item.icon}</View>
-            <View style={styles.detailsContainer}>
-              <Text style={styles.hotlineName}>{item.name}</Text>
-              <Text style={styles.hotlinePhone}>{item.phone}</Text>
-            </View>
-            <TouchableOpacity>
-              <Ionicons name="heart-outline" size={24} color="#071C34" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Swipeable>
-    );
-  };
-
-  const AllRoute = () => (
-    <View style={styles.allContainer}>
       {loading ? (
-        <ActivityIndicator size="large" color="#0A4D95" />
-      ) : (
+        <ActivityIndicator size="large" color="#071C34" />
+      ) : hotlines.length > 0 ? (
         <FlatList
           data={hotlines}
           keyExtractor={(item) => item.id}
-          renderItem={renderItem}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 15,
+                backgroundColor: "#fff",
+                marginBottom: 10,
+                borderRadius: 10,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3,
+              }}
+              onPress={() =>
+                item.phone !== "N/A"
+                  ? Linking.openURL(`tel:${item.phone}`)
+                  : Alert.alert("No Phone Number Available", "Please visit the location for assistance.")
+              }
+            >
+              {item.icon}
+              <View style={{ marginLeft: 15 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
+                <Text style={{ fontSize: 14, color: "gray" }}>{item.address}</Text>
+                <Text style={{ fontSize: 16, color: "blue" }}>📞 {item.phone}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         />
+      ) : (
+        <Text style={{ textAlign: "center", fontSize: 16, color: "gray" }}>
+          No emergency hotlines found near you.
+        </Text>
       )}
     </View>
   );
+};
 
-  const renderScene = SceneMap({
-    favorites: FavoritesRoute,
-    all: AllRoute,
-  });
-
-  return (
-    <View style={{ flex: 1, paddingTop: 70, backgroundColor: '#fff' }}>
-      <Text style={styles.title}>Emergency Hotlines</Text>
-
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            indicatorStyle={styles.indicator}
-            style={styles.tabBar}
-            tabStyle={styles.tabStyle}
-            renderLabel={({ route, focused }) => (
-              <Text
-                style={[
-                  styles.label,
-                  { color: focused ? '#000' : '#071C34' },
-                ]}
-              >
-                {route.title}
-              </Text>
-            )}
-          />
-        )}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    color: '#071C34',
-    fontFamily: 'Epilogue-Bold',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  scene: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  tabBar: {
-    backgroundColor: '#F1F1F1',
-    borderRadius: 20,
-    marginHorizontal: 60,
-    marginBottom: 10,
-    height: 50,
-    overflow: 'hidden',
-  },
-  indicator: {
-    backgroundColor: '#0A4D95',
-    height: '100%',
-    borderRadius: 20,
-  },
-  tabStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    padding: 0,
-    margin: 0,
-  },
-  label: {
-    fontFamily: 'Epilogue-Regular',
-    fontSize: 14,
-    margin: 0,
-    padding: 0,
-    textAlign: 'center',
-  },
-  allContainer: {
-    flex: 1,
-    paddingHorizontal: 25,
-    paddingTop: 10,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderColor: '#000',
-    padding: 30,
-    marginBottom: 15,
-    marginHorizontal: 3,
-    borderRadius: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  iconContainer: {
-    marginRight: 15,
-  },
-  detailsContainer: {
-    flex: 1,
-  },
-  hotlineName: {
-    fontSize: 16,
-    fontFamily: 'Epilogue-Bold',
-    color: '#071C34',
-    marginBottom: 2,
-  },
-  hotlinePhone: {
-    fontSize: 14,
-    fontFamily: 'Epilogue-Regular',
-    color: '#071C34',
-  },
-  leftAction: {
-    backgroundColor: '#2A74C7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 15,
-    marginHorizontal: 3,
-    borderRadius: 25,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  rightAction: {
-    backgroundColor: '#05173F',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 15,
-    marginHorizontal: 3,
-    borderRadius: 25,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  actionText: {
-    color: '#fff',
-    fontFamily: 'Epilogue-Bold',
-    marginLeft: 10,
-  },
-  icon: {
-    width: 50, // Adjust size based on your icon
-    height: 50,
-    resizeMode: 'contain',
-  },
-});
+export default EmergencyHotlines;
