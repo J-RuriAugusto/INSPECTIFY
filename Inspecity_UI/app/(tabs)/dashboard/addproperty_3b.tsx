@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, Alert, BackHandler, TextInput, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import 'react-native-get-random-values';
+import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import * as Location from 'expo-location';
+import HomeDetails from '../../../constants/HomeDetails'
+import useUserID from "../../useUserID";
 
 const GettingStarted = () => {
+  const { homeData } = useLocalSearchParams();
+  const userId = useUserID();
+  const [location, setLocation] = useState<{latitude: number | null, longitude: number | null}>({latitude: null, longitude: null});
+  const [locationError, setLocationError] = useState<string | null>(null);
+  console.log(homeData)
   const router = useRouter();
   const [selectedHouseType, setSelectedHouseType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState("");
@@ -18,18 +29,96 @@ const GettingStarted = () => {
   const [otherWall, setOtherWall] = useState('');
   const [otherCeiling, setOtherCeiling] = useState('');
 
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
+
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
     'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
   });
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationError('Permission to access location was denied');
+        return;
+      }
+
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+        });
+      } catch (error) {
+        setLocationError('Failed to get location');
+        console.error("Error getting location:", error);
+      }
+    })();
+  }, []);
+
   if (!fontsLoaded) {
     return null;
   }
 
-  const handleNavigateToGetStarted4 = () => {
-    router.push('/dashboard/MyProperties');
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
+  const handleNavigateToGetStarted4 = async () => {
+    const updatedHomeData = {
+      ...parsedHomeData,
+      selectedHouseType: selectedHouseType === "others" 
+        ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+        : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+
+      selectedMaterial: selectedMaterial === "others" 
+        ? (otherMaterial.trim() !== "" ? otherMaterial : null) 
+        : (selectedMaterial.trim() !== "" ? selectedMaterial : null),
+
+      selectedFlooring: selectedFlooring === "others" 
+        ? (otherFlooring.trim() !== "" ? otherFlooring : null) 
+        : (selectedFlooring.trim() !== "" ? selectedFlooring : null),
+
+      selectedWall: selectedWall === "others" 
+        ? (otherWall.trim() !== "" ? otherWall : null) 
+        : (selectedWall.trim() !== "" ? selectedWall : null),
+
+      selectedCeiling: selectedCeiling === "others" 
+        ? (otherCeiling.trim() !== "" ? otherCeiling : null) 
+        : (selectedCeiling.trim() !== "" ? selectedCeiling : null),
+        
+        latitude: location.latitude,
+        longitude: location.longitude,
+      homeowner_id: userId,
+      is_default: true,
+    };
+
+    try {
+      const homeResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY, // Add the API key header
+        },
+        body: JSON.stringify(updatedHomeData),
+      });
+
+      if (!homeResponse.ok) {
+        throw new Error('Failed to create home');
+      }
+  
+      console.log('Home created successfully');
+  
+      router.push('../dashboard/dashboard');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'Failed to create home. Try again later.',
+        [{ text: 'OK', onPress: () => BackHandler.exitApp() }]
+      );
+    }
   };
   
   const currentStep = 4;

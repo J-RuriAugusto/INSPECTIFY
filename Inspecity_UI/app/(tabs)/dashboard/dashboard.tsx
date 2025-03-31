@@ -94,14 +94,23 @@ const Dashboard = () => {
   
       if (response.status === 404) {
         console.log("No default home found.");
-        Alert.alert("Failed to fetch house details", "No default home found.");
+        Alert.alert(
+          "No Home Created",
+          "Click OK to create home.",
+          [
+            {
+              text: "OK",
+              onPress: () => router.push('/dashboard/MyProperties')
+            }
+          ]
+        );
         setHouseName("NAME OF HOUSE");
         setLocation("LOCATION");
-        return; // Stop execution here
+        return;
       }
   
       if (!response.ok) {
-        throw new Error("Backend is not accessible.");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
   
       const data = await response.json();
@@ -111,19 +120,40 @@ const Dashboard = () => {
   
       if (data.latitude && data.longitude) {
         HomeDetails.setHomeLocation(data.latitude, data.longitude);
-        let reverseGeocode = await Location.reverseGeocodeAsync({ latitude: data.latitude, longitude: data.longitude });
-  
-        if (reverseGeocode.length > 0) {
-          const { city, district, region } = reverseGeocode[0];
-          const formattedLocation = `${city || district || ''}, ${region || ''}`;
-          setLocation(formattedLocation.trim());
-        } else {
-          setLocation("LOCATION");
+        
+        try {
+          const reverseGeocode = await Location.reverseGeocodeAsync({
+            latitude: data.latitude,
+            longitude: data.longitude
+          });
+          
+          if (reverseGeocode.length > 0) {
+            const { city, region, street, name, district } = reverseGeocode[0];
+            const formattedLocation = [
+              name,
+              street,
+              district,
+              city,
+              region
+            ].filter(Boolean).join(', ');
+            setLocation(formattedLocation.trim());
+          } else {
+            setLocation(`${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`);
+          }
+        } catch (geocodeError) {
+          console.warn("Reverse geocoding failed:", geocodeError);
+          setLocation(`${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`);
         }
+      } else {
+        setLocation("LOCATION");
       }
     } catch (error) {
-      console.log("Error fetching house details:", error.message);
-      Alert.alert("Error fetching house details", "Backend is not accessible.");
+      let errorMessage = "Backend is not accessible.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.log("Error fetching house details:", errorMessage);
+      Alert.alert("Error fetching house details", errorMessage);
       setHouseName("NAME OF HOUSE");
       setLocation("LOCATION");
     }

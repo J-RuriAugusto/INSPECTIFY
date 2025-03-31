@@ -36,13 +36,35 @@ const PhotoDetails = () => {
   const [reportModalVisible, setReportModalVisible] = useState(false);
 
   const saveReport = () => {
-    alert("Report Saved!");
-    setReportModalVisible(false);
+    Alert.alert(
+      "Report Status",
+      "Your report is already saved.\nYou can turn off auto-save in settings.",
+      [{ text: "OK", onPress: () => setReportModalVisible(false) }]
+    );
   };
 
-  const deleteReport = () => {
-    alert("Report Deleted!");
-    setReportModalVisible(false);
+  const deleteReport = async () => {
+    try {
+      const response = await axios.delete(
+        `https://flask-railway-sample-production.up.railway.app/reports/${reportID}`,
+        {
+          headers: {
+            'X-API-KEY': API_KEY,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        Alert.alert("Success", "Report deleted successfully");
+        setReportModalVisible(false);
+        router.replace('../dashboard/dashboard'); // Navigate back after deletion
+      } else {
+        Alert.alert("Error", "Failed to delete report");
+      }
+    } catch (error) {
+      console.error("Error deleting report:", error);
+      Alert.alert("Error", "An error occurred while deleting the report");
+    }
   };
 
   useEffect(() => {

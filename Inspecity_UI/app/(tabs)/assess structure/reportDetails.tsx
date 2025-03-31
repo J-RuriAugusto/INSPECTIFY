@@ -28,14 +28,28 @@ const PhotoDetails = () => {
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
 
-  const saveReport = () => {
-    alert("Report Saved!");
-    setReportModalVisible(false);
-  };
-
-  const deleteReport = () => {
-    alert("Report Deleted!");
-    setReportModalVisible(false);
+  const deleteReport = async () => {
+    try {
+      const response = await axios.delete(
+        `https://flask-railway-sample-production.up.railway.app/reports/${reportID}`,
+        {
+          headers: {
+            'X-API-KEY': API_KEY,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        Alert.alert("Success", "Report deleted successfully");
+        setReportModalVisible(false);
+        router.replace('../dashboard/dashboard'); // Navigate back after deletion
+      } else {
+        Alert.alert("Error", "Failed to delete report");
+      }
+    } catch (error) {
+      console.error("Error deleting report:", error);
+      Alert.alert("Error", "An error occurred while deleting the report");
+    }
   };
 
   useFocusEffect(
@@ -260,17 +274,6 @@ const PhotoDetails = () => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Manage Report</Text>
-
-                {/* Save Report Button */}
-                <TouchableOpacity 
-                  style={styles.modalButton} 
-                  onPress={() => {
-                    saveReport();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.modalButtonText}>Save Report</Text>
-                </TouchableOpacity>
 
                 {/* Delete Report Button */}
                 <TouchableOpacity 
