@@ -23,7 +23,7 @@ const GettingStarted2 = () => {
   }
 
   const handleNavigateToGetStarted3 = () => {
-    router.push('/dashboard/addproperty_3'); // Navigate to the next screen
+    router.push('/board/addproperty_3'); // Navigate to the next screen
   };
 
   const currentStep = 2; // Current progress step
@@ -41,18 +41,7 @@ const GettingStarted2 = () => {
 
       {/* Lower White Section */}
       <View style={styles.lowerSection}>
-        {/* Custom Progress Bar */}
-        {/* <View style={styles.progressBar}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <View
-              key={index}
-              style={[ 
-                styles.progressStep, 
-                index < currentStep ? styles.progressStepActive : styles.progressStepInactive 
-              ]}
-            />
-          ))}
-        </View> */}
+
 
         <Text style={styles.title1}>Add New Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your</Text>

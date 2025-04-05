@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Modal, TextInput } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -7,15 +10,49 @@ import * as ImagePicker from 'expo-image-picker';
 
 const MyProperties = () => {
   const router = useRouter();
-  
+
+
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [newProperty, setNewProperty] = useState({ name: '', location: '', image: null });
+  const [newProperty, setNewProperty] = useState({ 
+    name: '', 
+    location: '', 
+    age: '', 
+    primaryUse: '', 
+    repairs: '', 
+    repairDetails: '',
+    image: null 
+  });  
   const [properties, setProperties] = useState([
-    { id: '1', name: 'Cozy Apartment', location: 'New York, NY', image: require('../../../assets/images/property.png') },
-    { id: '2', name: 'Luxury Villa', location: 'Los Angeles, CA', image: require('../../../assets/images/property.png') },
+    { 
+      id: '1', 
+      name: 'Cozy Apartment', 
+      location: 'New York, NY', 
+      age: '10 years', 
+      primaryUse: 'Residential', 
+      repairs: 'Yes', 
+      repairDetails: 'Roof repaired in 2020',
+      type: 'Apartment',
+      otherType: '',
+      height: '3 floors',
+      lotArea: '120 sqm',
+      floorArea: '250 sqm',
+      primaryMaterial: 'Concrete Hollow Blocks',
+      otherPrimaryMaterial: '',
+      roofingMaterial: 'GI Sheets (Yero)',
+      otherRoofingMaterial: '',
+      flooringMaterial: 'Tiles',
+      otherFlooringMaterial: '',
+      wallMaterial: 'Concrete',
+      otherWallMaterial: '',
+      ceilingMaterial: 'Gypsum Board',
+      otherCeilingMaterial: '',
+      image: require('../../../assets/images/property.png') 
+    }
   ]);
+  
+  
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -28,34 +65,30 @@ const MyProperties = () => {
   }
 
   const handleEdit = (property) => {
-    setSelectedProperty(property);
+    setSelectedProperty({
+      ...property,
+      primaryMaterial: property.primaryMaterial || "Reinforced Concrete",
+      otherPrimaryMaterial: property.otherPrimaryMaterial || "",
+      roofingMaterial: property.roofingMaterial || "GI Sheets (Yero)",
+      otherRoofingMaterial: property.otherRoofingMaterial || "",
+      flooringMaterial: property.flooringMaterial || "Concrete",
+      otherFlooringMaterial: property.otherFlooringMaterial || "",
+      wallMaterial: property.wallMaterial || "Concrete",
+      otherWallMaterial: property.otherWallMaterial || "",
+      ceilingMaterial: property.ceilingMaterial || "Gypsum Board",
+      otherCeilingMaterial: property.otherCeilingMaterial || ""
+    });
     setEditModalVisible(true);
   };
+  
+  
 
   const saveChanges = () => {
     console.log('Updated Property:', selectedProperty);
     setEditModalVisible(false);
   };
 
- 
 
-  // const renderLeftActions = (id) => (
-  //   <TouchableOpacity 
-  //     style={[styles.swipeAction, styles.deleteAction]} 
-  //     onPress={() => handleDelete(id)}
-  //   >
-  //     <Text style={styles.swipeText}>Delete</Text>
-  //   </TouchableOpacity>
-  // );
-
-  // const renderRightActions = (property) => (
-  //   <TouchableOpacity 
-  //     style={[styles.swipeAction, styles.editAction]} 
-  //     onPress={() => handleEdit(property)}
-  //   >
-  //     <Text style={styles.swipeText}>Edit</Text>
-  //   </TouchableOpacity>
-  // );
 
   const handleDelete = (id) => {
     Alert.alert('Delete Property', 'Are you sure you want to delete this property?', [
@@ -64,15 +97,6 @@ const MyProperties = () => {
     ]);
   };
 
-// const handleAddProperty = () => {
-//   if (newProperty.name && newProperty.location) {
-//     setProperties([...properties, { id: Date.now().toString(), ...newProperty }]);
-//     setNewProperty({ name: '', location: '', image: null });
-//     setAddModalVisible(false);
-//   } else {
-//     Alert.alert('Error', 'Please enter both name and location.');
-//   }
-// };
 
 const pickImage = async (isNew = false) => {
   let result = await ImagePicker.launchImageLibraryAsync({
@@ -122,101 +146,262 @@ const pickImage = async (isNew = false) => {
         )}
       />
 
-      {/* <TouchableOpacity style={styles.addButton} onPress={() => setAddModalVisible(true)}>
-        <Text style={styles.addButtonText}>Add Property</Text>
-      </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('/board/addproperty_2')}>
         <Text style={styles.addButtonText}>Add Property</Text>
       </TouchableOpacity>
 
-{/* Add Property Modal
-<Modal
-visible={isAddModalVisible}
-animationType="slide"
-transparent={true}
-onRequestClose={() => setAddModalVisible(false)}
+
+      <Modal
+  visible={isEditModalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={() => setEditModalVisible(false)}
 >
-<View style={styles.modalOverlay}>
-  <View style={styles.modalContent}>
-    <Text style={styles.modalTitle}>Add New Property</Text>
-
-    <TouchableOpacity onPress={() => pickImage(true)}>
-      <Image 
-        source={newProperty.image || require('../../../assets/images/property.png')} 
-        style={styles.modalImage} 
-      />
-      <Text style={styles.changeImageText}>Select Image</Text>
-    </TouchableOpacity>
-
-    <TextInput
-      style={styles.input}
-      value={newProperty.name}
-      onChangeText={(text) => setNewProperty({ ...newProperty, name: text })}
-      placeholder="Property Name"
-    />
-
-    <TextInput
-      style={styles.input}
-      value={newProperty.location}
-      onChangeText={(text) => setNewProperty({ ...newProperty, location: text })}
-      placeholder="Location"
-    />
-
-    <TouchableOpacity style={styles.saveButton} onPress={handleAddProperty}>
-      <Text style={styles.saveText}>Add Property</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity style={styles.cancelButton} onPress={() => setAddModalVisible(false)}>
-      <Text style={styles.cancelText}>Cancel</Text>
-    </TouchableOpacity>
-  </View>
-</View>
-</Modal> */}
-
-
-        <Modal
-        visible={isEditModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setEditModalVisible(false)}
+  <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+    <View style={styles.modalOverlay}>
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1 }} 
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Property</Text>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Edit Property</Text>
 
-            <TouchableOpacity onPress={pickImage}>
-              <Image 
-                source={selectedProperty?.image} 
-                style={styles.modalImage} 
-              />
-              <Text style={styles.changeImageText}>Change Image</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={pickImage}>
+            <Image 
+              source={selectedProperty?.image} 
+              style={styles.modalImage} 
+            />
+            <Text style={styles.changeImageText}>Change Image</Text>
+          </TouchableOpacity>
+
+          <TextInput
+            style={styles.input}
+            value={selectedProperty?.name}
+            onChangeText={(text) => setSelectedProperty({ ...selectedProperty, name: text })}
+            placeholder="Property Name"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={selectedProperty?.location}
+            onChangeText={(text) => setSelectedProperty({ ...selectedProperty, location: text })}
+            placeholder="Location"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={selectedProperty?.age}
+            onChangeText={(text) => setSelectedProperty({ ...selectedProperty, age: text })}
+            placeholder="Age of the house (in years)"
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={selectedProperty?.primaryUse}
+            onChangeText={(text) => setSelectedProperty({ ...selectedProperty, primaryUse: text })}
+            placeholder="Primary use of the house (e.g., Residential, Rental, Commercial)"
+          />
+
+          <TextInput
+            style={styles.input}
+            value={selectedProperty?.repairs}
+            onChangeText={(text) => setSelectedProperty({ ...selectedProperty, repairs: text })}
+            placeholder="Has the house undergone repairs? (Yes/No)"
+          />
+
+          {(selectedProperty?.repairs || "").toLowerCase() === 'yes' && (
 
             <TextInput
               style={styles.input}
-              value={selectedProperty?.name}
-              onChangeText={(text) => setSelectedProperty({ ...selectedProperty, name: text })}
-              placeholder="Property Name"
+              value={selectedProperty?.repairDetails}
+              onChangeText={(text) => setSelectedProperty({ ...selectedProperty, repairDetails: text })}
+              placeholder="Specify repairs done"
             />
+          )}
 
-            <TextInput
-              style={styles.input}
-              value={selectedProperty?.location}
-              onChangeText={(text) => setSelectedProperty({ ...selectedProperty, location: text })}
-              placeholder="Location"
-            />
+<Text style={styles.label}>Type of House</Text>
+<Picker
+  selectedValue={selectedProperty?.type}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, type: itemValue })}
+>
+  <Picker.Item label="Single-Detached" value="Single-Detached" />
+  <Picker.Item label="Townhouse" value="Townhouse" />
+  <Picker.Item label="Apartment" value="Apartment" />
+  <Picker.Item label="Stilt House" value="Stilt House" />
+  <Picker.Item label="Duplex" value="Duplex" />
+  <Picker.Item label="Other" value="Other" />
+</Picker>
 
-            <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
-              <Text style={styles.saveText}>Save Changes</Text>
-            </TouchableOpacity>
+{/* Show text input for "Other" only when "Other" is selected */}
+{selectedProperty?.type === "Other" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherType}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherType: text })}
+    placeholder="Specify type of house"
+  />
+)}
 
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
+<Text style={styles.label}>Height of House</Text>
+<TextInput
+  style={styles.input}
+  value={selectedProperty?.height}
+  onChangeText={(text) => setSelectedProperty({ ...selectedProperty, height: text })}
+  placeholder="Number of floors or height in meters"
+/>
+
+<Text style={styles.label}>Estimated Lot Area (sqm)</Text>
+<TextInput
+  style={styles.input}
+  value={selectedProperty?.lotArea}
+  onChangeText={(text) => setSelectedProperty({ ...selectedProperty, lotArea: text })}
+  placeholder="Enter estimated lot area in sqm"
+  keyboardType="numeric"
+/>
+
+<Text style={styles.label}>Estimated Floor Area (sqm)</Text>
+<TextInput
+  style={styles.input}
+  value={selectedProperty?.floorArea}
+  onChangeText={(text) => setSelectedProperty({ ...selectedProperty, floorArea: text })}
+  placeholder="Enter estimated floor area in sqm"
+  keyboardType="numeric"
+/>
+
+{/* Primary Material of the House */}
+<Text style={styles.label}>Primary Material of the House</Text>
+<Picker
+  selectedValue={selectedProperty?.primaryMaterial}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, primaryMaterial: itemValue })}
+>
+  <Picker.Item label="Reinforced Concrete" value="Reinforced Concrete" />
+  <Picker.Item label="Concrete Hollow Blocks" value="Concrete Hollow Blocks" />
+  <Picker.Item label="Wood" value="Wood" />
+  <Picker.Item label="Bamboo" value="Bamboo" />
+  <Picker.Item label="Mixed Material" value="Mixed Material" />
+</Picker>
+
+{selectedProperty?.primaryMaterial === "Mixed Material" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherPrimaryMaterial}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherPrimaryMaterial: text })}
+    placeholder="Specify material"
+  />
+)}
+
+{/* Primary Roofing Material */}
+<Text style={styles.label}>Primary Roofing Material</Text>
+<Picker
+  selectedValue={selectedProperty?.roofingMaterial}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, roofingMaterial: itemValue })}
+>
+  <Picker.Item label="GI Sheets (Yero)" value="GI Sheets (Yero)" />
+  <Picker.Item label="Clay Tiles" value="Clay Tiles" />
+  <Picker.Item label="Concrete Slab" value="Concrete Slab" />
+  <Picker.Item label="Nipa/Bamboo" value="Nipa/Bamboo" />
+  <Picker.Item label="Asphalt Shingles" value="Asphalt Shingles" />
+  <Picker.Item label="Others" value="Others" />
+</Picker>
+
+{selectedProperty?.roofingMaterial === "Others" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherRoofingMaterial}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherRoofingMaterial: text })}
+    placeholder="Specify roofing material"
+  />
+)}
+
+{/* Flooring Material */}
+<Text style={styles.label}>Flooring Material</Text>
+<Picker
+  selectedValue={selectedProperty?.flooringMaterial}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, flooringMaterial: itemValue })}
+>
+  <Picker.Item label="Concrete" value="Concrete" />
+  <Picker.Item label="Wood" value="Wood" />
+  <Picker.Item label="Tiles" value="Tiles" />
+  <Picker.Item label="Vinyl" value="Vinyl" />
+  <Picker.Item label="Others" value="Others" />
+</Picker>
+
+{selectedProperty?.flooringMaterial === "Others" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherFlooringMaterial}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherFlooringMaterial: text })}
+    placeholder="Specify flooring material"
+  />
+)}
+
+{/* Wall Material */}
+<Text style={styles.label}>Wall Material</Text>
+<Picker
+  selectedValue={selectedProperty?.wallMaterial}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, wallMaterial: itemValue })}
+>
+  <Picker.Item label="Concrete" value="Concrete" />
+  <Picker.Item label="Wood" value="Wood" />
+  <Picker.Item label="Bamboo" value="Bamboo" />
+  <Picker.Item label="Others" value="Others" />
+</Picker>
+
+{selectedProperty?.wallMaterial === "Others" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherWallMaterial}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherWallMaterial: text })}
+    placeholder="Specify wall material"
+  />
+)}
+
+{/* Ceiling Material */}
+<Text style={styles.label}>Ceiling Material</Text>
+<Picker
+  selectedValue={selectedProperty?.ceilingMaterial}
+  style={styles.picker}
+  onValueChange={(itemValue) => setSelectedProperty({ ...selectedProperty, ceilingMaterial: itemValue })}
+>
+  <Picker.Item label="Gypsum Board" value="Gypsum Board" />
+  <Picker.Item label="Wood" value="Wood" />
+  <Picker.Item label="PVC" value="PVC" />
+  <Picker.Item label="Others" value="Others" />
+</Picker>
+
+{selectedProperty?.ceilingMaterial === "Others" && (
+  <TextInput
+    style={styles.input}
+    value={selectedProperty?.otherCeilingMaterial}
+    onChangeText={(text) => setSelectedProperty({ ...selectedProperty, otherCeilingMaterial: text })}
+    placeholder="Specify ceiling material"
+  />
+)}
+
+
+
+          <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
+            <Text style={styles.saveText}>Save Changes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-      </Modal> 
+      </ScrollView>
+    </View>
+  </KeyboardAvoidingView>
+</Modal>
+
+
+
 
     </View>
   );
@@ -240,7 +425,7 @@ const styles = StyleSheet.create({
   modalImage: { width: 100, height: 100, borderRadius: 10, marginBottom: 10 },
   changeImageText: { color: '#007BFF', fontSize: 16 },
   input: { width: '100%', padding: 10, marginVertical: 5, borderRadius: 5, backgroundColor: '#f0f0f0' },
-  saveButton: { backgroundCoslor: '#007BFF', padding: 12, borderRadius: 5 },
+  saveButton: { backgroundColor: '#007BFF', padding: 12, borderRadius: 5 },
   saveText: { color: 'white', fontWeight: 'bold' },
   cancelButton: { marginTop: 10 },
   cancelText: { color: '#D11A2A', fontSize: 16 },
@@ -258,10 +443,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     textAlign: 'center' 
   },
+
+  picker: {
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    marginVertical: 5
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10
+  },
+  
   });
 
 export default MyProperties;
-
-
-
-
