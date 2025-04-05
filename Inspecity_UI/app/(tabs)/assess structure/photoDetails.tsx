@@ -3,32 +3,89 @@ import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedbac
 import { useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
+import * as Print from 'expo-print';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const photo = params.photo as string;
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const reportDate = "December 13, 2024 • 9:00 AM";
+  const condition = "Moderate";
+  const age = "20 years";
+  const issues = ["Crack near the center"];
+  const recommendations = ["Seal cracks using epoxy."];
+
 
   const saveReport = () => {
     alert("Report Saved!");
     setReportModalVisible(false);
+    navigation.popToTop();
   };
 
   const deleteReport = () => {
     alert("Report Deleted!");
     setReportModalVisible(false);
+    navigation.popToTop();
   };
 
-  const sharePhoto = async () => {
+  // const sharePhoto = async () => {
+  //   if (!(await Sharing.isAvailableAsync())) {
+  //     alert("Sharing is not available on this device");
+  //     return;
+  //   }
+  //   await Sharing.shareAsync(photo);
+  // };  
+  
+  const shareReportAsPDF = async () => {
     if (!(await Sharing.isAvailableAsync())) {
       alert("Sharing is not available on this device");
       return;
     }
-    await Sharing.shareAsync(photo);
-  };  
+  
+    // Convert issues and recommendations into <li> elements
+    const issuesHTML = issues.map(issue => `<li>${issue}</li>`).join('');
+    const recommendationsHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+  
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h1 { color: #2E86C1; }
+            img { margin-top: 10px; border-radius: 10px; }
+            ul { padding-left: 20px; }
+            .label { font-weight: bold; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>Living Room - Left Wall</h1>
+          <p><span class="label">Date:</span> ${reportDate}</p>
+  
+          <h2>Condition</h2>
+          <p>${condition} (Age: ${age})</p>
+  
+          <h2>Detected Issues</h2>
+          <ul>${issuesHTML}</ul>
+  
+          <h2>Recommendations</h2>
+          <ul>${recommendationsHTML}</ul>
+  
+          <h2>Notes</h2>
+          <p>${notes || 'No notes added.'}</p>
+  
+          <h2>Scanned Image</h2>
+          ${photo ? `<img src="${photo}" width="300"/>` : '<p>No image available</p>'}
+        </body>
+      </html>
+    `;
+  
+    const { uri } = await Print.printToFileAsync({ html: htmlContent });
+  
+    await Sharing.shareAsync(uri);
+  };
 
   if (!photo) {
     return (
@@ -47,9 +104,9 @@ const PhotoDetails = () => {
             </TouchableOpacity>
             
             {/* Share Button */}
-            <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
-              <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
-            </TouchableOpacity>
+            <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
+            <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
+          </TouchableOpacity>
           </View>
 
           <Text style={styles.title}>No photo provided!</Text>
@@ -78,7 +135,7 @@ const PhotoDetails = () => {
           </TouchableOpacity>
   
           {/* Share Button */}
-          <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
+          <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
             <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
           </TouchableOpacity>
         </View>

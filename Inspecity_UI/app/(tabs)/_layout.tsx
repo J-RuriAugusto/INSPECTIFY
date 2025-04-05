@@ -11,7 +11,7 @@ export default function TabLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}> {/* Wrap the whole Tabs inside this */}
       <Tabs
-        initialRouteName="dashboard"
+        initialRouteName="board"
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           tabBarInactiveTintColor: '#ccc',
@@ -22,7 +22,7 @@ export default function TabLayout() {
       >
         {/* Dashboard Tab */}
         <Tabs.Screen
-          name="dashboard"
+          name="board"
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
@@ -35,6 +35,17 @@ export default function TabLayout() {
               />
             ),
           }}
+          // Adding tabPress event to reset the screen on tab click
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              // Prevent default behavior and reset the screen
+              e.preventDefault();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'board' }],
+              });
+            },
+          })}
         />
 
         {/* Awareness Tool Tab */}

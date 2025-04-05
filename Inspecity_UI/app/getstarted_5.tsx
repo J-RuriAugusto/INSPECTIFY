@@ -18,7 +18,7 @@ const GettingStarted = () => {
   }
 
   const handleNavigateToDashboard = () => {
-    router.push('/dashboard/dashboard'); // Navigate to the next screen
+    router.push('/board/dashboard'); // Navigate to the next screen
   };
 
   const currentStep = 6; // Current progress step

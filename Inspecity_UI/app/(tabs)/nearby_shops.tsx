@@ -1,17 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import MapView, { Marker, Region, PROVIDER_GOOGLE } from "react-native-maps";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Pressable,
-  Image,
-  Linking,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, Linking, Animated} from "react-native";
 import * as Location from "expo-location";
+import Slider from "@react-native-community/slider";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz";
+const GOOGLE_MAPS_API_KEY = "AlzaSySKDpdVHxLHHnDMCvPuNtR0Ckwpg1ZbaYf";
 
 type Store = {
   id: string;
@@ -32,6 +25,10 @@ const NearbyShops = () => {
   const [selectedCard, setSelectedCard] = useState<string>("");
   const [userLocation, setUserLocation] = useState<Region | null>(null);
   const [stores, setStores] = useState<Store[]>([]);
+  const [filterVisible, setFilterVisible] = useState(false);
+  const filterAnimation = useRef(new Animated.Value(0)).current;  
+  const [ratingFilter, setRatingFilter] = useState(0);
+  const [distanceFilter, setDistanceFilter] = useState(0);
 
   // Get User Location
   useEffect(() => {
@@ -114,11 +111,29 @@ const NearbyShops = () => {
     Linking.openURL(url);
   };
 
+  // Toggle Filter Panel
+  const toggleFilter = () => {
+    if (filterVisible) {
+      Animated.timing(filterAnimation, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setFilterVisible(false)); // Hide after animation completes
+    } else {
+      setFilterVisible(true); // Show before animation starts
+      Animated.timing(filterAnimation, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  };  
+
   return (
     <View style={styles.container}>
-      {/* Map View takes 2/3 of the screen */}
+      {/* Map View */}
       <MapView
-        provider={PROVIDER_GOOGLE} // <-- Use Google Maps provider
+        provider={PROVIDER_GOOGLE}
         style={styles.map}
         ref={mapRef}
         initialRegion={
@@ -132,16 +147,92 @@ const NearbyShops = () => {
         showsUserLocation={true}
       >
         {stores.map((store) => (
-          <Marker
-            key={store.id}
-            coordinate={store.coordinates}
-            title={store.name}
-            onPress={() =>
-              openGoogleMaps(store.coordinates.latitude, store.coordinates.longitude)
-            }
-          />
+          <Marker key={store.id} coordinate={store.coordinates}>
+            <View style={{ alignItems: "center" }}>
+              {/* Store Name Beside Marker */}
+              {/* <View
+                style={{
+                  position: "absolute",
+                  left: 35, // Adjust position beside the marker
+                  backgroundColor: "white",
+                  paddingVertical: 4,
+                  paddingHorizontal: 6,
+                  borderRadius: 5,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5, // For Android shadow
+                }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: "bold", color: "black" }}>
+                  {store.name}
+                </Text>
+              </View> */}
+
+              {/* Custom Marker Icon */}
+              <Image
+                source={require("../../assets/images/store-icon.png")} // Replace with your marker icon
+                style={{ width: 40, height: 40 }}
+                resizeMode="contain"
+              />
+            </View>
+          </Marker>
         ))}
       </MapView>
+
+
+      {/* 🔵 FILTER BUTTON & PANEL */}
+      <View style={styles.filterWrapper}>
+        {filterVisible && (
+          /* Animated Filter Panel */
+          <Animated.View
+            style={[
+              styles.filterContainer,
+              { 
+                opacity: filterAnimation, 
+                transform: [{ scaleY: filterAnimation }] // Animates height using scaling
+              }
+            ]}
+          >
+            {/* Star Rating Filter */}
+            <View style={styles.ratingContainer}>
+              <Text style={styles.label}>Stars:</Text>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => setRatingFilter(star)}>
+                  <Text style={[styles.star, ratingFilter >= star && styles.starSelected]}>★</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Distance Slider */}
+            <View style={styles.sliderContainer}>
+              <Text style={styles.label}>Distance:</Text>
+              <Slider
+                style={{ width: 100 }}
+                minimumValue={500}
+                maximumValue={5000}
+                step={500}
+                value={distanceFilter}
+                onValueChange={(value) => setDistanceFilter(value)}
+                minimumTrackTintColor="#1E90FF"
+                maximumTrackTintColor="#D3D3D3"
+              />
+              <Text style={styles.distanceText}>{distanceFilter / 1000} km</Text>
+            </View>
+
+            {/* Apply Search Button */}
+            <TouchableOpacity style={styles.searchButton}>
+              <Text style={styles.searchButtonText}>Search</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
+        {/* Filter Button */}
+        <TouchableOpacity style={styles.filterButton} onPress={toggleFilter}>
+          <Image source={require("../../assets/images/filter-icon.png")} style={{ width: 24, height: 24, tintColor: "white" }} />
+        </TouchableOpacity>
+      </View>
 
       {/* Store List at the Bottom */}
       <View style={styles.storeList}>
@@ -170,17 +261,11 @@ const NearbyShops = () => {
             >
               <Image source={{ uri: item.image }} style={styles.image} />
               <View style={styles.cardContent}>
-                <Text style={styles.name} numberOfLines={1}>
-                  {item.name}
-                </Text>
+                <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
                 <Text style={styles.rating}>⭐ {item.rating}</Text>
-                <Text style={styles.address} numberOfLines={1}>
-                  {item.address}
-                </Text>
+                <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
                 {item.phone && (
-                  <Text style={styles.phone} numberOfLines={1}>
-                    📞 {item.phone}
-                  </Text>
+                  <Text style={styles.phone} numberOfLines={1}>📞 {item.phone}</Text>
                 )}
               </View>
             </Pressable>
@@ -195,11 +280,14 @@ const NearbyShops = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: {
-    flex: 5, // Takes up 2/3 of the screen
+    ...StyleSheet.absoluteFillObject, // Makes the map full screen
   },
   storeList: {
-    flex: 1, // Takes up 1/3 of the screen
-    paddingVertical: 30,
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingVertical: 10,
   },
   card: {
     backgroundColor: "#fff",
@@ -244,6 +332,42 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 2,
   },
+  filterWrapper: {
+    position: "absolute",
+    bottom: '17.5%',
+    right: '5%',
+    alignItems: "flex-end",
+  },
+  // Filter Button
+  filterButton: {
+    position: "absolute",
+    top: -45,
+    right: '5%',
+    backgroundColor: "#0B417D",
+    padding: 10,
+    borderRadius: 25,
+    zIndex: 10,
+  },
+
+  // Filter Panel
+  filterContainer: {
+    width: 230,
+    backgroundColor: "#0B417D",
+    borderRadius: 10,
+    padding: 10,
+    position: "absolute",
+    bottom: 50, // Expands UP above the button
+    overflow: "hidden",
+    zIndex: 10,
+  },
+  ratingContainer: { flexDirection: "row", alignItems: "center" },
+  label: { color: "white", fontSize: 14, fontWeight: "bold", marginRight: 5 },
+  star: { fontSize: 20, color: "white", marginRight: 18 },
+  starSelected: { color: "gold" },
+  sliderContainer: { flexDirection: "row", alignItems: "center", marginTop: 8 },
+  distanceText: { color: "white", fontSize: 12, marginLeft: 5 },
+  searchButton: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 5, alignItems: "center", marginTop: 10 },
+  searchButtonText: { color: "white", fontWeight: "bold" },
 });
 
 export default NearbyShops;

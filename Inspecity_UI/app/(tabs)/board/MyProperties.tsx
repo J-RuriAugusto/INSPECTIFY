@@ -109,7 +109,7 @@ const pickImage = async (isNew = false) => {
               </TouchableOpacity>
             </View>
           )}>
-            <TouchableOpacity onPress={() => router.push(`/dashboard/dashboard`)}>
+            <TouchableOpacity onPress={() => router.push(`/board/dashboard`)}>
               <View style={styles.propertyItem}>
                 <Image source={item.image} style={styles.propertyImage} />
                 <View style={styles.propertyInfo}>
@@ -126,7 +126,7 @@ const pickImage = async (isNew = false) => {
         <Text style={styles.addButtonText}>Add Property</Text>
       </TouchableOpacity> */}
 
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/dashboard/addproperty_2')}>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/board/addproperty_2')}>
         <Text style={styles.addButtonText}>Add Property</Text>
       </TouchableOpacity>
 

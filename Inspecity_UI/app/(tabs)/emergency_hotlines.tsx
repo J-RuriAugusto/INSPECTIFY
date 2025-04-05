@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Linking, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, FlatList, ActivityIndicator, TouchableOpacity, Alert, Linking, StyleSheet } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import * as Location from 'expo-location';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Swipeable } from "react-native-gesture-handler";
 
 const GOOGLE_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz"; // Replace with your actual API key
 
@@ -193,22 +194,36 @@ const EmergencyHotlines = () => {
   // Render individual hotline item
   const renderItem = useCallback(({ item, showFavorite = true }) => {
     const isFavorite = favorites.some(fav => fav.id === item.id);
-    
+  
     return (
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
           if (item.phone !== "N/A") {
-            Linking.openURL(`tel:${item.phone}`);
+            Alert.alert(
+              "Contact Hotline",
+              `How would you like to contact ${item.name}?`,
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Message",
+                  onPress: () => Linking.openURL(`sms:${item.phone}`),
+                },
+                {
+                  text: "Call",
+                  onPress: () => Linking.openURL(`tel:${item.phone}`),
+                }
+              ]
+            );
           } else {
             Alert.alert(
               item.isCommon ? "Standard Emergency Number" : "Service Information",
-              item.isCommon 
+              item.isCommon
                 ? "This is a standard emergency number for your area."
                 : "Phone number not available. Please visit the location for assistance."
             );
           }
-        }}
+        }}        
         activeOpacity={0.7}
       >
         <View style={styles.cardContent}>
@@ -309,8 +324,8 @@ const EmergencyHotlines = () => {
       <TabView
         navigationState={{ index, routes }}
         renderScene={SceneMap({
-          favorites: FavoritesRoute,
-          all: AllRoute,
+          favorites: FavoritesTab,
+          all: AllTab,
         })}
         onIndexChange={setIndex}
         renderTabBar={props => (
@@ -324,7 +339,7 @@ const EmergencyHotlines = () => {
         )}
         lazy
         lazyPreloadDistance={1}
-        initialLayout={{ width: '100%' }}
+        // initialLayout={{ width: 100 }}
       />
     </View>
   );
@@ -338,33 +353,60 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Epilogue-Bold',
     textAlign: 'center',
     marginBottom: 10,
     color: '#071C34',
   },
   tabBar: {
-    backgroundColor: '#fff',
+    backgroundColor: '#004A8E',
     elevation: 2,
     shadowOpacity: 0.1,
-    marginHorizontal: 20,
+    marginHorizontal: 40,
     marginBottom: 10,
-    borderRadius: 10,
+    borderRadius: 25,
     overflow: 'hidden',
   },
   indicator: {
-    backgroundColor: '#0A4D95',
-    height: 3,
+    backgroundColor: '#00A8E8',
+    height: '100%',
   },
   label: {
     color: '#071C34',
-    fontWeight: '600',
+    fontFamily: 'Epilogue-Regular',
     textTransform: 'none',
-    fontSize: 14,
+    fontSize: 15,
   },
   tabContainer: {
     flex: 1,
   },
+  leftAction: {
+    backgroundColor: '#2A74C7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // paddingHorizontal: 20,
+    // marginBottom: 15,
+    marginHorizontal: 20,
+    borderRadius: 25,
+    flexDirection: 'row',
+    // gap: 10,
+  },
+  rightAction: {
+    backgroundColor: '#05173F',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // paddingHorizontal: 20,
+    // marginBottom: 15,
+    marginHorizontal: 20,
+    borderRadius: 25,
+    flexDirection: 'row',
+    // gap: 10,
+  },
+  icon: {
+    width: '35%', // Adjust size based on your icon
+    height: '35%',
+    resizeMode: 'contain',
+  }, 
   card: {
     backgroundColor: '#fff',
     padding: 15,

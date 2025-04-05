@@ -1,29 +1,20 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Image, ActivityIndicator, StyleSheet, Dimensions, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { BlurView } from 'expo-blur';
 
-// Get screen dimensions
 const { width, height } = Dimensions.get('window');
 
 const Scanning = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const photo = Array.isArray(params.photo) ? params.photo[0] : params.photo; // Ensure `photo` is always a string
-
-  // Animation for scanning line movement
+  const photo = Array.isArray(params.photo) ? params.photo[0] : params.photo;
   const scanAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (photo) {
-      router.push({
-        pathname: '/assess structure/photoDetails',
-        params: { photo },
-      });
-    }
-
     // Scanning effect animation (moving up & down)
     Animated.loop(
-      Animated.sequence([
+      Animated.sequence([ 
         Animated.timing(scanAnim, {
           toValue: height * 0.68, // Move scan line down
           duration: 2000,
@@ -47,22 +38,23 @@ const Scanning = () => {
         <Text style={styles.errorText}>No photo available</Text>
       )}
 
+      {/* Blur overlay effect - top, bottom, left, and right */}
+      <BlurView style={styles.topBlur} intensity={10} tint="light" />
+      <BlurView style={styles.bottomBlur} intensity={10} tint="light" />
+      <BlurView style={styles.leftBlur} intensity={10} tint="light" />
+      <BlurView style={styles.rightBlur} intensity={10} tint="light" />
+
       {/* Scanning Overlay */}
       <View style={styles.overlay}>
         <Text style={styles.title}>Analyzing the structures</Text>
         <Text style={styles.title}>for cracks and damages...</Text>
-        {/* <ActivityIndicator size="large" color="#00A8E8" style={styles.loader} /> */}
       </View>
 
       {/* Corner Brackets */}
       <View style={styles.cornersContainer}>
-        {/* Top Left */}
         <View style={[styles.corner, styles.topLeft]} />
-        {/* Top Right */}
         <View style={[styles.corner, styles.topRight]} />
-        {/* Bottom Left */}
         <View style={[styles.corner, styles.bottomLeft]} />
-        {/* Bottom Right */}
         <View style={[styles.corner, styles.bottomRight]} />
       </View>
 
@@ -75,12 +67,44 @@ const Scanning = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#002B5B', // Black background in case the image is loading
+    backgroundColor: '#002B5B',
   },
   fullScreenImage: {
-    width: width, // Full width
-    height: height, // Full height
-    resizeMode: 'cover', // Cover entire screen
+    width: width,
+    height: height,
+    resizeMode: 'cover',
+  },
+  topBlur: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '15%',
+    zIndex: 1,
+  },
+  bottomBlur: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '15%',
+    zIndex: 1,
+  },
+  leftBlur: {
+    position: 'absolute',
+    top: '15%',
+    left: 0,
+    bottom: '15%',
+    width: '10%',
+    zIndex: 1,
+  },
+  rightBlur: {
+    position: 'absolute',
+    top: '15%',
+    right: 0,
+    bottom: '15%',
+    width: '10%',
+    zIndex: 1,
   },
   overlay: {
     position: 'absolute',
@@ -90,17 +114,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent black overlay
+    zIndex: 2,
   },
   title: {
     fontSize: 18,
     fontFamily: 'Epilogue-SemiBold',
     color: '#FFFFFF',
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  // loader: {
-  //   marginTop: 10,
-  // },
   errorText: {
     color: '#FF5B5B',
     fontSize: 18,
@@ -111,7 +132,6 @@ const styles = StyleSheet.create({
   cornersContainer: {
     position: 'absolute',
     top: '15.5%',
-    // alignItems: 'center',
     left: '10%',
     width: '80%',
     height: '70%',

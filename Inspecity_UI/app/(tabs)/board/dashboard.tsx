@@ -48,13 +48,13 @@ const Dashboard = () => {
     <View style={styles.container}>
       {/* Header with House and Settings Icons */}
       <View style={styles.header}>
-        <Link href="/dashboard/MyProperties" asChild>
+        <Link href="/board/MyProperties" asChild>
           <TouchableOpacity>
             <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
           </TouchableOpacity>
         </Link>
 
-        <Link href="/dashboard/settings" asChild>
+        <Link href="/board/settings" asChild>
         <TouchableOpacity>            
           <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
           </TouchableOpacity>
