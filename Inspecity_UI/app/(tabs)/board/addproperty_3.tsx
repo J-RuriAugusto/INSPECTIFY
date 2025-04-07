@@ -58,7 +58,7 @@ const GettingStarted = () => {
     };
   
     router.push({
-      pathname: '/dashboard/addproperty_3b',
+      pathname: './addproperty_3b',
       params: { homeData: JSON.stringify(updatedHomeData) },
     });
   };

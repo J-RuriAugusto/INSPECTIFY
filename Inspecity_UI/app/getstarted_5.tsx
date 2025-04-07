@@ -105,7 +105,7 @@ const GettingStarted = () => {
   
       await AsyncStorage.setItem('userId', userId);
   
-      router.push('../dashboard/dashboard');
+      router.push('../board/dashboard');
     } catch (error) {
       Alert.alert(
         'Error',

@@ -111,7 +111,7 @@ const GettingStarted = () => {
   
       console.log('Home created successfully');
   
-      router.push('../dashboard/dashboard');
+      router.push('./dashboard');
     } catch (error) {
       Alert.alert(
         'Error',

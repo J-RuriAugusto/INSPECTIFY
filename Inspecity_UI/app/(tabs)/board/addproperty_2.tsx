@@ -50,7 +50,7 @@ const GettingStarted2 = () => {
       });
     
       router.push({
-        pathname: '/dashboard/addproperty_3',
+        pathname: './addproperty_3',
         params: { homeData },
       });
     };

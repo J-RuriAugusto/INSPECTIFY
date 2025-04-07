@@ -163,7 +163,7 @@ const MyProperties = () => {
       console.log('Default home set:', data);
       
       // Navigate to dashboard after successfully setting default home
-      router.push('/dashboard/dashboard');
+      router.push('./dashboard');
       
     } catch (error) {
       console.error('Error setting default home:', error);
@@ -409,7 +409,7 @@ const MyProperties = () => {
         )}
       />
 
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/dashboard/addproperty_2')}>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push('./addproperty_2')}>
         <Text style={styles.addButtonText}>Add Property</Text>
       </TouchableOpacity>
 

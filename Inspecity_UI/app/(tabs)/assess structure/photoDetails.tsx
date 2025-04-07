@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
-import Modal from 'react-native-modal'; // Only import Modal from react-native-modal
+// import Modal from 'react-native-modal'; // Only import Modal from react-native-modal
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
+import * as Print from 'expo-print';
+import Scanning from './scanning';
+import ImageView from 'react-native-image-viewing';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const router = useRouter();
   const photo = params.photo as string;
   const reportName = params.reportName as string;
@@ -41,6 +44,8 @@ const PhotoDetails = () => {
       "Your report is already saved.\nYou can turn off auto-save in settings.",
       [{ text: "OK", onPress: () => setReportModalVisible(false) }]
     );
+    setReportModalVisible(false);
+    navigation.popToTop();
   };
 
   const deleteReport = async () => {
@@ -55,9 +60,8 @@ const PhotoDetails = () => {
       );
   
       if (response.status === 200) {
-        Alert.alert("Success", "Report deleted successfully");
         setReportModalVisible(false);
-        router.replace('../dashboard/dashboard'); // Navigate back after deletion
+        navigation.popToTop(); // Navigate back after deletion
       } else {
         Alert.alert("Error", "Failed to delete report");
       }
@@ -206,13 +210,71 @@ const PhotoDetails = () => {
     }
   };
 
-  const sharePhoto = async () => {
+  // const sharePhoto = async () => {
+  //   if (!(await Sharing.isAvailableAsync())) {
+  //     alert("Sharing is not available on this device");
+  //     return;
+  //   }
+  //   await Sharing.shareAsync(photo);
+  // };
+
+  const shareReportAsPDF = async () => {
     if (!(await Sharing.isAvailableAsync())) {
       alert("Sharing is not available on this device");
       return;
     }
-    await Sharing.shareAsync(photo);
-  };  
+  
+    // Convert damageTypes (previously called issues) into <li> elements
+    const issuesHTML = damageTypes.map(issue => `<li>${issue}</li>`).join('');
+    
+    // Split recommendations into an array if it's a string (assuming recommendations might contain multiple points)
+    const recommendationsArray = recommendations.split('\n').filter(rec => rec.trim() !== '');
+    const recommendationsHTML = recommendationsArray.map(rec => `<li>${rec}</li>`).join('');
+  
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h1 { color: #2E86C1; }
+            img { margin-top: 10px; border-radius: 10px; }
+            ul { padding-left: 20px; }
+            .label { font-weight: bold; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>${reportName || 'Living Room - Left Wall'}</h1>
+          <p><span class="label">Date:</span> ${dateCreated || new Date().toLocaleDateString()}</p>
+  
+          <h2>Condition</h2>
+          <p>${condition || 'No condition specified'} (Age: ${materialAge || 'N/A'})</p>
+  
+          <h2>Detected Issues</h2>
+          ${damageTypes.length > 0 ? `<ul>${issuesHTML}</ul>` : '<p>No issues detected</p>'}
+  
+          <h2>Recommendations</h2>
+          ${recommendations ? `<ul>${recommendationsHTML}</ul>` : '<p>No recommendations available</p>'}
+  
+          <h2>Notes</h2>
+          <p>${notes || 'No notes added.'}</p>
+  
+          <h2>Scanned Image</h2>
+          ${annotatedImage ? `<img src="${annotatedImage}" width="300"/>` : '<p>No image available</p>'}
+        </body>
+      </html>
+    `;
+  
+    const { uri } = await Print.printToFileAsync({ html: htmlContent });
+    await Sharing.shareAsync(uri);
+  };
+  
+  if (isUploading) {
+    return (
+      <Modal visible={true} transparent={false} animationType="fade">
+        <Scanning photo={photo} />
+      </Modal>
+    );
+  }
 
   if (!photo) {
     return (
@@ -225,8 +287,13 @@ const PhotoDetails = () => {
               <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
 
+            {/* Save/Delete Report Button */}
+            <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+              <Image source={require('../../../assets/images/save.png')} style={styles.reportIcon} />
+            </TouchableOpacity>
+
             {/* Share Button */}
-            <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
+            <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
               <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
             </TouchableOpacity>
           </View>
@@ -259,7 +326,7 @@ const PhotoDetails = () => {
           </TouchableOpacity>
 
           {/* Share Button */}
-          <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
+          <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
             <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
           </TouchableOpacity>
         </View>
@@ -337,10 +404,10 @@ const PhotoDetails = () => {
         </View>
         
         <Modal
-          isVisible={reportModalVisible}
-          animationIn="fadeIn"
-          animationOut="fadeOut"
-          onBackdropPress={() => setReportModalVisible(false)}
+          visible={reportModalVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setReportModalVisible(false)}
         >
           <TouchableWithoutFeedback onPress={() => setReportModalVisible(false)}>
             <View style={styles.modalContainer}>
@@ -382,27 +449,11 @@ const PhotoDetails = () => {
           </TouchableWithoutFeedback>
         </Modal>
 
-        {/* Full Screen Image Modal */}
-        <Modal 
-          isVisible={isImageModalVisible} 
-          onBackdropPress={() => setImageModalVisible(false)} 
-          style={{ margin: 0, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <View style={{ backgroundColor: 'white', padding: 10, borderRadius: 10 }}>
-            <TouchableOpacity onPress={() => setImageModalVisible(false)}>
-              <Text style={{ alignSelf: 'flex-end', padding: 10, fontSize: 18 }}>Close</Text>
-            </TouchableOpacity>
-            <Image 
-              source={{ uri: annotatedImage }} 
-              style={{ width: 300, height: 400, resizeMode: 'contain' }} 
-            />
-          </View>
-        </Modal>
-
         {/* Edit Note Modal */}
         <Modal
-          isVisible={editModalVisible} // Use isVisible instead of visible
-          onBackdropPress={() => setEditNoteModalVisible(false)}
+          visible={editModalVisible}
+          transparent={true}
+          onRequestClose={() => setEditNoteModalVisible(false)}
           style={styles.modalEditContainer}
         >
           <View style={styles.modalEditContainer}>
@@ -440,16 +491,25 @@ const PhotoDetails = () => {
           </View>
         </Modal>
 
-        {/* Uploading Modal */}
+        {/* Full Screen Image Viewer - NEW IMPLEMENTATION */}
+        <ImageView
+          images={[{ uri: annotatedImage }]}
+          imageIndex={0}
+          visible={isImageModalVisible}
+          onRequestClose={() => setImageModalVisible(false)}
+          backgroundColor="rgba(0, 0, 0, 0.9)"
+          swipeToCloseEnabled={true}
+          doubleTapToZoomEnabled={true}
+        />
+
+        {/* Scanning Animation Modal */}
           <Modal 
-            isVisible={isUploading} 
-            backdropOpacity={0.5}
-            style={styles.uploadingModal}
+            visible={isUploading} 
+            transparent={false}
+            animationType="fade"
+            onRequestClose={() => {}}
           >
-            <View style={styles.uploadingModalContent}>
-              <ActivityIndicator size="large" color="#00A8E8" />
-              <Text style={styles.uploadingText}>Uploading...</Text>
-            </View>
+            <Scanning photo={photo} />
           </Modal>
       </View>
     </ImageBackground>
@@ -530,32 +590,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5
   },
-  ageNumText: {
-    backgroundColor: '#B7B7B7',
-    color: '#FFF',
-    fontFamily: 'Epilogue-Medium',
-    fontSize: 15,
-    borderRadius: 15,
-    paddingHorizontal: 9,
-    paddingVertical: 2,
-  }, 
-  ageText: { fontSize: 15, fontFamily: 'Epilogue-Bold', color: '#071C34' },
-  shopButton: {
-    backgroundColor: '#ACD3FF',
-    borderRadius: 15,
-    alignSelf: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    width: '60%',
-    marginBottom: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  shopButtonText: { color: '#0B417D', fontSize: 15, fontFamily: 'Epilogue-Bold', textAlign: 'center' },
-  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 },
   conditionText: { fontFamily: 'Epilogue-Bold', fontSize: 15, textAlign: 'center', color: '#071C34' },
   conditionBadge: {
     backgroundColor: '#FFA500',
@@ -582,6 +616,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5
   },
+  ageNumText: {
+    backgroundColor: '#B7B7B7',
+    color: '#FFF',
+    fontFamily: 'Epilogue-Medium',
+    fontSize: 15,
+    borderRadius: 15,
+    paddingHorizontal: 9,
+    paddingVertical: 2,
+  }, 
+  ageText: { fontSize: 15, fontFamily: 'Epilogue-Bold', color: '#071C34' },
+  shopButton: {
+    backgroundColor: '#ACD3FF',
+    borderRadius: 15,
+    alignSelf: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    width: '60%',
+    marginBottom: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  shopButtonText: { color: '#0B417D', fontSize: 15, fontFamily: 'Epilogue-Bold', textAlign: 'center' },
+  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 },
   concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000' },  
   editNotesInput: {
     backgroundColor: '#FFF',
@@ -642,22 +702,6 @@ const styles = StyleSheet.create({
   reportIcon: {
     width: 30,
     height: 30,
-  },
-  uploadingModal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  uploadingModalContent: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  uploadingText: {
-    marginTop: 10,
-    fontSize: 18,
-    fontFamily: 'Epilogue-Bold',
-    color: '#002B5B',
   },
   fullScreenModal: {
     margin: 0, // Ensures full width and height
