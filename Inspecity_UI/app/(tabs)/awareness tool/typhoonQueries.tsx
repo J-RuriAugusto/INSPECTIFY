@@ -10,21 +10,21 @@ const { width, height } = Dimensions.get('window');
 const Questions = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const questions = [
-    'Is your house located near a river, creek, or estero?',
-    'Has your area experienced flooding in the past 2 years?',
-    'Is your house in a low-lying area or near a floodplain?',
-    'Does water enter your house during heavy rain?',
-    'Is your house near a clogged or poorly maintained drainage system?',
-    'Is your house surrounded by concrete or paved surfaces that prevent water absorption?',
-    'Is your house near a coastal area prone to storm surges?',
-    'Is your house near a dam or reservoir that could overflow?',
-    'Is your house in an area where the local government has issued flood warnings?',
-    'Is your house near a construction site that could block water flow?',
-    'Is your house near a landfill or area with poor waste management?',
-    'Is your house in an area where the water table is high?',
-    'Is your house near a river that often overflows during typhoons?',
-    'Is your house in an area where flooding lasts for several days?',
-    'Is your house near a creek or estero that overflows during heavy rain?',
+    'Is your house located in an area frequently hit by typhoons? ',
+    'Does your area experience strong winds during typhoons?  ',
+    'Is your house near a coastal area prone to storm surges?  ',
+    'Is your roof made of lightweight materials (e.g., galvanized iron, nipa)?',
+    'Are there loose objects (e.g., signs, furniture) outside your house that could be blown away?',
+    'Is your house near a hill or mountain prone to landslides during heavy rain?',
+    'Does your area experience power outages during typhoons? ',
+    'Is your house near a river or creek that overflows during heavy rain?  ',
+    'Is your house in an area with poor drainage systems? ',
+    'Does your house have large windows or glass doors that could shatter in strong winds? ',
+    'Is your house near a construction site with temporary structures that could collapse?',
+    'Is your house in an area where typhoons often cause flooding? ',
+    'Is your house near a body of water that could cause storm surges?',
+    'Is your house in an area with weak or old electrical poles and wires?',
+    'Is your house in an area where typhoons often cause landslides?',  
     ];
 
   const [fontsLoaded] = useFonts({
@@ -60,7 +60,7 @@ const Questions = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/flood_bg.png')}
+      source={require('../../../assets/images/typhoon_bg.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -70,7 +70,7 @@ const Questions = () => {
                 <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             </TouchableOpacity>
 
-            <Text style={styles.categoryTitle}>FLOOD</Text>
+            <Text style={styles.categoryTitle}>TYPHOON</Text>
 
             <TouchableOpacity onPress={() => {
                 if (questionIndex < questions.length - 1) {
