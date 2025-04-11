@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, L
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSySKDpdVHxLHHnDMCvPuNtR0Ckwpg1ZbaYf";
+const GOOGLE_MAPS_API_KEY = "AlzaSyq6F4CSzE_WKPYlT_jSLWRaKzAQyavZIox";
 
 type Store = {
   id: string;
@@ -18,6 +18,7 @@ type Store = {
   address: string;
   phone?: string;
   openingHours?: string[];
+  distance?: number; // Added for distance calculations
 };
 
 const NearbyShops = () => {
@@ -28,7 +29,10 @@ const NearbyShops = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const filterAnimation = useRef(new Animated.Value(0)).current;  
   const [ratingFilter, setRatingFilter] = useState(0);
-  const [distanceFilter, setDistanceFilter] = useState(0);
+  const [distanceFilter, setDistanceFilter] = useState(2000); // Default 2km
+  
+  // Track if filters have been applied
+  const [filtersApplied, setFiltersApplied] = useState(false);
 
   // Get User Location
   useEffect(() => {
@@ -58,9 +62,22 @@ const NearbyShops = () => {
     })();
   }, []);
 
+  // Calculate distance between two coordinates in meters
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371000; // Earth radius in meters
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in meters
+  };
+
   // Fetch Nearby Stores from Google Places API
   const fetchNearbyStores = async (latitude: number, longitude: number) => {
-    const radius = 2000;
+    const radius = 5000; // 5km max radius for API
     const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
     const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
 
@@ -76,6 +93,14 @@ const NearbyShops = () => {
             const detailsResponse = await fetch(detailsUrl);
             const detailsData = await detailsResponse.json();
 
+            // Calculate distance from user
+            const distance = calculateDistance(
+              latitude,
+              longitude,
+              place.geometry.location.lat,
+              place.geometry.location.lng
+            );
+
             return {
               id: place.place_id,
               name: place.name,
@@ -87,15 +112,18 @@ const NearbyShops = () => {
                 place.photos && place.photos.length > 0
                   ? `https://maps.gomaps.pro/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
                   : "https://via.placeholder.com/400",
-              rating: place.rating || "No rating",
+              rating: place.rating || 0,
               address: place.vicinity || "No address available",
               phone: detailsData.result.formatted_phone_number || "No phone available",
               openingHours:
                 detailsData.result.opening_hours?.weekday_text || ["No hours available"],
+              distance: distance, // Store the distance
             };
           })
         );
 
+        // Sort by distance automatically - this happens by default, without filtering
+        formattedStores.sort((a, b) => (a.distance || 0) - (b.distance || 0));
         setStores(formattedStores);
       } else {
         console.error("Error fetching places:", data.status);
@@ -103,6 +131,82 @@ const NearbyShops = () => {
     } catch (error) {
       console.error("Error fetching places:", error);
     }
+  };
+
+  // Apply Filters
+  const applyFilters = () => {
+    if (!userLocation) return;
+    
+    // Get current user coordinates
+    const userLat = userLocation.latitude;
+    const userLng = userLocation.longitude;
+    
+    let filteredResults = [...stores]; // Start with all stores
+    
+    // Apply rating filter if set
+    if (ratingFilter > 0) {
+      filteredResults = filteredResults.filter(store => store.rating >= ratingFilter);
+    }
+    
+    // Apply distance filter
+    filteredResults = filteredResults.filter(store => 
+      store.distance && store.distance <= distanceFilter
+    );
+    
+    // Sort by distance
+    filteredResults.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    
+    // Update stores with filtered results
+    setStores(filteredResults);
+    setFiltersApplied(true);
+    
+    // Close filter panel
+    toggleFilter();
+    
+    // Update map to show all filtered stores if there are any
+    if (filteredResults.length > 0) {
+      fitMapToStores(filteredResults);
+    }
+  };
+
+  // Fit map to show all filtered stores
+  const fitMapToStores = (stores: Store[]) => {
+    if (stores.length === 0 || !mapRef.current) return;
+
+    if (stores.length === 1) {
+      // If only one store, center on it
+      mapRef.current.animateToRegion({
+        latitude: stores[0].coordinates.latitude,
+        longitude: stores[0].coordinates.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+      return;
+    }
+
+    // Calculate bounds for all stores
+    let minLat = stores[0].coordinates.latitude;
+    let maxLat = stores[0].coordinates.latitude;
+    let minLng = stores[0].coordinates.longitude;
+    let maxLng = stores[0].coordinates.longitude;
+
+    stores.forEach(store => {
+      minLat = Math.min(minLat, store.coordinates.latitude);
+      maxLat = Math.max(maxLat, store.coordinates.latitude);
+      minLng = Math.min(minLng, store.coordinates.longitude);
+      maxLng = Math.max(maxLng, store.coordinates.longitude);
+    });
+
+    // Add padding
+    const latDelta = (maxLat - minLat) * 1.5;
+    const lngDelta = (maxLng - minLng) * 1.5;
+
+    mapRef.current.animateToRegion({
+      latitude: (minLat + maxLat) / 2,
+      longitude: (minLng + maxLng) / 2,
+      latitudeDelta: Math.max(latDelta, 0.01),
+      longitudeDelta: Math.max(lngDelta, 0.01),
+    });
   };
 
   // Open Google Maps for Directions
@@ -129,6 +233,30 @@ const NearbyShops = () => {
     }
   };  
 
+  // Reset Filters and fetch original nearby stores
+  const resetFilters = async () => {
+    setRatingFilter(0);
+    setDistanceFilter(2000);
+    setFiltersApplied(false);
+    
+    // Re-fetch original stores if user location is available
+    if (userLocation) {
+      fetchNearbyStores(userLocation.latitude, userLocation.longitude);
+    }
+    
+    toggleFilter();
+    
+    // Reset map to user location
+    if (userLocation && mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Map View */}
@@ -147,32 +275,26 @@ const NearbyShops = () => {
         showsUserLocation={true}
       >
         {stores.map((store) => (
-          <Marker key={store.id} coordinate={store.coordinates}>
+          <Marker 
+            key={store.id} 
+            coordinate={store.coordinates}
+            onPress={() => {
+              setSelectedCard(store.name);
+              mapRef.current?.animateToRegion(
+                {
+                  latitude: store.coordinates.latitude,
+                  longitude: store.coordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                },
+                1000
+              );
+            }}
+          >
             <View style={{ alignItems: "center" }}>
-              {/* Store Name Beside Marker */}
-              {/* <View
-                style={{
-                  position: "absolute",
-                  left: 35, // Adjust position beside the marker
-                  backgroundColor: "white",
-                  paddingVertical: 4,
-                  paddingHorizontal: 6,
-                  borderRadius: 5,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 3,
-                  elevation: 5, // For Android shadow
-                }}
-              >
-                <Text style={{ fontSize: 14, fontWeight: "bold", color: "black" }}>
-                  {store.name}
-                </Text>
-              </View> */}
-
               {/* Custom Marker Icon */}
               <Image
-                source={require("../../assets/images/store-icon.png")} // Replace with your marker icon
+                source={require("../../assets/images/store-icon.png")}
                 style={{ width: 40, height: 40 }}
                 resizeMode="contain"
               />
@@ -181,8 +303,7 @@ const NearbyShops = () => {
         ))}
       </MapView>
 
-
-      {/* 🔵 FILTER BUTTON & PANEL */}
+      {/* Filter Button & Panel */}
       <View style={styles.filterWrapper}>
         {filterVisible && (
           /* Animated Filter Panel */
@@ -191,15 +312,18 @@ const NearbyShops = () => {
               styles.filterContainer,
               { 
                 opacity: filterAnimation, 
-                transform: [{ scaleY: filterAnimation }] // Animates height using scaling
+                transform: [{ scaleY: filterAnimation }]
               }
             ]}
           >
             {/* Star Rating Filter */}
             <View style={styles.ratingContainer}>
-              <Text style={styles.label}>Stars:</Text>
+              <Text style={styles.label}>Rating:</Text>
               {[1, 2, 3, 4, 5].map((star) => (
-                <TouchableOpacity key={star} onPress={() => setRatingFilter(star)}>
+                <TouchableOpacity 
+                  key={star} 
+                  onPress={() => setRatingFilter(ratingFilter === star ? 0 : star)}
+                >
                   <Text style={[styles.star, ratingFilter >= star && styles.starSelected]}>★</Text>
                 </TouchableOpacity>
               ))}
@@ -211,7 +335,7 @@ const NearbyShops = () => {
               <Slider
                 style={{ width: 100 }}
                 minimumValue={500}
-                maximumValue={5000}
+                maximumValue={20000}
                 step={500}
                 value={distanceFilter}
                 onValueChange={(value) => setDistanceFilter(value)}
@@ -221,10 +345,20 @@ const NearbyShops = () => {
               <Text style={styles.distanceText}>{distanceFilter / 1000} km</Text>
             </View>
 
-            {/* Apply Search Button */}
-            <TouchableOpacity style={styles.searchButton}>
-              <Text style={styles.searchButtonText}>Search</Text>
-            </TouchableOpacity>
+            {/* Filter Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={styles.resetButton} 
+                onPress={resetFilters}
+                disabled={!filtersApplied}
+                opacity={filtersApplied ? 1 : 0.5}
+              >
+                <Text style={styles.resetButtonText}>Reset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.searchButton} onPress={applyFilters}>
+                <Text style={styles.searchButtonText}>Apply</Text>
+              </TouchableOpacity>
+            </View>
           </Animated.View>
         )}
 
@@ -236,43 +370,64 @@ const NearbyShops = () => {
 
       {/* Store List at the Bottom */}
       <View style={styles.storeList}>
-        <FlatList
-          horizontal
-          data={stores}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => {
-                setSelectedCard(item.name);
-                mapRef.current?.animateToRegion(
-                  {
-                    latitude: item.coordinates.latitude,
-                    longitude: item.coordinates.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  },
-                  1000
-                );
-              }}
-              style={[
-                styles.card,
-                item.name === selectedCard && styles.activeCard,
-              ]}
-            >
-              <Image source={{ uri: item.image }} style={styles.image} />
-              <View style={styles.cardContent}>
-                <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-                <Text style={styles.rating}>⭐ {item.rating}</Text>
-                <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
-                {item.phone && (
-                  <Text style={styles.phone} numberOfLines={1}>📞 {item.phone}</Text>
-                )}
-              </View>
-            </Pressable>
-          )}
-          showsHorizontalScrollIndicator={false}
-        />
+        {stores.length > 0 ? (
+          <FlatList
+            horizontal
+            data={stores}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => {
+                  setSelectedCard(item.name);
+                  mapRef.current?.animateToRegion(
+                    {
+                      latitude: item.coordinates.latitude,
+                      longitude: item.coordinates.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    },
+                    1000
+                  );
+                }}
+                style={[
+                  styles.card,
+                  item.name === selectedCard && styles.activeCard,
+                ]}
+              >
+                <Image source={{ uri: item.image }} style={styles.image} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                  <Text style={styles.rating}>⭐ {item.rating || "No rating"}</Text>
+                  <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
+                  {item.distance && (
+                    <Text style={styles.distance}>{(item.distance / 1000).toFixed(1)} km</Text>
+                  )}
+                </View>
+              </Pressable>
+            )}
+            showsHorizontalScrollIndicator={false}
+          />
+        ) : (
+          <View style={styles.noResultsContainer}>
+            <Text style={styles.noResultsText}>
+              {filtersApplied ? 
+                "No stores match your filters" : 
+                "Looking for nearby stores..."}
+            </Text>
+          </View>
+        )}
       </View>
+      
+      {/* Filter Status Indicator (only shows when filters are applied) */}
+      {filtersApplied && (
+        <View style={styles.filterStatusContainer}>
+          <Text style={styles.filterStatusText}>
+            Filters applied: 
+            {ratingFilter > 0 ? ` ${ratingFilter}+ stars` : ''}
+            {distanceFilter < 5000 ? ` within ${distanceFilter/1000}km` : ''}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -280,7 +435,7 @@ const NearbyShops = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: {
-    ...StyleSheet.absoluteFillObject, // Makes the map full screen
+    ...StyleSheet.absoluteFillObject,
   },
   storeList: {
     position: "absolute",
@@ -296,8 +451,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
     flexDirection: "row",
     alignItems: "center",
-    width: 280, // Adjust width
-    height: 100, // Adjust height for consistency
+    width: 280,
+    height: 100,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -332,13 +487,18 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 2,
   },
+  distance: {
+    fontSize: 12,
+    color: "#0B417D",
+    fontWeight: "bold",
+    marginTop: 2,
+  },
   filterWrapper: {
     position: "absolute",
     bottom: '17.5%',
     right: '5%',
     alignItems: "flex-end",
   },
-  // Filter Button
   filterButton: {
     position: "absolute",
     top: -45,
@@ -348,26 +508,70 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     zIndex: 10,
   },
-
-  // Filter Panel
   filterContainer: {
     width: 230,
     backgroundColor: "#0B417D",
     borderRadius: 10,
     padding: 10,
     position: "absolute",
-    bottom: 50, // Expands UP above the button
+    bottom: 50,
     overflow: "hidden",
     zIndex: 10,
   },
-  ratingContainer: { flexDirection: "row", alignItems: "center" },
+  ratingContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   label: { color: "white", fontSize: 14, fontWeight: "bold", marginRight: 5 },
-  star: { fontSize: 20, color: "white", marginRight: 18 },
+  star: { fontSize: 20, color: "white", marginRight: 8 },
   starSelected: { color: "gold" },
-  sliderContainer: { flexDirection: "row", alignItems: "center", marginTop: 8 },
-  distanceText: { color: "white", fontSize: 12, marginLeft: 5 },
-  searchButton: { backgroundColor: "#4CAF50", padding: 8, borderRadius: 5, alignItems: "center", marginTop: 10 },
+  sliderContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  distanceText: { color: "white", fontSize: 12, marginLeft: 5, width: 40 },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 5,
+  },
+  searchButton: { 
+    backgroundColor: "#4CAF50", 
+    padding: 8, 
+    borderRadius: 5, 
+    alignItems: "center", 
+    flex: 1,
+    marginLeft: 5,
+  },
   searchButtonText: { color: "white", fontWeight: "bold" },
+  resetButton: { 
+    backgroundColor: "#FF5252", 
+    padding: 8, 
+    borderRadius: 5, 
+    alignItems: "center", 
+    flex: 1,
+    marginRight: 5,
+  },
+  resetButtonText: { color: "white", fontWeight: "bold" },
+  noResultsContainer: {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  noResultsText: {
+    color: "#333",
+    fontWeight: "bold",
+  },
+  filterStatusContainer: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    backgroundColor: "rgba(11, 65, 125, 0.7)",
+    paddingVertical:.5,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+  },
+  filterStatusText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
 });
 
 export default NearbyShops;
