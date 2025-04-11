@@ -18,7 +18,7 @@ interface Property {
   image: any;
   latitude?: number;
   longitude?: number;
-  house_age?: string;
+  home_age?: string;
   primaryUse?: string;
   repairDetails?: string;
   renovations?: string;
@@ -215,24 +215,24 @@ const MyProperties = () => {
               }
             }
             console.log("hey")
-            console.log(home.house_age)
+            console.log(home.home_age)
             
-            const backendType = home.type_of_house || '';
+            const backendType = home.type_of_home || '';
             const isStandardType = HOUSE_TYPES.some(type => type.value === backendType);
             
-            const backendPrimaryMaterial = home.selected_house_type || '';
+            const backendPrimaryMaterial = home.primary_home_material || '';
             const isStandardPrimaryMaterial = PRIMARY_MATERIALS.some(mat => mat.value === backendPrimaryMaterial);
             
-            const backendRoofingMaterial = home.selected_material || '';
+            const backendRoofingMaterial = home.roof_material || '';
             const isStandardRoofing = ROOFING_MATERIALS.some(mat => mat.value === backendRoofingMaterial);
 
-            const backendFlooring = home.selected_flooring || '';
+            const backendFlooring = home.floor_material || '';
             const isStandardFlooring = FLOORING_MATERIALS.some(type => type.value === backendFlooring);
           
-            const backendWallMaterial = home.selected_wall || '';
+            const backendWallMaterial = home.wall_material || '';
             const isStandardWallMaterial = WALL_MATERIALS.some(mat => mat.value === backendWallMaterial);
           
-            const backendCeilingMaterial = home.selected_ceiling || '';
+            const backendCeilingMaterial = home.ceiling_material || '';
             const isStandardCeilingMaterial = CEILING_MATERIALS.some(mat => mat.value === backendCeilingMaterial);
           
             return {
@@ -241,8 +241,8 @@ const MyProperties = () => {
               location: locationText,
               latitude: home.latitude,
               longitude: home.longitude,
-              house_age: home.house_age?.toString() || '',
-              primaryUse: home.house_use || '',
+              home_age: home.home_age?.toString() || '',
+              primaryUse: home.primary_home_use || '',
               renovations: home.renovations || '',
               type: isStandardType ? backendType : 'other',
               otherType: isStandardType ? '' : backendType,
@@ -463,10 +463,10 @@ const MyProperties = () => {
 
           <TextInput
             style={styles.input}
-            value={selectedProperty?.house_age}
+            value={selectedProperty?.home_age}
             onChangeText={(text) => {
               if (selectedProperty) {
-                setSelectedProperty({ ...selectedProperty, house_age: text });
+                setSelectedProperty({ ...selectedProperty, home_age: text });
               }
             }}
             placeholder="Age of the house (in years)"
@@ -793,18 +793,18 @@ const MyProperties = () => {
                     latitude: selectedProperty.latitude,
                     longitude: selectedProperty.longitude, 
                     home_name: selectedProperty.name,
-                    house_age: selectedProperty.house_age,
-                    house_use: selectedProperty.primaryUse,
+                    home_age: selectedProperty.home_age,
+                    primary_home_use: selectedProperty.primaryUse,
                     renovations: selectedProperty.renovations,
-                    type_of_house: typeToSend,
+                    type_of_home: typeToSend,
                     num_floor: selectedProperty.num_floor,
                     lot_area: selectedProperty.lot_area,
                     floor_area: selectedProperty.floor_area,
-                    selected_house_type: primaryMaterialToSend,
-                    selected_material: roofingMaterialToSend,
-                    selected_flooring: flooringToSend,
-                    selected_wall: wallMaterialToSend,
-                    selected_ceiling: ceilingMaterialToSend,
+                    primary_home_material: primaryMaterialToSend,
+                    roof_material: roofingMaterialToSend,
+                    floor_material: flooringToSend,
+                    wall_material: wallMaterialToSend,
+                    ceiling_material: ceilingMaterialToSend,
                     home_img: imageUrl || null, // Send the new image URL or null
                   }),
                 });

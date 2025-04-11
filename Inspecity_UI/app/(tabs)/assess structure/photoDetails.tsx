@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
@@ -172,11 +172,29 @@ const PhotoDetails = () => {
         setReportID(Number(response.data.report_id));
         Alert.alert('Success', 'Report created successfully');
       } else {
-        Alert.alert('Error', 'Failed to create report');
+        Alert.alert(
+          'Error', 
+          'Failed to create report',
+          [
+            { 
+              text: "OK", 
+              onPress: () => navigation.popToTop() // This will navigate to top when OK is pressed
+            }
+          ]
+        );
       }
     } catch (error) {
       console.error('Error creating report: ', error);
-      Alert.alert('Error', 'An error occurred while creating the report');
+      Alert.alert(
+        'Error', 
+        'An error occurred while creating the report',
+        [
+          { 
+            text: "OK", 
+            onPress: () => navigation.popToTop() // This will navigate to top when OK is pressed
+          }
+        ]
+      );
     }
   };
 
@@ -380,7 +398,10 @@ const PhotoDetails = () => {
   
               <Text style={styles.sectionTitle}>Recommendations:</Text>
               <Text style={styles.detailText}>• {recommendations}</Text>
-              <TouchableOpacity style={styles.shopButton}>
+              <TouchableOpacity 
+                style={styles.shopButton} 
+                onPress={() => router.push('../../nearby_shops')}
+              >
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
   

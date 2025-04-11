@@ -295,7 +295,10 @@ const ReportDetails = () => {
   
               <Text style={styles.sectionTitle}>Recommendations:</Text>
               <Text style={styles.detailText}>• {recommendations}</Text>
-              <TouchableOpacity style={styles.shopButton}>
+              <TouchableOpacity 
+                style={styles.shopButton} 
+                onPress={() => router.push('../../nearby_shops')}
+              >
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
   

@@ -93,19 +93,19 @@ const Dashboard = () => {
       );
   
       if (response.status === 404) {
-        console.log("No default home found.");
-        Alert.alert(
-          "No Home Created",
-          "Click OK to create home.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push('./board/MyProperties')
-            }
-          ]
-        );
-        setHouseName("NAME OF HOUSE");
-        setLocation("LOCATION");
+        // console.log("No default home found.");
+        // Alert.alert(
+        //   "No Home Created",
+        //   "Click OK to create home.",
+        //   [
+        //     {
+        //       text: "OK",
+        //       onPress: () => router.push('./board/MyProperties')
+        //     }
+        //   ]
+        // );
+        // setHouseName("NAME OF HOUSE");
+        // setLocation("LOCATION");
         return;
       }
   
