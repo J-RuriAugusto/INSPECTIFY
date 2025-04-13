@@ -8,6 +8,7 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as Print from 'expo-print';
 import ImageView from 'react-native-image-viewing';
+import { Asset } from 'expo-asset';
 
 const ReportDetails = () => {
   const params = useLocalSearchParams();
@@ -20,6 +21,7 @@ const ReportDetails = () => {
   const [notes, setNotes] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [reportName, setReportName] = useState('');
+  // const [locationName, setLocationName] = useState('');
   const [condition, setCondition] = useState('');
   const [annotatedImage, setAnnotatedImage] = useState('');
   const [material, setMaterial] = useState('');
@@ -154,51 +156,322 @@ const ReportDetails = () => {
   };
 
   const shareReportAsPDF = async () => {
-    if (!(await Sharing.isAvailableAsync())) {
-      alert("Sharing is not available on this device");
-      return;
+    try {
+      // Check if sharing is available on the device
+      if (!(await Sharing.isAvailableAsync())) {
+        alert("Sharing is not available on this device.");
+        return;
+      }
+  
+      // Use the provided base64 logo
+      const logoBase64 = `data:image/png;base64,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`;
+  
+      // Format current date properly
+      const currentDate = new Date();
+      const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      });
+  
+      // Parse and validate damage types data
+      const processedDamageTypes = processListData(damageTypes);
+      const issuesHTML = generateListHTML(processedDamageTypes, 'No issues detected.');
+  
+      // Parse and validate recommendations data
+      const processedRecommendations = typeof recommendations === 'string'
+        ? recommendations.split('\n').filter(rec => rec.trim() !== '')
+        : [];
+      const recommendationsHTML = generateListHTML(processedRecommendations, 'No recommendations provided.');
+  
+      // Format report date properly
+      const formattedReportDate = dateCreated 
+        ? new Date(dateCreated).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        : formattedCurrentDate;
+  
+      // Generate HTML content with improved accessibility and semantic structure
+      const htmlContent = generateReportHTML({
+        logoBase64,
+        reportName: reportName || 'Not specified',
+        formattedDate: formattedCurrentDate,
+        location: 'University of the Philippines',
+        coordinates: '123.90467, 10.41196',
+        condition: condition || 'Not specified',
+        materialAge,
+        issuesHTML,
+        recommendationsHTML,
+        notes: notes || 'No notes available.',
+        annotatedImage,
+        currentYear: currentDate.getFullYear()
+      });
+  
+      // Generate PDF file with proper dimensions
+      const { uri } = await Print.printToFileAsync({ 
+        html: htmlContent,
+        width: 612,   // US Letter width in points (8.5in)
+        height: 792,  // US Letter height in points (11in)
+        base64: false
+      });
+      
+      // Share the PDF file
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'Share Inspection Report',
+        UTI: 'com.adobe.pdf'
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert(`Failed to generate the PDF report: ${error.message || 'Unknown error'}`);
     }
-  
-    const issuesHTML = damageTypes.map(issue => `<li>${issue}</li>`).join('');
-    const recommendationsArray = recommendations.split('\n').filter(rec => rec.trim() !== '');
-    const recommendationsHTML = recommendationsArray.map(rec => `<li>${rec}</li>`).join('');
-  
-    const htmlContent = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial; padding: 20px; }
-            h1 { color: #2E86C1; }
-            img { margin-top: 10px; border-radius: 10px; }
-            ul { padding-left: 20px; }
-            .label { font-weight: bold; margin-top: 10px; }
-          </style>
-        </head>
-        <body>
-          <h1>${reportName || 'Living Room - Left Wall'}</h1>
-          <p><span class="label">Date:</span> ${dateCreated || new Date().toLocaleDateString()}</p>
-  
-          <h2>Condition</h2>
-          <p>${condition || 'No condition specified'} (Age: ${materialAge || 'N/A'})</p>
-  
-          <h2>Detected Issues</h2>
-          ${damageTypes.length > 0 ? `<ul>${issuesHTML}</ul>` : '<p>No issues detected</p>'}
-  
-          <h2>Recommendations</h2>
-          ${recommendations ? `<ul>${recommendationsHTML}</ul>` : '<p>No recommendations available</p>'}
-  
-          <h2>Notes</h2>
-          <p>${notes || 'No notes added.'}</p>
-  
-          <h2>Scanned Image</h2>
-          ${annotatedImage ? `<img src="${annotatedImage}" width="300"/>` : '<p>No image available</p>'}
-        </body>
-      </html>
-    `;
-  
-    const { uri } = await Print.printToFileAsync({ html: htmlContent });
-    await Sharing.shareAsync(uri);
   };
+  
+  /**
+   * Process array-like data into a clean array
+   * @param {Array|string} data - The data to process
+   * @returns {Array} - Processed array of items
+   */
+  const processListData = (data) => {
+    if (Array.isArray(data)) {
+      return data.filter(item => item && item.trim() !== '');
+    } else if (typeof data === 'string') {
+      return data.split('\n').filter(item => item && item.trim() !== '');
+    }
+    return [];
+  };
+  
+  /**
+   * Generate HTML for lists
+   * @param {Array} items - List items
+   * @param {string} emptyMessage - Message to show when list is empty
+   * @returns {string} - HTML string
+   */
+  const generateListHTML = (items, emptyMessage) => {
+    if (items.length > 0) {
+      return `<ul>${items.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul>`;
+    }
+    return `<p>${emptyMessage}</p>`;
+  };
+  
+  /**
+   * Escape HTML special characters to prevent XSS
+   * @param {string} text - Text to escape
+   * @returns {string} - Escaped HTML
+   */
+  const escapeHTML = (text) => {
+    if (!text) return '';
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+  
+  /**
+   * Generate the complete HTML report
+   * @param {Object} data - Report data
+   * @returns {string} - Complete HTML document
+   */
+  const generateReportHTML = ({
+    logoBase64,
+    reportName,
+    formattedDate,
+    location,
+    coordinates,
+    condition,
+    materialAge,
+    issuesHTML,
+    recommendationsHTML,
+    notes,
+    annotatedImage,
+    currentYear
+  }) => {
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inspectify Hazard Assessment Report</title>
+        <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          padding: 2rem 1.5rem;
+          color: #333;
+          line-height: 1.6;
+          margin: 0;
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        .report-container {
+          margin-left: .75in;
+          margin-right: .75in;
+        }
+        .header {
+          position: running(header);
+          display: flex;
+          align-items: center;
+          border-bottom: 2px solid #4CAF50;
+          padding-bottom: 0.75rem;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+          width: 100%;
+        }
+        .header img {
+          height: 60px;
+          margin-right: 1rem;
+        }
+        .header-text {
+          flex: 1;
+          min-width: 200px;
+        }
+        .header-text h1 {
+          font-size: 1.4rem;
+          color: #2E86C1;
+          margin: 0 0 0.25rem 0;
+          font-weight: 600;
+        }
+        .meta {
+          margin-bottom: 1.5rem;
+          font-size: 0.875rem;
+          color: #555;
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 4px;
+        }
+        h2 {
+          font-size: 1.2rem;
+          color: #2E86C1;
+          margin-top: 1.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          page-break-after: avoid;
+        }
+        section {
+          margin-bottom: 1.25rem;
+          page-break-inside: avoid;
+        }
+        p, li {
+          font-size: 0.875rem;
+          margin: 0.5rem 0;
+        }
+        ul {
+          padding-left: 1.25rem;
+          margin: 0.5rem 0;
+        }
+        li {
+          margin-bottom: 0.25rem;
+        }
+        .image-container {
+          margin: 1rem 0;
+          text-align: center;
+          page-break-inside: avoid;
+        }
+        .image-container img {
+          max-width: 100%;
+          max-height: 400px;
+          border-radius: 8px;
+          border: 1px solid #ddd;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .footer {
+          font-size: 0.75rem;
+          text-align: center;
+          color: #777;
+          margin-top: 2.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #eee;
+          page-break-before: auto;
+        }
+
+        /* CSS for the header on every page */
+        @page {
+          margin: 1in;
+        }
+        
+        @top-center {
+          content: element(header);
+        }
+
+        @media print {
+          body {
+            padding: 0.5rem;
+          }
+          .report-container {
+            margin-left: 1in;
+            margin-right: 1in;
+          }
+          .header {
+            margin-top: 0.5rem;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="report-container">
+        <div class="header" role="banner">
+          <img src="${logoBase64}" alt="Inspectify Logo" />
+          <div class="header-text">
+            <h1>Inspectify Structural Assessment Report</h1>
+            <p style="font-size: 0.875rem; color: #666;">Comprehensive structural assessment report</p>
+          </div>
+        </div>
+
+        <div class="meta" role="contentinfo">
+          <p><strong>Report For:</strong> ${escapeHTML(reportName)}</p>
+          <p><strong>Date:</strong> ${formattedDate}</p>
+          <p><strong>Location:</strong> ${escapeHTML(location)}</p>
+          <p><strong>Coordinates:</strong> ${escapeHTML(coordinates)}</p>
+        </div>
+
+        <main role="main">
+          <section aria-labelledby="condition-heading">
+            <h2 id="condition-heading">Condition</h2>
+            <p>${escapeHTML(condition)} ${materialAge ? `(Age: ${escapeHTML(materialAge)})` : ''}</p>
+          </section>
+
+          <section aria-labelledby="issues-heading">
+            <h2 id="issues-heading">Detected Issues</h2>
+            ${issuesHTML}
+          </section>
+
+          <section aria-labelledby="recommendations-heading">
+            <h2 id="recommendations-heading">Recommendations</h2>
+            ${recommendationsHTML}
+          </section>
+
+          <section aria-labelledby="notes-heading">
+            <h2 id="notes-heading">Notes</h2>
+            <p>${escapeHTML(notes)}</p>
+          </section>
+
+          ${annotatedImage ? `
+          <section aria-labelledby="image-heading">
+            <h2 id="image-heading">Scanned Image</h2>
+            <div class="image-container">
+              <img src="${annotatedImage}" alt="Annotated scan of the assessed area" />
+            </div>
+          </section>
+          ` : ''}
+        </main>
+
+        <div class="footer" role="contentinfo">
+          <p>This report was generated automatically by Inspectify. For official documentation, please consult a licensed structural engineer.</p>
+          <p>© ${currentYear} Inspectify. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+  };
+  
   
 
   if (!annotatedImage) {
