@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import MapView, { Marker, Region, PROVIDER_GOOGLE } from "react-native-maps";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, Linking, Animated} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, Linking, Animated, AsyncStorage } from "react-native";
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
 const GOOGLE_MAPS_API_KEY = "AlzaSyq6F4CSzE_WKPYlT_jSLWRaKzAQyavZIox";
 
@@ -33,6 +34,62 @@ const NearbyShops = () => {
   
   // Track if filters have been applied
   const [filtersApplied, setFiltersApplied] = useState(false);
+  
+  // BOOKMARK FEATURE - New state variables
+  const [bookmarkedStores, setBookmarkedStores] = useState<string[]>([]);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+
+  // Load bookmarked stores from AsyncStorage on component mount
+  useEffect(() => {
+    loadBookmarkedStores();
+  }, []);
+
+  // Load bookmarked stores from AsyncStorage
+  const loadBookmarkedStores = async () => {
+    try {
+      const savedBookmarks = await AsyncStorage.getItem('bookmarkedStores');
+      if (savedBookmarks) {
+        setBookmarkedStores(JSON.parse(savedBookmarks));
+      }
+    } catch (error) {
+      console.error('Error loading bookmarked stores:', error);
+    }
+  };
+
+  // Save bookmarked stores to AsyncStorage
+  const saveBookmarkedStores = async (bookmarks: string[]) => {
+    try {
+      await AsyncStorage.setItem('bookmarkedStores', JSON.stringify(bookmarks));
+    } catch (error) {
+      console.error('Error saving bookmarked stores:', error);
+    }
+  };
+
+  // Toggle bookmark for a store
+  const toggleBookmark = (storeId: string) => {
+    let updatedBookmarks: string[];
+    
+    if (bookmarkedStores.includes(storeId)) {
+      // Remove bookmark
+      updatedBookmarks = bookmarkedStores.filter(id => id !== storeId);
+    } else {
+      // Add bookmark
+      updatedBookmarks = [...bookmarkedStores, storeId];
+    }
+    
+    setBookmarkedStores(updatedBookmarks);
+    saveBookmarkedStores(updatedBookmarks);
+  };
+
+  // Check if a store is bookmarked
+  const isBookmarked = (storeId: string) => {
+    return bookmarkedStores.includes(storeId);
+  };
+
+  // Toggle showing only bookmarked stores
+  const toggleShowOnlyBookmarked = () => {
+    setShowOnlyBookmarked(!showOnlyBookmarked);
+  };
 
   // Get User Location
   useEffect(() => {
@@ -238,6 +295,7 @@ const NearbyShops = () => {
     setRatingFilter(0);
     setDistanceFilter(2000);
     setFiltersApplied(false);
+    setShowOnlyBookmarked(false);
     
     // Re-fetch original stores if user location is available
     if (userLocation) {
@@ -257,6 +315,17 @@ const NearbyShops = () => {
     }
   };
 
+  // Get filtered stores based on all criteria
+  const getFilteredStores = () => {
+    if (showOnlyBookmarked) {
+      return stores.filter(store => bookmarkedStores.includes(store.id));
+    }
+    return stores;
+  };
+
+  // Stores to display based on filters and bookmarks
+  const displayStores = getFilteredStores();
+
   return (
     <View style={styles.container}>
       {/* Map View */}
@@ -274,7 +343,7 @@ const NearbyShops = () => {
         }
         showsUserLocation={true}
       >
-        {stores.map((store) => (
+        {displayStores.map((store) => (
           <Marker 
             key={store.id} 
             coordinate={store.coordinates}
@@ -302,6 +371,21 @@ const NearbyShops = () => {
           </Marker>
         ))}
       </MapView>
+
+      {/* Bookmark Toggle Button */}
+      <TouchableOpacity 
+        style={[
+          styles.bookmarkFilterButton, 
+          showOnlyBookmarked && styles.bookmarkFilterButtonActive
+        ]} 
+        onPress={toggleShowOnlyBookmarked}
+      >
+        <Ionicons 
+          name={showOnlyBookmarked ? "bookmark" : "bookmark-outline"} 
+          size={24} 
+          color={showOnlyBookmarked ? "#FFD700" : "white"} 
+        />
+      </TouchableOpacity>
 
       {/* Filter Button & Panel */}
       <View style={styles.filterWrapper}>
@@ -350,8 +434,8 @@ const NearbyShops = () => {
               <TouchableOpacity 
                 style={styles.resetButton} 
                 onPress={resetFilters}
-                disabled={!filtersApplied}
-                opacity={filtersApplied ? 1 : 0.5}
+                disabled={!filtersApplied && !showOnlyBookmarked}
+                opacity={filtersApplied || showOnlyBookmarked ? 1 : 0.5}
               >
                 <Text style={styles.resetButtonText}>Reset</Text>
               </TouchableOpacity>
@@ -364,16 +448,16 @@ const NearbyShops = () => {
 
         {/* Filter Button */}
         <TouchableOpacity style={styles.filterButton} onPress={toggleFilter}>
-          <Image source={require("../../assets/images/filter-icon.png")} style={{ width: 24, height: 24, tintColor: "white" }} />
+          <Ionicons name="filter" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Store List at the Bottom */}
       <View style={styles.storeList}>
-        {stores.length > 0 ? (
+        {displayStores.length > 0 ? (
           <FlatList
             horizontal
-            data={stores}
+            data={displayStores}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
@@ -396,7 +480,19 @@ const NearbyShops = () => {
               >
                 <Image source={{ uri: item.image }} style={styles.image} />
                 <View style={styles.cardContent}>
-                  <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                    <TouchableOpacity 
+                      onPress={() => toggleBookmark(item.id)}
+                      style={styles.bookmarkButton}
+                    >
+                      {isBookmarked(item.id) ? (
+                        <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
+                      ) : (
+                        <MaterialIcons name="favorite-border" size={22} color="#999999" />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.rating}>⭐ {item.rating || "No rating"}</Text>
                   <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
                   {item.distance && (
@@ -410,19 +506,21 @@ const NearbyShops = () => {
         ) : (
           <View style={styles.noResultsContainer}>
             <Text style={styles.noResultsText}>
-              {filtersApplied ? 
-                "No stores match your filters" : 
-                "Looking for nearby stores..."}
+              {showOnlyBookmarked ? 
+                "No bookmarked stores" : 
+                filtersApplied ? 
+                  "No stores match your filters" : 
+                  "Looking for nearby stores..."}
             </Text>
           </View>
         )}
       </View>
       
-      {/* Filter Status Indicator (only shows when filters are applied) */}
-      {filtersApplied && (
+      {/* Filter Status Indicator */}
+      {(filtersApplied || showOnlyBookmarked) && (
         <View style={styles.filterStatusContainer}>
           <Text style={styles.filterStatusText}>
-            Filters applied: 
+            {showOnlyBookmarked ? "Showing saved stores" : "Filters applied:"} 
             {ratingFilter > 0 ? ` ${ratingFilter}+ stars` : ''}
             {distanceFilter < 5000 ? ` within ${distanceFilter/1000}km` : ''}
           </Text>
@@ -469,10 +567,23 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   cardContent: { flex: 1 },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
+  },
   name: {
     fontSize: 14,
     fontWeight: "bold",
     color: "#333",
+    flex: 1,
+  },
+  bookmarkButton: {
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
   },
   rating: {
     fontSize: 12,
@@ -507,6 +618,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     zIndex: 10,
+  },
+  bookmarkFilterButton: {
+    position: "absolute",
+    top: 75,
+    right: '5%',
+    backgroundColor: "#0B417D",
+    padding: 10,
+    borderRadius: 25,
+    zIndex: 10,
+  },
+  bookmarkFilterButtonActive: {
+    backgroundColor: "#0064C8",
   },
   filterContainer: {
     width: 230,
@@ -563,7 +686,7 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
     backgroundColor: "rgba(11, 65, 125, 0.7)",
-    paddingVertical:.5,
+    paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 15,
   },
