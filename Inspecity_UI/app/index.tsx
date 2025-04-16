@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StatusBar } from 'react-native';
+import { View, Text, Button, StatusBar, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const LoadingScreen = () => {
@@ -21,7 +21,7 @@ const LoadingScreen = () => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create ({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -41,6 +41,6 @@ const styles = {
     marginBottom: 20,
     color: '#555555', // Optional styling for subtitle color
   },
-};
+});
 
 export default LoadingScreen;

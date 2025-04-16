@@ -1,23 +1,91 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Modal, ScrollView } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, Modal, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
+import * as Print from 'expo-print';
 
 const PhotoDetails = () => {
   const params = useLocalSearchParams();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const photo = params.photo as string;
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const reportDate = "December 13, 2024 • 9:00 AM";
+  const condition = "Moderate";
+  const age = "20 years";
+  const issues = ["Crack near the center"];
+  const recommendations = ["Seal cracks using epoxy."];
 
-  const sharePhoto = async () => {
+
+  const saveReport = () => {
+    alert("Report Saved!");
+    setReportModalVisible(false);
+    navigation.popToTop();
+  };
+
+  const deleteReport = () => {
+    alert("Report Deleted!");
+    setReportModalVisible(false);
+    navigation.popToTop();
+  };
+
+  // const sharePhoto = async () => {
+  //   if (!(await Sharing.isAvailableAsync())) {
+  //     alert("Sharing is not available on this device");
+  //     return;
+  //   }
+  //   await Sharing.shareAsync(photo);
+  // };  
+  
+  const shareReportAsPDF = async () => {
     if (!(await Sharing.isAvailableAsync())) {
       alert("Sharing is not available on this device");
       return;
     }
-    await Sharing.shareAsync(photo);
-  };  
+  
+    // Convert issues and recommendations into <li> elements
+    const issuesHTML = issues.map(issue => `<li>${issue}</li>`).join('');
+    const recommendationsHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+  
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h1 { color: #2E86C1; }
+            img { margin-top: 10px; border-radius: 10px; }
+            ul { padding-left: 20px; }
+            .label { font-weight: bold; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>Living Room - Left Wall</h1>
+          <p><span class="label">Date:</span> ${reportDate}</p>
+  
+          <h2>Condition</h2>
+          <p>${condition} (Age: ${age})</p>
+  
+          <h2>Detected Issues</h2>
+          <ul>${issuesHTML}</ul>
+  
+          <h2>Recommendations</h2>
+          <ul>${recommendationsHTML}</ul>
+  
+          <h2>Notes</h2>
+          <p>${notes || 'No notes added.'}</p>
+  
+          <h2>Scanned Image</h2>
+          ${photo ? `<img src="${photo}" width="300"/>` : '<p>No image available</p>'}
+        </body>
+      </html>
+    `;
+  
+    const { uri } = await Print.printToFileAsync({ html: htmlContent });
+  
+    await Sharing.shareAsync(uri);
+  };
 
   if (!photo) {
     return (
@@ -30,10 +98,15 @@ const PhotoDetails = () => {
               <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
 
-            {/* Share Button */}
-            <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
-              <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
+            {/* Save/Delete Report Button */}
+            <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+              <Image source={require('../../../assets/images/save.png')} style={styles.reportIcon} />
             </TouchableOpacity>
+            
+            {/* Share Button */}
+            <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
+            <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
+          </TouchableOpacity>
           </View>
 
           <Text style={styles.title}>No photo provided!</Text>
@@ -55,9 +128,14 @@ const PhotoDetails = () => {
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
+
+          {/* Save/Delete Report Button */}
+          <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+            <Image source={require('../../../assets/images/save.png')} style={styles.reportIcon} />
+          </TouchableOpacity>
   
           {/* Share Button */}
-          <TouchableOpacity style={styles.shareButton} onPress={sharePhoto}>
+          <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
             <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
           </TouchableOpacity>
         </View>
@@ -119,6 +197,53 @@ const PhotoDetails = () => {
           </ScrollView>
         </View>
 
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={reportModalVisible}
+          onRequestClose={() => setReportModalVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setReportModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Manage Report</Text>
+
+                {/* Save Report Button */}
+                <TouchableOpacity 
+                  style={styles.modalButton} 
+                  onPress={() => {
+                    saveReport();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.modalButtonText}>Save Report</Text>
+                </TouchableOpacity>
+
+                {/* Delete Report Button */}
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: 'red' }]} 
+                  onPress={() => {
+                    deleteReport();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.modalButtonText}>Delete Report</Text>
+                </TouchableOpacity>
+
+                {/* Close Button */}
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={() => setReportModalVisible(false)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+
         {/* Edit Note Modal */}
         <Modal
           animationType="slide"
@@ -170,35 +295,25 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 43, 91, 0.7)' },
   header: {
     position: 'absolute',
-    top: 40,
-    left: 20,
-    right: 20,
+    top: '4%',
+    zIndex: 10,
+    right: '3%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  input: {
-    width: '90%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: 'white',
-  },
-  backButton: { flexDirection: 'row', alignItems: 'center' },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: '142%' },
   backIcon: { width: 30, height: 30, marginRight: 5 },
-  backText: { fontSize: 17, color: '#FFFFFF' },
+  backText: { fontSize: 17, fontFamily: 'Epilogue-Bold', color: '#FFFFFF' },
   shareButton: { padding: 5 },
   shareIcon: { width: 30, height: 30 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   imageContainer: {
     position: 'absolute',
-    top: 40,
+    top: '5%',
     left: '50%',
     transform: [{ translateX: -150 }],
-    zIndex: 10,
+    zIndex: 9,
     alignItems: 'center'
   },
   houseImage: { width: 300, height: 250 },  
@@ -360,7 +475,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 5
   },
-  saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},  
+  saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},
+  reportIcon: {
+    width: 30,
+    height: 30,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: 'Epilogue-Bold',
+    marginBottom: 5,
+  },
+  modalButton: {
+    backgroundColor: '#002B5B',
+    padding: 12,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'Epilogue-Bold',
+  },
+  closeButton: {
+    padding: 5,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontFamily: 'Epilogue-Medium',
+    color: '#333',
+  },
 });
 
 export default PhotoDetails;

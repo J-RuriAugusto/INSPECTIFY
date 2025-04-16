@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 
+const { width, height } = Dimensions.get('window');
+
 const Flood = () => {
-  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -12,86 +13,101 @@ const Flood = () => {
     'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  const navigation = useNavigation();
+  
+  if (!fontsLoaded) return null;
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require('../../../assets/images/flood_bg.png')}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
         <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
 
-      <View style={styles.floodContainer}>
+      {/* EARTHQUAKE Label at the top */}
+      <View style={styles.textContainer}>
         <Image source={require('../../../assets/images/flood-icon.png')} style={styles.icon} />
-        <Text style={styles.floodText}>FLOOD</Text>
+        <Text style={styles.title1}>FLOOD</Text>
       </View>
 
-      <Text style={styles.locationText}>LOCATION & GEOGRAPHY</Text>
+      {/* Centered content */}
+      <View style={styles.content}>
+        <Text style={styles.title2}>CATEGORY</Text>
 
-      <TouchableOpacity style={styles.startButton} onPress={() => alert('Start button pressed')}>
-        <Text style={styles.startButtonText}>Start</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('floodQueries')}>
+          <Text style={styles.startButtonText}>Start</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#0B417D',
+    width: '100%',
+    height: '100%',
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: width * 0.05,
   },
   backButton: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: height * 0.05,
+    left: width * 0.05,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 5,
+    width: width * 0.07,     // ~7% of screen width
+    height: width * 0.07,
+    marginRight: width * 0.01,
   },
   backText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: 17,
+    fontSize: width * 0.045, // ~16-18px on standard phones
     color: '#FFFFFF',
   },
-  floodContainer: {
+  textContainer: {
+    top: height * 0.12,
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
   icon: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
+    width: width * 0.1,
+    height: width * 0.1,
+    marginRight: width * 0.025,
   },
-  floodText: {
+  title1: {
     fontFamily: 'Epilogue-Black',
-    fontSize: 30,
+    fontSize: width * 0.08,
     color: '#FFFFFF',
   },
-  locationText: {
-    fontFamily: 'Epilogue-Bold',
-    fontSize: 50,
-    color: '#00A8E8',
-    marginBottom: 30,
+  title2: {
+    fontFamily: 'Epilogue-Black',
+    fontSize: width * 0.12,
+    color: '#5CD2FF',
+    marginBottom: height * 0.01,
+    textAlign: 'center',
   },
   startButton: {
     backgroundColor: '#00A8E8',
-    paddingVertical: 5,
-    paddingHorizontal: 40,
-    borderRadius: 20,
+    paddingVertical: height * 0.002,
+    paddingHorizontal: width * 0.1,
+    borderRadius: width * 0.07,
   },
   startButtonText: {
     fontFamily: 'Epilogue-Black',
-    fontSize: 25,
+    fontSize: width * 0.065,
     color: '#FFFFFF',
   },
 });

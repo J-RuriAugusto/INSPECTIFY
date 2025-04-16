@@ -3,14 +3,15 @@ import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, Scroll
 import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
+import { Link } from 'expo-router';
 
 const Dashboard = () => {
   const [search, setSearch] = React.useState('');
   
   const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../assets/fonts/Archivo-Regular.ttf'),
-    'Epilogue-Bold': require('../../assets/fonts/Epilogue-Bold.ttf'),
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
   });
 
   if (!fontsLoaded) {
@@ -18,10 +19,10 @@ const Dashboard = () => {
   }
 
   const savedShops = [
-    { id: '1', image: require('../../assets/images/shop1.png') },
-    { id: '2', image: require('../../assets/images/shop2.png') },
-    { id: '3', image: require('../../assets/images/shop2.png') },
-    { id: '4', image: require('../../assets/images/shop2.png') },
+    { id: '1', image: require('../../../assets/images/shop1.png') },
+    { id: '2', image: require('../../../assets/images/shop2.png') },
+    { id: '3', image: require('../../../assets/images/shop2.png') },
+    { id: '4', image: require('../../../assets/images/shop2.png') },
   ];
 
   const reportsData = [
@@ -47,13 +48,17 @@ const Dashboard = () => {
     <View style={styles.container}>
       {/* Header with House and Settings Icons */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => Alert.alert('House Icon Pressed!')}>
-          <Image source={require('../../assets/images/houseicon.png')} style={styles.headerIcon} />
-        </TouchableOpacity>
+        <Link href="/board/MyProperties" asChild>
+          <TouchableOpacity>
+            <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
+          </TouchableOpacity>
+        </Link>
 
-        <TouchableOpacity onPress={() => Alert.alert('Settings Icon Pressed!')}>
-          <Image source={require('../../assets/images/settings_icon.png')} style={styles.headerIcon} />
-        </TouchableOpacity>
+        <Link href="/board/settings" asChild>
+        <TouchableOpacity>            
+          <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
+          </TouchableOpacity>
+        </Link>
       </View>
 
       {/* Main Content */}
@@ -95,7 +100,7 @@ const Dashboard = () => {
           <View style={styles.reportContent}>
             {/* Icon before the report title */}
             <Image 
-              source={require('../../assets/images/report_icon.png')} 
+              source={require('../../../assets/images/report_icon.png')} 
               style={styles.reportIcon}
             />
             
