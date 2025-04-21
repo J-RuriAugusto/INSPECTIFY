@@ -4,9 +4,9 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import * as Location from 'expo-location';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Swipeable } from "react-native-gesture-handler";
+// import { Swipeable } from "react-native-gesture-handler";
 
-const GOOGLE_API_KEY = "AlzaSysSIYHDroeAu3l1D7TZ2X3ZkJNiRQUsNBz"; // Replace with your actual API key
+const GOOGLE_API_KEY = "AlzaSycMz978ghujEfEk1vWDNzF86fgwzsPrPmq"; // Replace with your actual API key
 
 // Common emergency numbers (always available)
 const COMMON_HOTLINES = [

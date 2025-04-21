@@ -37,7 +37,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/scanning",
+        pathname: "/assess structure/photoDetails",
         params: { photo: result.assets[0].uri }
       });
     }
@@ -58,7 +58,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/scanning",
+        pathname: "/assess structure/photoDetails",
         params: { photo: result.assets[0].uri }
       });
     }

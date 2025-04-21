@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, L
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSyq6F4CSzE_WKPYlT_jSLWRaKzAQyavZIox";
+const GOOGLE_MAPS_API_KEY = "AlzaSycMz978ghujEfEk1vWDNzF86fgwzsPrPmq";
 
 type Store = {
   id: string;
@@ -347,12 +347,14 @@ const NearbyShops = () => {
 
             {/* Filter Buttons */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity 
-                style={styles.resetButton} 
-                onPress={resetFilters}
-                disabled={!filtersApplied}
-                opacity={filtersApplied ? 1 : 0.5}
-              >
+            <TouchableOpacity 
+              style={[
+                styles.resetButton, 
+                { opacity: filtersApplied ? 1 : 0.5 }
+              ]}
+              onPress={resetFilters}
+              disabled={!filtersApplied}
+            >
                 <Text style={styles.resetButtonText}>Reset</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.searchButton} onPress={applyFilters}>
