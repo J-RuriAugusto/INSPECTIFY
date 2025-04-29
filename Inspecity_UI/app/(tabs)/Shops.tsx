@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import MapView, { Marker, Region, PROVIDER_GOOGLE } from "react-native-maps";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, Linking, Animated } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Pressable, Image, Linking, Animated, Modal, ScrollView } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSy-i3QEpxWHOlSbKGuJcuqKzB5OB0ejLe_E";
+const GOOGLE_MAPS_API_KEY = "AlzaSyq6F4CSzE_WKPYlT_jSLWRaKzAQyavZIox";
 
 type Store = {
   id: string;
@@ -40,6 +40,10 @@ const NearbyShops = () => {
   // BOOKMARK FEATURE - New state variables
   const [bookmarkedStores, setBookmarkedStores] = useState<string[]>([]);
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+  
+  // NEW: State for the selected store and modal visibility
+  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Load bookmarked stores from AsyncStorage on component mount
   useEffect(() => {
@@ -269,8 +273,8 @@ const NearbyShops = () => {
   };
 
   // Open Google Maps for Directions
-  const openGoogleMaps = (latitude: number, longitude: number) => {
-    const url = `https://maps.gomaps.pro/maps/dir/?api=1&destination=${latitude},${longitude}`;
+  const openGoogleMaps = (latitude: number, longitude: number, name: string) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&destination_place_id=${encodeURIComponent(name)}`;
     Linking.openURL(url);
   };
 
@@ -325,6 +329,22 @@ const NearbyShops = () => {
     return stores;
   };
 
+  // NEW: Function to handle opening the detail modal for a store
+  const handleStoreSelect = (store: Store) => {
+    setSelectedStore(store);
+    setModalVisible(true);
+    setSelectedCard(store.name);
+    mapRef.current?.animateToRegion(
+      {
+        latitude: store.coordinates.latitude,
+        longitude: store.coordinates.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      1000
+    );
+  };
+
   // Stores to display based on filters and bookmarks
   const displayStores = getFilteredStores();
 
@@ -349,18 +369,7 @@ const NearbyShops = () => {
           <Marker 
             key={store.id} 
             coordinate={store.coordinates}
-            onPress={() => {
-              setSelectedCard(store.name);
-              mapRef.current?.animateToRegion(
-                {
-                  latitude: store.coordinates.latitude,
-                  longitude: store.coordinates.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                },
-                1000
-              );
-            }}
+            onPress={() => handleStoreSelect(store)}
           >
             <View style={{ alignItems: "center" }}>
               {/* Custom Marker Icon */}
@@ -465,18 +474,7 @@ const NearbyShops = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() => {
-                  setSelectedCard(item.name);
-                  mapRef.current?.animateToRegion(
-                    {
-                      latitude: item.coordinates.latitude,
-                      longitude: item.coordinates.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    },
-                    1000
-                  );
-                }}
+                onPress={() => handleStoreSelect(item)}
                 style={[
                   styles.card,
                   item.name === selectedCard && styles.activeCard,
@@ -530,6 +528,114 @@ const NearbyShops = () => {
           </Text>
         </View>
       )}
+
+      {/* NEW: Store Detail Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => {
+          setModalVisible(false);
+          setSelectedStore(null);
+        }}
+      >
+        {selectedStore && (
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              {/* Close Button */}
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setModalVisible(false);
+                  setSelectedStore(null);
+                }}
+              >
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+              
+              {/* Store Image */}
+              <Image 
+                source={{ uri: selectedStore.image }} 
+                style={styles.modalImage}
+                resizeMode="cover"
+              />
+              
+              <ScrollView style={styles.modalScrollView}>
+                {/* Store Details */}
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedStore.name}</Text>
+                  
+                  <TouchableOpacity 
+                    onPress={() => toggleBookmark(selectedStore.id)}
+                    style={styles.modalBookmarkButton}
+                  >
+                    {isBookmarked(selectedStore.id) ? (
+                      <MaterialIcons name="favorite" size={24} color="#FF4D4D" />
+                    ) : (
+                      <MaterialIcons name="favorite-border" size={24} color="#777" />
+                    )}
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.ratingRow}>
+                  <Ionicons name="star" size={18} color="#FFD700" />
+                  <Text style={styles.modalRating}>{selectedStore.rating.toFixed(1) || "No rating"}</Text>
+                  
+                  {selectedStore.distance && (
+                    <View style={styles.distanceChip}>
+                      <Ionicons name="location" size={14} color="#0B417D" />
+                      <Text style={styles.modalDistance}>
+                        {(selectedStore.distance / 1000).toFixed(1)} km
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                
+                <View style={styles.infoSection}>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="location-outline" size={18} color="#555" style={styles.infoIcon} />
+                    <Text style={styles.modalAddress}>{selectedStore.address}</Text>
+                  </View>
+                  
+                  {selectedStore.phone && selectedStore.phone !== "No phone available" && (
+                    <TouchableOpacity 
+                      style={styles.infoRow}
+                      onPress={() => Linking.openURL(`tel:${selectedStore.phone}`)}
+                    >
+                      <Ionicons name="call-outline" size={18} color="#0066CC" style={styles.infoIcon} />
+                      <Text style={styles.modalPhone}>{selectedStore.phone}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                {selectedStore.openingHours && selectedStore.openingHours[0] !== "No hours available" && (
+                  <View style={styles.hoursSection}>
+                    <Text style={styles.sectionTitle}>Opening Hours</Text>
+                    {selectedStore.openingHours.map((hours, index) => (
+                      <Text key={index} style={styles.hoursText}>{hours}</Text>
+                    ))}
+                  </View>
+                )}
+              </ScrollView>
+              
+              {/* Directions Button */}
+              <TouchableOpacity 
+                style={styles.directionsButton}
+                onPress={() => {
+                  openGoogleMaps(
+                    selectedStore.coordinates.latitude,
+                    selectedStore.coordinates.longitude,
+                    selectedStore.name
+                  );
+                }}
+              >
+                <Text style={styles.directionsButtonText}>Get Directions</Text>
+                <Ionicons name="navigate" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </Modal>
     </View>
   );
 };
@@ -672,6 +778,129 @@ const styles = StyleSheet.create({
     borderRadius: wp(5),
   },
   filterStatusText: { color: 'white', fontSize: wp(3), fontWeight: 'bold' },
+  
+  // NEW: Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '80%',
+    overflow: 'hidden',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 15,
+    padding: 5,
+  },
+  modalImage: {
+    width: '100%',
+    height: 200,
+  },
+  modalScrollView: {
+    padding: 16,
+    maxHeight: 350,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+  },
+  modalBookmarkButton: {
+    padding: 5,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalRating: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 4,
+  },
+  distanceChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F4FF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    marginLeft: 12,
+  },
+  modalDistance: {
+    fontSize: 12,
+    color: '#0B417D',
+    marginLeft: 3,
+  },
+  infoSection: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  infoIcon: {
+    marginRight: 8,
+  },
+  modalAddress: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  modalPhone: {
+    fontSize: 14,
+    color: '#0066CC',
+    textDecorationLine: 'underline',
+  },
+  hoursSection: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  hoursText: {
+    fontSize: 13,
+    color: '#444',
+    marginBottom: 4,
+  },
+  directionsButton: {
+    backgroundColor: '#0B417D',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  directionsButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginRight: 8,
+  }
 });
 
 export default NearbyShops;
