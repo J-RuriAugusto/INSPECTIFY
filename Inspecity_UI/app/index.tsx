@@ -1,45 +1,55 @@
-import React from 'react';
-import { View, Text, Button, StatusBar, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Video, ResizeMode } from 'expo-av';
 
 const LoadingScreen = () => {
   const router = useRouter();
+  const video = useRef(null);
 
-  const handleNavigateToGetStarted = () => {
-    router.push('/getstarted_1'); // Navigate to the dashboard when the button is pressed
+  const handlePlaybackStatusUpdate = (status) => {
+    if (status.didJustFinish) {
+      router.replace('/getstarted_1'); // replace instead of push to avoid back to loading
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Hide Status Bar */}
-      <StatusBar hidden={true} />
-
       <Text style={styles.title}>LOADING VIDEO</Text>
-      <Text style={styles.subtitle}>Loading animation is here.</Text>
-      <Button title="Get started" onPress={handleNavigateToGetStarted} />
+      <Video
+        ref={video}
+        style={styles.video}
+        source={require('../assets/videos/LOADINGSCREEN2.mp4')}
+        resizeMode={ResizeMode.CONTAIN}
+        shouldPlay
+        isMuted
+        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+      />
+      <Text style={styles.description}>Loading animation is here.</Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffff', // Optional: Change background color if needed
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    fontWeight: 'bold', // Optional styling
-    textAlign: 'center',
   },
-  subtitle: {
+  description: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 20,
-    color: '#555555', // Optional styling for subtitle color
+    marginTop: 20,
+  },
+  video: {
+    width: 1000,
+    height: 800,
+    marginRight: 7
   },
 });
 

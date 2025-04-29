@@ -26,7 +26,7 @@ const GettingStarted = () => {
   }
 
   const handleNavigateToGetStarted3b = () => {
-    router.push('/dashboard/addproperty_3b');
+    router.push('/board/addproperty_3b');
   };
 
   const currentStep = 3;

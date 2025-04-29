@@ -51,7 +51,7 @@ const Questions = () => {
       setQuestionIndex(prev => prev + 1);
     } else {
       router.push({
-        pathname: '/awareness tool/results',
+        pathname: '/awareness tool/general_results',
         params: { score: score.toString() }, // Must stringify numbers
       });
     }
