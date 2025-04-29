@@ -1,39 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StatusBar, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
-
-const { width, height } = Dimensions.get('window');
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted5 = () => {
   const router = useRouter();
+
+  // Load custom fonts
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
     'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
   });
 
-  if (!fontsLoaded) return null;
-
-  const styles = getStyles(width, height); // ✅ Use responsive styles
+  if (!fontsLoaded) {
+    return null; // Show nothing until fonts are loaded
+  }
 
   const handleNavigateToDashboard = () => {
-    router.push('/Dashboard/board');
+    router.push('/Dashboard/board'); // Navigate to the next screen
   };
 
-  const currentStep = 6;
+  const currentStep = 6; // Current progress step
 
   return (
     <View style={styles.container}>
+      {/* Hide Status Bar */}
       <StatusBar hidden={true} />
+
+      {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
-          source={require('../assets/images/houseGS5.png')}
+          source={require('../assets/images/houseGS5.png')} // Path to your image
           style={styles.image}
-          resizeMode="contain"
+          resizeMode="contain" // Ensure the image fits well
         />
       </View>
+
+      {/* Lower White Section */}
       <View style={styles.lowerSection}>
+        {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
           {Array.from({ length: 6 }).map((_, index) => (
             <View
@@ -50,6 +57,7 @@ const GettingStarted5 = () => {
         <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
         <Text style={styles.subtitle2}>inspect your home.</Text>
 
+        {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToDashboard}>
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
@@ -58,82 +66,81 @@ const GettingStarted5 = () => {
   );
 };
 
-const getStyles = (width: number, height: number) => StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    upperSection: {
-      flex: 1,
-      backgroundColor: '#0B417D',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    image: {
-      width: width * 1,
-      height: height * 1,
-    },
-    lowerSection: {
-      flex: 1.05,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: width * 0.05,
-    },
-    title1: {
-      fontSize: 25,
-      color: '#05173F',
-      textAlign: 'center',
-      fontFamily: 'Epilogue-Black',
-      letterSpacing: 1,
-      marginBottom: 5,
-      marginTop: height * 0.05,
-    },
-    subtitle1: {
-      fontSize: 15,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      fontFamily: 'Archivo-Regular',
-      letterSpacing: 1,
-    },
-    subtitle2: {
-      fontSize: width * 0.04,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      marginBottom: height * 0.05,
-      fontFamily: 'Archivo-Regular',
-      letterSpacing: 1,
-    },
-    progressBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginBottom: 35,
-      marginTop: -height * 0.04,
-    },
-    progressStep: {
-      width: width * 0.13,
-      height: 5,
-      borderRadius: 10,
-    },
-    progressStepActive: {
-      backgroundColor: '#0B417D',
-    },
-    progressStepInactive: {
-      backgroundColor: '#E0E0E0',
-    },
-    button: {
-      backgroundColor: '#08294E',
-      paddingVertical: 12,
-      paddingHorizontal: width * 0.25,
-      borderRadius: 30,
-      alignItems: 'center',
-      marginTop: height * 0.03,
-    },
-    buttonText: {
-      fontSize: 16,
-      color: '#FFFFFF',
-      fontFamily: 'Archivo-Bold',
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+  title1: {
+    fontSize: wp('6.5%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: 1,
+    marginBottom: hp('1.2%'),
+    marginTop: hp('6%'),
+  },
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+  },
+  subtitle2: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    marginBottom: hp('7.5%'),
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+  },
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('90%'),
+    marginBottom: hp('5%'),
+  },
+  progressStep: {
+    width: wp('13%'),
+    height: hp('0.6%'),
+    borderRadius: wp('2.5%'),
+  },
+  progressStepActive: {
+    backgroundColor: '#0B417D',
+  },
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0',
+  },
+  button: {
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('24%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('4%'),
+  },
+  buttonText: {
+    fontSize: wp('4.2%'),
+    color: '#FFFFFF',
+    fontFamily: 'Archivo-Bold',
+  },
+});
 
 export default GettingStarted5;

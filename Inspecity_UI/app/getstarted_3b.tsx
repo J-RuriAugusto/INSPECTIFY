@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
-const { width, height } = Dimensions.get('window');
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted3b = () => {
   const router = useRouter();
@@ -12,12 +12,13 @@ const GettingStarted3b = () => {
   const [selectedFlooring, setSelectedFlooring] = useState("");
   const [selectedWall, setSelectedWall] = useState("");
   const [selectedCeiling, setSelectedCeiling] = useState("");
+
   const [otherHouseType, setOtherHouseType] = useState('');
   const [otherMaterial, setOtherMaterial] = useState('');
   const [otherFlooring, setOtherFlooring] = useState('');
   const [otherWall, setOtherWall] = useState('');
   const [otherCeiling, setOtherCeiling] = useState('');
-  const styles = getStyles(width, height);
+
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
@@ -177,102 +178,99 @@ const GettingStarted3b = () => {
   );
 };
 
-  const getStyles = (width: number, height: number) => StyleSheet.create({
-    container: { flex: 1 },
-    upperSection: {
-      flex: 1,
-      backgroundColor: '#0B417D',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    lowerSection: {
-      flex: 1.05,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: width * 0.05,
-      paddingVertical: height * 0.03,
-    },
-    image: {
-      width: width * 1,
-      height: height * 1,
-    },
-    progressBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginBottom: 8,
-    },
-    progressStep: {
-      flex: 1,
-      height: 5,
-      borderRadius: 10,
-      marginHorizontal: 2,
-    },
-    progressStepActive: {
-      backgroundColor: '#0B417D',
-    },
-    progressStepInactive: {
-      backgroundColor: '#E0E0E0',
-    },
-    scrollView: {
-      width: '100%',
-    },
-    scrollContainer: {
-      flexGrow: 1,
-      alignItems: 'center',
-      paddingBottom: height * 0.1,
-    },
-    pickerContainer: {
-      width: '90%',
-      backgroundColor: '#D9D9D9',
-      borderRadius: 25,
-      marginBottom: 15,
-      paddingHorizontal: 10,
-    },
-    picker: {
-      height: Platform.OS === 'ios' ? 200 : 50,
-      width: '100%',
-      color: '#000',
-    },
-    textBox: {
-      width: '90%',
-      padding: 12,
-      borderRadius: 25,
-      backgroundColor: '#D9D9D9',
-      marginBottom: 15,
-      fontSize: 16,
-    },
-    button: {
-      width: '80%',
-      height: 50,
-      backgroundColor: '#08294E',
-      borderRadius: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    buttonText: {
-      color: '#FFFFFF',
-      fontSize: 18,
-      fontFamily: 'Archivo-Bold',
-    },
-    title1: {
-      fontSize: 23,
-      color: '#05173F',
-      textAlign: 'center',
-      fontFamily: 'Epilogue-Black',
-      letterSpacing: 1,
-      marginBottom: 5,
-    },
-    subtitle1: {
-      fontSize: 15,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      fontFamily: 'Archivo-Regular',
-      marginBottom: 15,
-      letterSpacing: 1,
-    },
-  });
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('90%'),
+    marginBottom: hp('1%'),
+    marginTop: hp('1%'),
+  },
+  progressStep: {
+    width: wp('13%'),
+    height: hp('0.6%'),
+    borderRadius: wp('2.5%'),
+  },
+  progressStepActive: {
+    backgroundColor: '#0B417D',
+  },
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0',
+  },
+  scrollView: {
+    width: wp('100%'),
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  pickerContainer: {
+    width: wp('70%'),
+    height: hp('7%'),
+    backgroundColor: '#D9D9D9',
+    borderRadius: wp('6%'),
+    marginBottom: hp('1.5%'),
+  },
+  picker: {
+    width: wp('70%'),
+    color: '#000',
+  },
+  textBox: {
+    width: wp('60%'),
+    padding: wp('2%'),
+    borderRadius: wp('6%'),
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.5%'),
+  },
+  button: {
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
+    padding: wp('3%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('3%'),
+    // marginHorizontal: wp('18%'),
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: wp('4.5%'),
+    fontFamily: 'Archivo-Bold',
+  },
+  title1: {
+    fontSize: wp('6%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: 1,
+    marginBottom: hp('0.4%'),
+  },
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    marginBottom: hp('1.5%'),
+    letterSpacing: 1,
+  },
+});
 
 export default GettingStarted3b;
