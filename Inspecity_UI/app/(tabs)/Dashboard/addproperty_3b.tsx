@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView 
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
+import MyProperties from './MyProperties';
 
 const GettingStarted = () => {
   const router = useRouter();
