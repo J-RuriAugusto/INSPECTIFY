@@ -4,7 +4,25 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a17bb22-087b-473b-9b6b-1de2beb62bec" name="Changes" comment="" />
+    <list default="true" id="9a17bb22-087b-473b-9b6b-1de2beb62bec" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/assess structure/reportName.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/assess structure/reportName.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/assess structure/scanning.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/assess structure/scanning.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/MyProperties.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/MyProperties.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3b.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3b.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/settings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/emergency_hotlines.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/emergency_hotlines.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_1.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_1.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_2.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_2.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_3.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_3.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_3b.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_3b.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_4.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_4.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_5.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_5.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -48,7 +66,7 @@
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "Jam",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI/app",
+    "last_opened_file_path": "C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI",
     "settings.editor.selected.configurable": "AndroidSdkUpdater"
   }
 }]]></component>

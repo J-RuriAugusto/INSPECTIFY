@@ -10,21 +10,21 @@ const { width, height } = Dimensions.get('window');
 const Questions = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const questions = [
-    'Is your house located near a fault line or earthquake-prone area?',
-    'Is your house built on soft or unstable soil (e.g., near a river or reclaimed land)? ',
-    'Is your house near a steep slope or hill that could collapse during an earthquake?',
-    'Is your house made of weak materials (e.g., wood, hollow blocks without reinforcement)? ',
-    'Is your house more than 30 years old?',
-    'Is your house located near a large body of water that could cause liquefaction?',
-    'Is your house near a construction site or tall building that could collapse?',
-    'Is your house located in an area with frequent small earthquakes?',
-    'Is your house near a volcano or in a volcanic area?',
-    'Is your house near a dam or reservoir that could fail during an earthquake?',
-    'Is your house located in an area with poor building code enforcement?',
-    'Is your house near a highway or bridge that could collapse during an earthquake?',
-    'Is your house near a power plant or industrial area that could be hazardous during an earthquake?',
-    'Is your house near a landfill or area with unstable ground?',
-    'Is your house in an area where earthquakes have caused damage in the past?',  
+    'Do you have an emergency kit with basic supplies (e.g., flashlight, first aid, food, water)?',
+    'Do you have a family emergency plan in case of disasters?',
+    'Do you know the nearest evacuation center in your area?',
+    'Do you have a list of emergency contact numbers (e.g., barangay, hospital, fire station)?',
+    'Do you have a battery-powered radio for updates during power outages?  ',
+    'Do you store important documents (e.g., IDs, land titles) in a waterproof and fireproof container?',
+    'Do you have a plan for securing your pets during disasters?',
+    'Do you regularly check and maintain your emergency supplies? ',
+    'Do you know how to turn off utilities (electricity, water, gas) in case of emergencies? ',
+    'Do you have a backup power source (e.g., generator, power bank)? ',
+    'Do you have a plan for evacuating elderly or disabled family members? ',
+    'Do you have a fire extinguisher at home? ',
+    'Do you regularly participate in community disaster drills?  ',
+    'Do you have a plan for communicating with family members during disasters? ',
+    'Do you know the basic first aid procedures (e.g., CPR, wound care)?',  
     ];
 
   const [fontsLoaded] = useFonts({
@@ -51,7 +51,7 @@ const Questions = () => {
       setQuestionIndex(prev => prev + 1);
     } else {
       router.push({
-        pathname: '/awareness tool/results',
+        pathname: '/Forms/general_results',
         params: { score: score.toString() }, // Must stringify numbers
       });
     }
@@ -60,7 +60,7 @@ const Questions = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/earthquake_bg.png')}
+      source={require('../../../assets/images/general_bg.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -70,7 +70,7 @@ const Questions = () => {
                 <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             </TouchableOpacity>
 
-            <Text style={styles.categoryTitle}>EARTHQUAKE</Text>
+            <Text style={styles.categoryTitle}>GENERAL</Text>
 
             <TouchableOpacity onPress={() => {
                 if (questionIndex < questions.length - 1) {

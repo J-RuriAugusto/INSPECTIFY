@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GOOGLE_MAPS_API_KEY = "AlzaSycMz978ghujEfEk1vWDNzF86fgwzsPrPmq";
 
@@ -525,7 +526,7 @@ const NearbyShops = () => {
           <Text style={styles.filterStatusText}>
             {showOnlyBookmarked ? "Showing saved stores" : "Filters applied:"} 
             {ratingFilter > 0 ? ` ${ratingFilter}+ stars` : ''}
-            {distanceFilter < 5000 ? ` within ${distanceFilter/1000}km` : ''}
+            {distanceFilter < 5000 ? ` within ${distanceFilter/1000}km.` : ''}
           </Text>
         </View>
       )}
@@ -535,169 +536,142 @@ const NearbyShops = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
+  map: { ...StyleSheet.absoluteFillObject },
+
   storeList: {
-    position: "absolute",
-    bottom: 20,
+    position: 'absolute',
+    bottom: hp(2.5),
     left: 0,
     right: 0,
-    paddingVertical: 10,
+    paddingVertical: hp(1.2),
   },
+
   card: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    marginHorizontal: 6,
-    flexDirection: "row",
-    alignItems: "center",
-    width: 280,
-    height: 100,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    backgroundColor: '#fff',
+    padding: wp(3),
+    borderRadius: wp(3),
+    marginHorizontal: wp(1.5),
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: wp(70),
+    height: hp(13),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: hp(0.25) },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: wp(1),
     elevation: 3,
   },
-  activeCard: {
-    backgroundColor: "#E7E3AC",
-  },
+  activeCard: { backgroundColor: '#E7E3AC' },
+
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 10,
+    width: wp(20),
+    height: wp(20),
+    borderRadius: wp(2),
+    marginRight: wp(2.5),
   },
+
   cardContent: { flex: 1 },
   cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: hp(0.25),
   },
-  name: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#333",
-    flex: 1,
-  },
-  bookmarkButton: {
-    width: 28,
-    height: 28,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  rating: {
-    fontSize: 12,
-    color: "#555",
-  },
-  address: {
-    fontSize: 12,
-    color: "#777",
-  },
-  phone: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 2,
-  },
-  distance: {
-    fontSize: 12,
-    color: "#0B417D",
-    fontWeight: "bold",
-    marginTop: 2,
-  },
+
+  name: { fontSize: wp(3.5), fontWeight: 'bold', color: '#333', flex: 1 },
+  bookmarkButton: { width: wp(7), height: wp(7), justifyContent: 'center', alignItems: 'center' },
+  rating: { fontSize: wp(3), color: '#555' },
+  address: { fontSize: wp(3), color: '#777' },
+  phone: { fontSize: wp(3), color: '#555', marginTop: hp(0.25) },
+  distance: { fontSize: wp(3), color: '#0B417D', fontWeight: 'bold', marginTop: hp(0.25) },
+
   filterWrapper: {
-    position: "absolute",
-    bottom: '17.5%',
-    right: '5%',
-    alignItems: "flex-end",
+    position: 'absolute',
+    bottom: hp(17.5),
+    right: wp(5),
+    alignItems: 'flex-end',
   },
+
   filterButton: {
-    position: "absolute",
-    top: -45,
-    right: '5%',
-    backgroundColor: "#0B417D",
-    padding: 10,
-    borderRadius: 25,
+    position: 'absolute',
+    top: -hp(5.5),
+    right: -wp(2.5),
+    backgroundColor: '#0B417D',
+    padding: wp(2.5),
+    borderRadius: wp(12.5),
     zIndex: 10,
   },
+
   bookmarkFilterButton: {
-    position: "absolute",
-    top: 75,
-    right: '5%',
-    backgroundColor: "#0B417D",
-    padding: 10,
-    borderRadius: 25,
+    position: 'absolute',
+    top: hp(1),
+    right: wp(15),
+    backgroundColor: '#0B417D',
+    padding: wp(2.5),
+    borderRadius: wp(12.5),
     zIndex: 10,
   },
-  bookmarkFilterButtonActive: {
-    backgroundColor: "#0064C8",
-  },
+  bookmarkFilterButtonActive: { backgroundColor: '#0064C8' },
+
   filterContainer: {
-    width: 230,
-    backgroundColor: "#0B417D",
-    borderRadius: 10,
-    padding: 10,
-    position: "absolute",
-    bottom: 50,
-    overflow: "hidden",
+    width: wp(58),
+    backgroundColor: '#0B417D',
+    borderRadius: wp(3),
+    padding: wp(2.5),
+    position: 'absolute',
+    bottom: hp(6),
+    overflow: 'hidden',
     zIndex: 10,
   },
-  ratingContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  label: { color: "white", fontSize: 14, fontWeight: "bold", marginRight: 5 },
-  star: { fontSize: 20, color: "white", marginRight: 8 },
-  starSelected: { color: "gold" },
-  sliderContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  distanceText: { color: "white", fontSize: 12, marginLeft: 5, width: 40 },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 5,
-  },
-  searchButton: { 
-    backgroundColor: "#4CAF50", 
-    padding: 8, 
-    borderRadius: 5, 
-    alignItems: "center", 
+
+  ratingContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: hp(1.2) },
+  label: { color: 'white', fontSize: wp(3.5), fontWeight: 'bold', marginRight: wp(1.2) },
+  star: { fontSize: wp(5), color: 'white', marginRight: wp(2) },
+  starSelected: { color: 'gold' },
+
+  sliderContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: hp(1.2) },
+  distanceText: { color: 'white', fontSize: wp(3), marginLeft: wp(1.2), width: wp(10) },
+
+  buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: hp(0.5) },
+  searchButton: {
+    backgroundColor: '#4CAF50',
+    padding: wp(2),
+    borderRadius: wp(1.5),
+    alignItems: 'center',
     flex: 1,
-    marginLeft: 5,
+    marginLeft: wp(1.2),
   },
-  searchButtonText: { color: "white", fontWeight: "bold" },
-  resetButton: { 
-    backgroundColor: "#FF5252", 
-    padding: 8, 
-    borderRadius: 5, 
-    alignItems: "center", 
+  searchButtonText: { color: 'white', fontWeight: 'bold' },
+
+  resetButton: {
+    backgroundColor: '#FF5252',
+    padding: wp(2),
+    borderRadius: wp(1.5),
+    alignItems: 'center',
     flex: 1,
-    marginRight: 5,
+    marginRight: wp(1.2),
   },
-  resetButtonText: { color: "white", fontWeight: "bold" },
+  resetButtonText: { color: 'white', fontWeight: 'bold' },
+
   noResultsContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    alignSelf: "center",
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: wp(2.5),
+    borderRadius: wp(3),
+    alignItems: 'center',
+    alignSelf: 'center',
   },
-  noResultsText: {
-    color: "#333",
-    fontWeight: "bold",
-  },
+  noResultsText: { color: '#333', fontWeight: 'bold' },
+
   filterStatusContainer: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: "rgba(11, 65, 125, 0.7)",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 15,
+    position: 'absolute',
+    bottom: hp(17.5),
+    left: wp(2.5),
+    backgroundColor: 'rgba(11, 65, 125, 0.7)',
+    paddingVertical: hp(0.6),
+    paddingHorizontal: wp(2.5),
+    borderRadius: wp(5),
   },
-  filterStatusText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
+  filterStatusText: { color: 'white', fontSize: wp(3), fontWeight: 'bold' },
 });
 
 export default NearbyShops;

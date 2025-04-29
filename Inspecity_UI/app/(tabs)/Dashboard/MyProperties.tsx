@@ -14,7 +14,8 @@ const MyProperties = () => {
 
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [newProperty, setNewProperty] = useState({ 
     name: '', 
     location: '', 
@@ -24,35 +25,58 @@ const MyProperties = () => {
     repairDetails: '',
     image: null 
   });  
-  const [properties, setProperties] = useState([
-    { 
-      id: '1', 
-      name: 'Cozy Apartment', 
-      location: 'New York, NY', 
-      age: '10 years', 
-      primaryUse: 'Residential', 
-      repairs: 'Yes', 
-      repairDetails: 'Roof repaired in 2020',
-      type: 'Apartment',
-      otherType: '',
-      height: '3 floors',
-      lotArea: '120 sqm',
-      floorArea: '250 sqm',
-      primaryMaterial: 'Concrete Hollow Blocks',
-      otherPrimaryMaterial: '',
-      roofingMaterial: 'GI Sheets (Yero)',
-      otherRoofingMaterial: '',
-      flooringMaterial: 'Tiles',
-      otherFlooringMaterial: '',
-      wallMaterial: 'Concrete',
-      otherWallMaterial: '',
-      ceilingMaterial: 'Gypsum Board',
-      otherCeilingMaterial: '',
-      image: require('../../../assets/images/property.png') 
-    }
-  ]);
-  
-  
+  // const [properties, setProperties] = useState([
+  //   { 
+  //     id: '1', 
+  //     name: 'Cozy Apartment', 
+  //     location: 'New York, NY', 
+  //     age: '10 years', 
+  //     primaryUse: 'Residential', 
+  //     repairs: 'Yes', 
+  //     repairDetails: 'Roof repaired in 2020',
+  //     type: 'Apartment',
+  //     otherType: '',
+  //     height: '3 floors',
+  //     lotArea: '120 sqm',
+  //     floorArea: '250 sqm',
+  //     primaryMaterial: 'Concrete Hollow Blocks',
+  //     otherPrimaryMaterial: '',
+  //     roofingMaterial: 'GI Sheets (Yero)',
+  //     otherRoofingMaterial: '',
+  //     flooringMaterial: 'Tiles',
+  //     otherFlooringMaterial: '',
+  //     wallMaterial: 'Concrete',
+  //     otherWallMaterial: '',
+  //     ceilingMaterial: 'Gypsum Board',
+  //     otherCeilingMaterial: '',
+  //     image: require('../../../assets/images/property.png') 
+  //   }
+  // ]);
+  interface Property {
+    id?: string;
+    name?: string;
+    location?: string;
+    age?: string;
+    primaryUse?: string;
+    repairs?: string;
+    repairDetails?: string;
+    type?: string;
+    otherType?: string;
+    height?: string;
+    lotArea?: string;
+    floorArea?: string;
+    primaryMaterial?: string;
+    otherPrimaryMaterial?: string;
+    roofingMaterial?: string;
+    otherRoofingMaterial?: string;
+    flooringMaterial?: string;
+    otherFlooringMaterial?: string;
+    wallMaterial?: string;
+    otherWallMaterial?: string;
+    ceilingMaterial?: string;
+    otherCeilingMaterial?: string;
+    image?: any; // You can use ImageSourcePropType from 'react-native' if preferred
+  }  
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -64,7 +88,8 @@ const MyProperties = () => {
     return null;
   }
 
-  const handleEdit = (property) => {
+
+  const handleEdit = (property: Property) => {
     setSelectedProperty({
       ...property,
       primaryMaterial: property.primaryMaterial || "Reinforced Concrete",
@@ -79,7 +104,7 @@ const MyProperties = () => {
       otherCeilingMaterial: property.otherCeilingMaterial || ""
     });
     setEditModalVisible(true);
-  };
+  };  
   
   
 
@@ -90,7 +115,7 @@ const MyProperties = () => {
 
 
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: any) => {
     Alert.alert('Delete Property', 'Are you sure you want to delete this property?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', onPress: () => setProperties(properties.filter((prop) => prop.id !== id)), style: 'destructive' }
@@ -106,12 +131,11 @@ const pickImage = async (isNew = false) => {
     quality: 1,
   });
 
-  if (!result.canceled) {
-    if (isNew) {
-      setNewProperty({ ...newProperty, image: { uri: result.uri } });
-    } else {
-      setSelectedProperty({ ...selectedProperty, image: { uri: result.uri } });
-    }
+  if (!result.canceled && selectedProperty) {
+    setSelectedProperty({
+      ...selectedProperty,
+      image: { uri: result.assets[0].uri },
+    });
   }
 };
   
@@ -121,7 +145,7 @@ const pickImage = async (isNew = false) => {
       <Text style={styles.title}>My Properties</Text>
       <FlatList
         data={properties}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.id || index.toString()}
         renderItem={({ item }) => (
           <Swipeable renderRightActions={() => (
             <View style={styles.swipeActions}>
@@ -133,7 +157,7 @@ const pickImage = async (isNew = false) => {
               </TouchableOpacity>
             </View>
           )}>
-            <TouchableOpacity onPress={() => router.push(`/board/dashboard`)}>
+            <TouchableOpacity onPress={() => router.push(`/Dashboard/board`)}>
               <View style={styles.propertyItem}>
                 <Image source={item.image} style={styles.propertyImage} />
                 <View style={styles.propertyInfo}>
@@ -147,7 +171,7 @@ const pickImage = async (isNew = false) => {
       />
 
 
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/board/addproperty_2')}>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/Dashboard/addproperty_2')}>
         <Text style={styles.addButtonText}>Add Property</Text>
       </TouchableOpacity>
 
@@ -167,7 +191,7 @@ const pickImage = async (isNew = false) => {
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Edit Property</Text>
 
-          <TouchableOpacity onPress={pickImage}>
+          <TouchableOpacity onPress={() => pickImage(true)}>
             <Image 
               source={selectedProperty?.image} 
               style={styles.modalImage} 

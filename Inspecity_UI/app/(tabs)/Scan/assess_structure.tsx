@@ -23,7 +23,7 @@ const AssessStructure = () => {
 
       {/* Button Containers */}
       <View style={styles.column}>
-        <Link href="/assess structure/reportName" asChild>
+        <Link href="/Scan/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image
@@ -34,7 +34,7 @@ const AssessStructure = () => {
             </View>
           </TouchableOpacity>
         </Link>
-        <Link href="/assess structure/reportName" asChild>
+        <Link href="/Scan/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image
@@ -45,7 +45,7 @@ const AssessStructure = () => {
             </View>
           </TouchableOpacity>
         </Link>
-        <Link href="/assess structure/reportName" asChild>
+        <Link href="/Scan/reportName" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <View style={styles.buttonContent}>
               <Image
@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 50,
     height: 50,
-    // backgroundColor: '#08294E',
     resizeMode: 'contain',
   },
 });

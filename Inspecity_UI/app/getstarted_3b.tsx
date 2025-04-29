@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
+const { width, height } = Dimensions.get('window');
 
-const GettingStarted = () => {
+const GettingStarted3b = () => {
   const router = useRouter();
   const [selectedHouseType, setSelectedHouseType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedFlooring, setSelectedFlooring] = useState("");
   const [selectedWall, setSelectedWall] = useState("");
   const [selectedCeiling, setSelectedCeiling] = useState("");
-
   const [otherHouseType, setOtherHouseType] = useState('');
   const [otherMaterial, setOtherMaterial] = useState('');
   const [otherFlooring, setOtherFlooring] = useState('');
   const [otherWall, setOtherWall] = useState('');
   const [otherCeiling, setOtherCeiling] = useState('');
-
+  const styles = getStyles(width, height);
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
@@ -177,30 +177,102 @@ const GettingStarted = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  upperSection: { flex: 1, backgroundColor: '#0B417D', justifyContent: 'center', alignItems: 'center' },
-  lowerSection: {
-    flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  image: { width: '100%', height: 400 },
-  progressBar: { flexDirection: 'row', justifyContent: 'space-between', width:'100%', marginBottom: 8 },
-  progressStep: { width: 50, height: 5, borderRadius: 10 },
-  progressStepActive: { backgroundColor: '#0B417D' },
-  progressStepInactive: { backgroundColor: '#E0E0E0' },
-  scrollView: { width: '100%' },
-  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
-  pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
-  textBox: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
-  button: {width:'70%', height: '12%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 20, marginHorizontal: 75 },
-  buttonText: { color: '#FFFFFF', fontSize: 18, fontFamily: 'Archivo-Bold' },
-  title1: { fontSize: 23, color: '#05173F', textAlign: 'center', fontFamily: 'Epilogue-Black', letterSpacing: 1 },
-  subtitle1: { fontSize: 15, color: '#7C7C7C', textAlign: 'center', fontFamily: 'Archivo-Regular', marginBottom: 10, letterSpacing: 1 },
-  
-});
+  const getStyles = (width: number, height: number) => StyleSheet.create({
+    container: { flex: 1 },
+    upperSection: {
+      flex: 1,
+      backgroundColor: '#0B417D',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    lowerSection: {
+      flex: 1.05,
+      backgroundColor: '#FFFFFF',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: width * 0.05,
+      paddingVertical: height * 0.03,
+    },
+    image: {
+      width: width * 1,
+      height: height * 1,
+    },
+    progressBar: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginBottom: 8,
+    },
+    progressStep: {
+      flex: 1,
+      height: 5,
+      borderRadius: 10,
+      marginHorizontal: 2,
+    },
+    progressStepActive: {
+      backgroundColor: '#0B417D',
+    },
+    progressStepInactive: {
+      backgroundColor: '#E0E0E0',
+    },
+    scrollView: {
+      width: '100%',
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      alignItems: 'center',
+      paddingBottom: height * 0.1,
+    },
+    pickerContainer: {
+      width: '90%',
+      backgroundColor: '#D9D9D9',
+      borderRadius: 25,
+      marginBottom: 15,
+      paddingHorizontal: 10,
+    },
+    picker: {
+      height: Platform.OS === 'ios' ? 200 : 50,
+      width: '100%',
+      color: '#000',
+    },
+    textBox: {
+      width: '90%',
+      padding: 12,
+      borderRadius: 25,
+      backgroundColor: '#D9D9D9',
+      marginBottom: 15,
+      fontSize: 16,
+    },
+    button: {
+      width: '80%',
+      height: 50,
+      backgroundColor: '#08294E',
+      borderRadius: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    buttonText: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontFamily: 'Archivo-Bold',
+    },
+    title1: {
+      fontSize: 23,
+      color: '#05173F',
+      textAlign: 'center',
+      fontFamily: 'Epilogue-Black',
+      letterSpacing: 1,
+      marginBottom: 5,
+    },
+    subtitle1: {
+      fontSize: 15,
+      color: '#7C7C7C',
+      textAlign: 'center',
+      fontFamily: 'Archivo-Regular',
+      marginBottom: 15,
+      letterSpacing: 1,
+    },
+  });
 
-export default GettingStarted;
+export default GettingStarted3b;

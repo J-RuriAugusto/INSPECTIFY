@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
+import { useWindowDimensions, Platform } from 'react-native';
 
-const GettingStarted = () => {
+
+const GettingStarted1 = () => {
   const router = useRouter();
 
   // Load custom fonts
@@ -17,6 +19,8 @@ const GettingStarted = () => {
 
   const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
+  const { width, height } = useWindowDimensions();
+  const styles = getStyles(width, height);
 
   useEffect(() => {
     scale.value = withTiming(1, { duration: 800, easing: Easing.ease });
@@ -76,7 +80,7 @@ const GettingStarted = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (width: number, height: number) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -85,17 +89,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#0B417D', // Blue background
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 400, // Adjust height as needed
-  },
+  },  
   lowerSection: {
-    flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+    flex: 1.1,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.03,
+  },
+  image: {
+    width: width * 1,
+    height: height * 1,
+    // maxHeight: 350,
+    // maxWidth: 350,
   },
   title1: {
     fontSize: 30,
@@ -103,6 +110,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
+    // marginBottom: 5,
+    // marginTop: height * 0.02,
   },
   title2: {
     fontSize: 50,
@@ -132,7 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 50,
+    marginBottom: 60,
     marginTop: -45,
   },
   progressStep: {
@@ -147,12 +156,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0', // Inactive color
   },
   button: {
-    backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 12,
-    paddingHorizontal: 90,
+    backgroundColor: '#08294E',
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.25,
     borderRadius: 30,
     alignItems: 'center',
-    marginTop: 50
+    marginTop: height * 0.05,
   },
   buttonText: {
     fontSize: 18,
@@ -161,4 +170,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GettingStarted;
+export default GettingStarted1;

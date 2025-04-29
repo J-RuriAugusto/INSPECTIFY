@@ -4,8 +4,20 @@ import { useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
 import * as Print from 'expo-print';
+import { useFonts } from 'expo-font';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const PhotoDetails = () => {
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+  // });
+
+  // if (!fontsLoaded) {
+  //   return null; 
+  // }
+
   const params = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const photo = params.photo as string;
@@ -30,14 +42,6 @@ const PhotoDetails = () => {
     setReportModalVisible(false);
     navigation.popToTop();
   };
-
-  // const sharePhoto = async () => {
-  //   if (!(await Sharing.isAvailableAsync())) {
-  //     alert("Sharing is not available on this device");
-  //     return;
-  //   }
-  //   await Sharing.shareAsync(photo);
-  // };  
   
   const shareReportAsPDF = async () => {
     if (!(await Sharing.isAvailableAsync())) {
@@ -174,7 +178,7 @@ const PhotoDetails = () => {
               <Text style={styles.detailText}>• Seal cracks using epoxy.</Text>
               <TouchableOpacity 
                 style={styles.shopButton} 
-                onPress={() => navigation.navigate('nearby_shops')}
+                onPress={() => navigation.navigate('Shops')}
               >
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
@@ -291,237 +295,72 @@ const PhotoDetails = () => {
 };
 
 const styles = StyleSheet.create({
-  background: { flex: 1, resizeMode: 'cover', position: 'absolute', width: '100%', height: '100%' },
+  // Background & Container
+  background: { flex: 1, resizeMode: 'cover', position: 'absolute', width: wp('100%'), height: hp('100%') },
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 43, 91, 0.7)' },
-  header: {
-    position: 'absolute',
-    top: '4%',
-    zIndex: 10,
-    right: '3%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  backButton: { flexDirection: 'row', alignItems: 'center', right: '142%' },
-  backIcon: { width: 30, height: 30, marginRight: 5 },
-  backText: { fontSize: 17, fontFamily: 'Epilogue-Bold', color: '#FFFFFF' },
-  shareButton: { padding: 5 },
-  shareIcon: { width: 30, height: 30 },
-  buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  imageContainer: {
-    position: 'absolute',
-    top: '5%',
-    left: '50%',
-    transform: [{ translateX: -150 }],
-    zIndex: 9,
-    alignItems: 'center'
-  },
-  houseImage: { width: 300, height: 250 },  
-  detailsWrapper: {
-    height: '69%',
-    width: '100%',
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    paddingTop: 15,
-  },   
-  scrollContent: { padding: 20 },
-  detailsContainer: { flexGrow: 1 },
-  title: { fontFamily: 'Epilogue-Bold', fontSize: 25, color: '#2B3C62', textAlign: 'center' },
-  subtitle: { fontFamily: 'Epilogue-Regular', fontSize: 12, textAlign: 'center', color: '#32373E', marginTop: 3, marginBottom: 10 },
-  capturedImage: {
-    width: 200,
-    height: 200,
-    alignSelf: 'center',
-    borderRadius: 10,
-    backgroundColor: '#00A8E8'
-  },
+
+  // Header
+  header: { position: 'absolute', top: hp('3%'), right: wp('3%'), zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('52%') },
+  backIcon: { width: wp('8%'), height: hp('4%'), marginRight: wp('1.5%') },
+  backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
+  shareButton: { padding: wp('2%') },
+  shareIcon: { width: wp('8%'), height: wp('8%') },
+
+  // Image Display
+  imageContainer: { position: 'absolute', top: hp('3%'), left: wp(1), zIndex: 9, alignItems: 'center' },
+  houseImage: { width: wp('100%'), height: hp('35%') },
+  capturedImage: { width: wp('55%'), height: wp('55%'), alignSelf: 'center', borderRadius: 10, backgroundColor: '#00A8E8' },
   imageWrapper: { alignSelf: 'center', justifyContent: 'center', marginVertical: 10 },
-  scannedImageText: { marginTop: 5, fontFamily: 'Epilogue-Regular', fontSize: 10, color: '#000', textAlign: 'center'},  
-  conditionWrapper: {
-    width: '40%',
-    alignSelf: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 15,
-    padding: 10,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  conditionText: { fontFamily: 'Epilogue-Bold', fontSize: 15, textAlign: 'center', color: '#071C34' },
-  conditionBadge: {
-    backgroundColor: '#FFA500',
-    fontFamily: 'Epilogue-Regular',
-    textAlign: 'center',
-    fontSize: 13,
-    borderRadius: 15,
-    marginVertical: 3,
-  },
-  detailText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: 10 },  
-  sectionTitle: {
-    color: '#FFF',
-    fontSize: 15,
-    fontFamily: 'Epilogue-Bold',
-    marginBottom: 5,
-    backgroundColor: '#0B417D',
-    borderRadius: 15,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    alignSelf: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  ageNumText: {
-    backgroundColor: '#B7B7B7',
-    color: '#FFF',
-    fontFamily: 'Epilogue-Medium',
-    fontSize: 15,
-    borderRadius: 15,
-    paddingHorizontal: 9,
-    paddingVertical: 2,
-  }, 
-  ageText: { fontSize: 15, fontFamily: 'Epilogue-Bold', color: '#071C34' },
-  shopButton: {
-    backgroundColor: '#ACD3FF',
-    borderRadius: 15,
-    alignSelf: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    width: '60%',
-    marginBottom: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  shopButtonText: { color: '#0B417D', fontSize: 15, fontFamily: 'Epilogue-Bold', textAlign: 'center' },
-  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 },
-  notesInput: {
-    backgroundColor: '#FFF',
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-    flex: 1,
-    fontSize: 16,
-    color: '#32373E',
-    fontFamily: 'Epilogue-Regular',
-    marginTop: 10
-  },
-  editNotesInput: {
-    backgroundColor: '#FFF',
-    borderRadius: 15,
-    flex: 1,
-    fontSize: 16,
-    color: '#32373E',
-    fontFamily: 'Epilogue-Regular',
-    textAlignVertical: 'top',
-  },
-  editButton: {
-    backgroundColor: '#B0EDEB',
-    padding: 10,
-    borderRadius: 15,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  editButtonText: { color: '#05173F', fontSize: 15, fontFamily: 'Epilogue-Bold' },
-  modalEditContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative'},
-  modalEditContent: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    height: '60%',
-    width: '90%',
-    alignSelf: 'center'
-  },
-  modalEditTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
-  closeEditButton: {
-    position: 'absolute',
-    top: 100,
-    right: 10,
-    width: 50,
-    height: 50,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeEditButtonImage: { width: 35, height: 35, resizeMode: 'contain'},
-  saveButton: {
-    position: 'absolute',
-    bottom: -50,
-    right: 0,
-    backgroundColor: '#ADE792',
-    borderRadius: 8,
-    width: '40%',
-    alignItems: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 5
-  },
-  saveButtonText: { color: '#05173F', fontSize: 18, fontFamily: 'Epilogue-Bold'},
-  reportIcon: {
-    width: 30,
-    height: 30,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: 'Epilogue-Bold',
-    marginBottom: 5,
-  },
-  modalButton: {
-    backgroundColor: '#002B5B',
-    padding: 12,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontFamily: 'Epilogue-Bold',
-  },
-  closeButton: {
-    padding: 5,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontFamily: 'Epilogue-Medium',
-    color: '#333',
-  },
+  scannedImageText: { marginTop: hp('1%'), fontFamily: 'Epilogue-Regular', fontSize: wp('2.5%'), color: '#000', textAlign: 'center' },
+
+  // Details Section
+  detailsWrapper: { height: hp('69%'), width: wp('100%'), backgroundColor: '#F6F6F6', borderTopLeftRadius: wp('6%'), borderTopRightRadius: wp('6%'), overflow: 'hidden', position: 'absolute', bottom: 0, paddingTop: hp('3%') },
+  scrollContent: { padding: wp('5%') },
+  detailsContainer: { flexGrow: 1 },
+  title: { fontFamily: 'Epilogue-Bold', fontSize: wp('6.5%'), color: '#2B3C62', textAlign: 'center' },
+  subtitle: { fontFamily: 'Epilogue-Regular', fontSize: wp('3%'), textAlign: 'center', color: '#32373E', marginTop: hp('1%'), marginBottom: hp('2%') },
+  detailText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%') },
+
+  // Condition & Tags
+  conditionWrapper: { width: wp('40%'), alignSelf: 'center', backgroundColor: '#FFF', borderRadius: wp('4%'), padding: wp('3%'), marginBottom: hp('3%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%') },
+  conditionText: { fontFamily: 'Epilogue-Bold', fontSize: wp('4%'), textAlign: 'center', color: '#071C34' },
+  conditionBadge: { backgroundColor: '#FFA500', fontFamily: 'Epilogue-Regular', textAlign: 'center', fontSize: wp('3.5%'), borderRadius: wp('5%'), marginVertical: hp('0.5%') },
+  ageText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Bold', color: '#071C34' },
+  ageNumText: { backgroundColor: '#B7B7B7', color: '#FFF', fontFamily: 'Epilogue-Medium', fontSize: wp('4%'), borderRadius: wp('5%'), paddingHorizontal: wp('3.5'), paddingVertical: hp('0.1%') },
+  sectionTitle: { color: '#FFF', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold', marginBottom: hp('1%'), backgroundColor: '#0B417D', borderRadius: wp('5%'), paddingHorizontal: wp('4%'), paddingVertical: hp('0.1%'), alignSelf: 'flex-start', shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('1%') },
+
+  // Buttons
+  shopButton: { backgroundColor: '#ACD3FF', borderRadius: wp('5%'), alignSelf: 'center', paddingHorizontal: wp('8%'), paddingVertical: hp('0.5%'), marginBottom: hp('2%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('1.5%') },
+  shopButtonText: { color: '#0B417D', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold', textAlign: 'center' },
+  editButton: { backgroundColor: '#B0EDEB', marginBottom: hp('1%'), borderRadius: wp('5%'), paddingHorizontal: wp('4%'), paddingVertical: hp('0.1%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('1%') },
+  editButtonText: { color: '#05173F', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold' },
+  saveButton: { position: 'absolute', bottom: -hp('5.5%'), right: 0, backgroundColor: '#ADE792', borderRadius: wp('5%'), alignItems: 'center', paddingHorizontal: wp('5%'), paddingVertical: hp('0.3%') },
+  saveButtonText: { color: '#05173F', fontSize: wp('5%'), fontFamily: 'Epilogue-Bold' },
+
+  // Inputs
+  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('6%')},
+  editNotesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', textAlignVertical: 'top' },
+
+  // Row Layouts
+  rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp('0.1%') },
+
+  // Modal Edit
+  modalEditContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative' },
+  modalEditContent: { backgroundColor: '#FFF', padding: wp('5%'), borderRadius: wp('5%'), alignItems: 'center', height: hp('60%'), width: wp('90%'), alignSelf: 'center' },
+  modalEditTitle: { fontSize: wp('5%'), fontWeight: 'bold' },
+  closeEditButton: { position: 'absolute', top: hp('13.5%'), right: wp('3%'), width: wp('13%'), height: wp('13%'), alignItems: 'center', justifyContent: 'center' },
+  closeEditButtonImage: { width: wp('9%'), height: wp('9%'), resizeMode: 'contain' },
+
+  // Report Modal
+  reportIcon: { width: wp('8%'), height: wp('8%') },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContent: { width: wp('80%'), backgroundColor: '#fff', padding: wp('5%'), borderRadius: wp('3%'), alignItems: 'center' },
+  modalTitle: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', marginBottom: hp('2%') },
+  modalButton: { backgroundColor: '#002B5B', padding: wp('3%'), borderRadius: wp('3%'), width: wp('60%'), alignItems: 'center', marginVertical: wp('1%') },
+  modalButtonText: { color: '#FFF', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold' },
+  closeButton: { paddingTop: hp('1%'), alignItems: 'center' },
+  closeButtonText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium' },
 });
 
 export default PhotoDetails;

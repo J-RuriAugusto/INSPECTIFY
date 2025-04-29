@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportName = () => {
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+  //   'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
+  // });
 
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
+  
   const [isModalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  // const navigation = useNavigation();
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -37,7 +37,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/photoDetails",
+        pathname: "/Scan/photoDetails",
         params: { photo: result.assets[0].uri }
       });
     }
@@ -58,7 +58,7 @@ const ReportName = () => {
 
     if (!result.canceled) {
       router.push({
-        pathname: "/assess structure/photoDetails",
+        pathname: "/Scan/photoDetails",
         params: { photo: result.assets[0].uri }
       });
     }
@@ -66,13 +66,6 @@ const ReportName = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        {/* <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity> */}
-      </View>
       <Text style={styles.title1}>NAME YOUR REPORT</Text>
       <Text style={styles.title2}>Enter a report name</Text>
 
@@ -116,56 +109,53 @@ const ReportName = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: wp('5%'), // 20px ≈ 5% width
     backgroundColor: '#002B5B',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  header: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  // backButton: { flexDirection: 'row', alignItems: 'center' },
-  // backIcon: { width: 30, height: 30, marginRight: 5 },
-  // backText: { fontSize: 17, color: '#FFFFFF' },
+  // header: {
+  //   position: 'absolute',
+  //   top: hp('5%'), // 40px ≈ 5% height
+  //   left: wp('5%'),
+  //   right: wp('5%'),
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  // },
   title1: {
     fontFamily: 'Epilogue-Black',
-    fontSize: 30,
+    fontSize: wp('8%'), // 30px ≈ 8% width
     color: '#FFFFFF',
   },
   title2: {
     fontFamily: 'Epilogue-Medium',
-    fontSize: 18,
+    fontSize: wp('4.8%'), // 18px ≈ 4.8%
     color: '#4783C7',
-    marginBottom: 20,
+    marginBottom: hp('2.5%'), // 20px ≈ 2.5%
   },
   inputContainer: {
-    width: '80%',
+    width: wp('70%'),
     backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 30,
+    borderRadius: wp('10%'),
+    paddingHorizontal: wp('2.5%'),
+    paddingVertical: hp('1%'),
+    marginBottom: hp('2.5%'),
   },
   input: {
     fontFamily: 'Epilogue-Medium',
-    fontSize: 18,
+    fontSize: wp('4.8%'),
     color: '#000000',
   },
   nextButton: {
     backgroundColor: '#00A8E8',
-    paddingVertical: 5,
-    paddingHorizontal: 40,
-    borderRadius: 20,
+    paddingVertical: hp('0.5%'),
+    paddingHorizontal: wp('10%'),
+    borderRadius: wp('5%'),
   },
   nextButtonText: {
     fontFamily: 'Epilogue-Black',
-    fontSize: 25,
+    fontSize: wp('6.5%'),
     color: '#FFFFFF',
   },
   modal: {
@@ -174,35 +164,36 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    padding: wp('5%'),
+    borderTopLeftRadius: wp('5%'),
+    borderTopRightRadius: wp('5%'),
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: wp('5.8%'), // 22px
     fontFamily: 'Epilogue-Bold',
-    marginBottom: 10,
+    marginBottom: hp('1.2%'),
   },
   modalButton: {
     backgroundColor: '#00A8E8',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginVertical: 5,
-    width: '80%',
+    paddingVertical: hp('1.2%'),
+    paddingHorizontal: wp('5.5%'),
+    borderRadius: wp('2.5%'),
+    marginVertical: hp('0.6%'),
+    width: wp('80%'),
     alignItems: 'center',
   },
   modalButtonText: {
     fontFamily: 'Epilogue-Black',
-    fontSize: 18,
+    fontSize: wp('4.8%'),
     color: '#FFFFFF',
   },
   closeButton: {
-    marginTop: 10,
+    marginTop: hp('1.2%'),
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: wp('4.2%'),
+    fontFamily: 'Epilogue-Medium',
     color: '#002B5B',
   },
 });

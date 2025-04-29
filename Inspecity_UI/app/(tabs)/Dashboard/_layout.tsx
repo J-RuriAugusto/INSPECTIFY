@@ -18,7 +18,7 @@ export default function DahboardlLayout() {
       }}
     >
       <Stack.Screen
-        name="dashboard"
+        name="board"
         options={{presentation: 'modal', headerShown: false }}
       />
       <Stack.Screen

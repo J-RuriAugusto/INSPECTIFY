@@ -4,9 +4,21 @@ import { Picker } from '@react-native-picker/picker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native';
-
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+// import { useFonts } from 'expo-font';
 
 const Settings = () => {
+    // const [fontsLoaded] = useFonts({
+    //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+    //   'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
+    // });
+  
+    // if (!fontsLoaded) {
+    //   return null;
+    // }
+  
   const navigation = useNavigation();
 
   // Initial state
@@ -19,7 +31,7 @@ const Settings = () => {
   };
 
   const [settings, setSettings] = useState(initialSettings);
-  const [backupLocation, setBackupLocation] = useState(null);
+  const [backupLocation, setBackupLocation] = useState<string | null>(null);
   const [changesMade, setChangesMade] = useState(false);
 
   // Check for changes
@@ -33,7 +45,7 @@ const Settings = () => {
     setChangesMade(isChanged);
   }, [settings]);
 
-  const updateSetting = (key, value) => {
+  const updateSetting = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -47,15 +59,19 @@ const Settings = () => {
   const chooseBackupLocation = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
+  
       if (result.canceled) return;
-      setBackupLocation(result.uri);
-      updateSetting('backupLocation', result.uri);
-      Alert.alert('Backup Location Selected', `Your backup will be saved to:\n${result.uri}`);
+  
+      const file = result.assets[0];
+      setBackupLocation(file.uri);
+      updateSetting('backupLocation', file.uri);
+  
+      Alert.alert('Backup Location Selected', `Your backup will be saved to:\n${file.uri}`);
     } catch (error) {
       console.error('Error selecting backup location:', error);
       Alert.alert('Error', 'Failed to select backup location.');
     }
-  };
+  };  
 
   const backupData = async () => {
     if (!backupLocation) {
@@ -177,16 +193,72 @@ const Settings = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F5F5' },
-  scrollContainer: { padding: 20, paddingTop: 50 },
-  title: { fontSize: 30, color: '#333', fontFamily: 'Epilogue-Black', marginBottom: 20 },
-  sectionTitle: { fontSize: 18, color: '#555', fontFamily: 'Epilogue-Bold', marginTop: 20, marginBottom: 5 },
-  optionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFFFFF', padding: 15, borderRadius: 10, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, elevation: 3 },
-  optionText: { fontSize: 13.5, color: '#333', fontFamily: 'Epilogue-Bold' },
-  picker: { backgroundColor: '#FFFFFF', color: '#333', width: 140, borderRadius: 10 },
-  optionButton: { backgroundColor: '#FFFFFF', padding: 15, borderRadius: 10, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, elevation: 3 },
-  saveButton: { padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 20 },
-  saveButtonText: { fontSize: 16, color: '#FFF', fontFamily: 'Epilogue-Bold' },
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5'
+  },
+  scrollContainer: {
+    padding: wp('5%'),        // replaces 20px
+    paddingTop: hp('6.2%'),   // replaces 50px
+  },
+  title: {
+    fontSize: wp('8%'),       // replaces 30px
+    color: '#333',
+    fontFamily: 'Epilogue-Black',
+    marginBottom: hp('2.5%'), // replaces 20px
+  },
+  sectionTitle: {
+    fontSize: wp('4.8%'),     // replaces 18px
+    color: '#555',
+    fontFamily: 'Epilogue-Bold',
+    marginTop: hp('2.5%'),    // replaces 20px
+    marginBottom: hp('0.6%'), // replaces 5px
+  },
+  optionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: wp('4%'),        // replaces 15px
+    borderRadius: wp('3%'),
+    marginBottom: hp('1.2%'),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  optionText: {
+    fontSize: wp('3.8%'),     // replaces 13.5px
+    color: '#333',
+    fontFamily: 'Epilogue-Bold',
+  },
+  picker: {
+    backgroundColor: '#FFFFFF',
+    color: '#333',
+    width: wp('37%'),         // replaces 140px
+    borderRadius: wp('3%'),
+  },
+  optionButton: {
+    backgroundColor: '#FFFFFF',
+    padding: wp('4%'),        // replaces 15px
+    borderRadius: wp('3%'),
+    marginBottom: hp('1.2%'),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  saveButton: {
+    padding: wp('4%'),        // replaces 15px
+    borderRadius: wp('3%'),
+    alignItems: 'center',
+    marginTop: hp('2.5%'),    // replaces 20px
+  },
+  saveButtonText: {
+    fontSize: wp('4.3%'),     // replaces 16px
+    color: '#FFF',
+    fontFamily: 'Epilogue-Bold',
+  },
 });
 
 export default Settings;

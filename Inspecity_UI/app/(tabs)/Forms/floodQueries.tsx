@@ -10,21 +10,21 @@ const { width, height } = Dimensions.get('window');
 const Questions = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const questions = [
-    'Do you have an emergency kit with basic supplies (e.g., flashlight, first aid, food, water)?',
-    'Do you have a family emergency plan in case of disasters?',
-    'Do you know the nearest evacuation center in your area?',
-    'Do you have a list of emergency contact numbers (e.g., barangay, hospital, fire station)?',
-    'Do you have a battery-powered radio for updates during power outages?  ',
-    'Do you store important documents (e.g., IDs, land titles) in a waterproof and fireproof container?',
-    'Do you have a plan for securing your pets during disasters?',
-    'Do you regularly check and maintain your emergency supplies? ',
-    'Do you know how to turn off utilities (electricity, water, gas) in case of emergencies? ',
-    'Do you have a backup power source (e.g., generator, power bank)? ',
-    'Do you have a plan for evacuating elderly or disabled family members? ',
-    'Do you have a fire extinguisher at home? ',
-    'Do you regularly participate in community disaster drills?  ',
-    'Do you have a plan for communicating with family members during disasters? ',
-    'Do you know the basic first aid procedures (e.g., CPR, wound care)?',  
+    'Is your house located near a river, creek, or estero?',
+    'Has your area experienced flooding in the past 2 years?',
+    'Is your house in a low-lying area or near a floodplain?',
+    'Does water enter your house during heavy rain?',
+    'Is your house near a clogged or poorly maintained drainage system?',
+    'Is your house surrounded by concrete or paved surfaces that prevent water absorption?',
+    'Is your house near a coastal area prone to storm surges?',
+    'Is your house near a dam or reservoir that could overflow?',
+    'Is your house in an area where the local government has issued flood warnings?',
+    'Is your house near a construction site that could block water flow?',
+    'Is your house near a landfill or area with poor waste management?',
+    'Is your house in an area where the water table is high?',
+    'Is your house near a river that often overflows during typhoons?',
+    'Is your house in an area where flooding lasts for several days?',
+    'Is your house near a creek or estero that overflows during heavy rain?',
     ];
 
   const [fontsLoaded] = useFonts({
@@ -51,7 +51,7 @@ const Questions = () => {
       setQuestionIndex(prev => prev + 1);
     } else {
       router.push({
-        pathname: '/awareness tool/results',
+        pathname: '/Forms/flood_results',
         params: { score: score.toString() }, // Must stringify numbers
       });
     }
@@ -60,7 +60,7 @@ const Questions = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/general_bg.png')}
+      source={require('../../../assets/images/flood_bg.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -70,7 +70,7 @@ const Questions = () => {
                 <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             </TouchableOpacity>
 
-            <Text style={styles.categoryTitle}>GENERAL</Text>
+            <Text style={styles.categoryTitle}>FLOOD</Text>
 
             <TouchableOpacity onPress={() => {
                 if (questionIndex < questions.length - 1) {

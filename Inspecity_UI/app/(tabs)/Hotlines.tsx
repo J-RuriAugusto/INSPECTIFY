@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Image, FlatList, ActivityIndicator, TouchableOpacity, Alert, Linking, StyleSheet } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import * as Location from 'expo-location';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { Swipeable } from "react-native-gesture-handler";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GOOGLE_API_KEY = "AlzaSycMz978ghujEfEk1vWDNzF86fgwzsPrPmq"; // Replace with your actual API key
 
@@ -29,12 +29,28 @@ const EmergencyHotlines = () => {
     { key: 'favorites', title: 'Favorites' },
     { key: 'all', title: 'All' },
   ]);
-  
-  const [apiHotlines, setApiHotlines] = useState([]);
+  const [apiHotlines, setApiHotlines] = useState<Hotline[]>([]);
   const [favorites, setFavorites] = useState(COMMON_HOTLINES);
   const [loading, setLoading] = useState(false);
-  const [locationError, setLocationError] = useState(null);
-  const [apiError, setApiError] = useState(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  type Hotline = {
+    id: string;
+    name: string;
+    phone: string;
+    address?: string;
+    type: string;
+    isCommon: boolean;
+  };
+  type Coordinates = {
+    latitude: number;
+    longitude: number;
+  };
+  type Place = {
+    place_id: string;
+    name?: string;
+    vicinity?: string;
+  };
 
   // Load user's saved favorites on startup
   useEffect(() => {
@@ -52,13 +68,19 @@ const EmergencyHotlines = () => {
   }, []);
 
   // Get icon component based on type
-  const getIcon = useCallback((type) => {
+  const getIcon = useCallback((type: string) => {
     const iconType = EMERGENCY_TYPES.find(t => t.type === type) || EMERGENCY_TYPES[0];
-    return <MaterialIcons name={iconType.icon} size={24} color={iconType.color} />;
-  }, []);
+    return (
+      <MaterialIcons
+        name={iconType.icon as keyof typeof MaterialIcons.glyphMap}
+        size={24}
+        color={iconType.color}
+      />
+    );
+  }, []);  
 
   // Fetch place details including phone number
-  const fetchPlaceDetails = useCallback(async (placeId) => {
+  const fetchPlaceDetails = useCallback(async (placeId: string) => {
     try {
       const response = await fetch(
         `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${GOOGLE_API_KEY}`
@@ -70,60 +92,54 @@ const EmergencyHotlines = () => {
       return null;
     }
   }, []);
-
-  // Fetch nearby hotlines from Google Places API
-  const fetchNearbyHotlines = useCallback(async (coords) => {
+  
+  const fetchNearbyHotlines = useCallback(async (coords: Coordinates) => {
     const { latitude, longitude } = coords;
     const cacheKey = `apiHotlines-${latitude.toFixed(4)}-${longitude.toFixed(4)}`;
-
+  
     try {
-      // Check for cached data (valid for 1 hour)
       const cachedData = await AsyncStorage.getItem(cacheKey);
       const cachedTimestamp = await AsyncStorage.getItem(`${cacheKey}-timestamp`);
-      
+  
       if (cachedData && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp) < 3600000)) {
         setApiHotlines(JSON.parse(cachedData));
         return;
       }
-
+  
       setLoading(true);
       setApiError(null);
-
-      // Process all emergency types in parallel
+  
       const typeRequests = EMERGENCY_TYPES.map(async (emergencyType) => {
         try {
-          // First fetch the place IDs
           const searchResponse = await fetch(
             `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&keyword=${emergencyType.keyword}&key=${GOOGLE_API_KEY}`
           );
           const searchData = await searchResponse.json();
-          
+  
           if (searchData.status !== "OK" || !searchData.results?.length) return [];
-
-          // Then fetch details for each place (limited to 3 per type for performance)
+  
           const placeDetails = await Promise.all(
-            searchData.results.slice(0, 3).map(place => fetchPlaceDetails(place.place_id))
+            searchData.results.slice(0, 3).map((place: Place) => fetchPlaceDetails(place.place_id))
           );
-
+  
           return placeDetails.map((details, index) => ({
             id: searchData.results[index].place_id,
             name: details?.name || searchData.results[index].name,
             phone: details?.formatted_phone_number || "N/A",
             address: details?.vicinity || "Address not available",
             type: emergencyType.type,
+            isCommon: false,
           }));
         } catch (error) {
           console.error(`Error fetching ${emergencyType.keyword}:`, error);
           return [];
         }
       });
-
+  
       const results = await Promise.all(typeRequests);
       const nearbyHotlines = results.flat().filter(Boolean);
-
+  
       setApiHotlines(nearbyHotlines);
-      
-      // Cache the results with timestamp
       await AsyncStorage.setItem(cacheKey, JSON.stringify(nearbyHotlines));
       await AsyncStorage.setItem(`${cacheKey}-timestamp`, Date.now().toString());
     } catch (error) {
@@ -132,35 +148,53 @@ const EmergencyHotlines = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchPlaceDetails]);
+  }, [fetchPlaceDetails]);  
 
   // Request location permission and fetch data
   useEffect(() => {
     let isMounted = true;
 
-    const initialize = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setLocationError("Location access needed for nearby services");
-          return;
-        }
+    async function getLocationWithTimeout(timeoutMs: number) {
+      const locPromise = Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
 
-        const location = await Location.getCurrentPositionAsync({ 
-          accuracy: Location.Accuracy.High,
-          timeout: 10000 
-        });
-        
-        if (isMounted) {
+      const timeoutPromise = new Promise<Location.LocationObject>((_, reject) =>
+        setTimeout(() => reject(new Error('Location request timed out')), timeoutMs)
+      );
+
+      return Promise.race([locPromise, timeoutPromise]);
+    }
+
+    const initialize = async () => {
+      let attempts = 0;
+      const maxAttempts = 3;
+      let success = false;
+    
+      while (attempts < maxAttempts && !success) {
+        try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setLocationError("Location access needed for nearby services");
+            return;
+          }
+    
+          const location = await getLocationWithTimeout(10_000);
           fetchNearbyHotlines(location.coords);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setLocationError("Couldn't access your location");
-          console.error("Location error:", err);
+          success = true;
+        } catch (err: any) {
+          attempts++;
+          if (attempts >= maxAttempts) {
+            if (err.message === 'Location request timed out') {
+              setLocationError("Location request took too long. Please try again.");
+            } else {
+              setLocationError("Couldn't access your location");
+            }
+            console.error("Location error:", err);
+          }
         }
       }
-    };
+    };    
 
     initialize();
 
@@ -170,7 +204,7 @@ const EmergencyHotlines = () => {
   }, [fetchNearbyHotlines]);
 
   // Toggle favorite status
-  const toggleFavorite = useCallback(async (hotline) => {
+  const toggleFavorite = useCallback(async (hotline: Hotline) => {
     if (hotline.isCommon) return; // Common hotlines cannot be unfavorited
 
     setFavorites(prev => {
@@ -192,7 +226,14 @@ const EmergencyHotlines = () => {
   }, []);
 
   // Render individual hotline item
-  const renderItem = useCallback(({ item, showFavorite = true }) => {
+  const renderItem = useCallback(
+    ({
+      item,
+      showFavorite = true,
+    }: {
+      item: Hotline;
+      showFavorite?: boolean;
+    }) => {
     const isFavorite = favorites.some(fav => fav.id === item.id);
   
     return (
@@ -260,15 +301,15 @@ const EmergencyHotlines = () => {
           item, 
           showFavorite: !item.isCommon
         })}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <MaterialIcons name="favorite-border" size={48} color="#ccc" />
-            <Text style={styles.emptyText}>No favorites added yet</Text>
-            <Text style={styles.emptySubtext}>
-              Tap the heart icon on hotlines to save them here
-            </Text>
-          </View>
-        }
+        // ListEmptyComponent={
+        //   <View style={styles.emptyState}>
+        //     <MaterialIcons name="favorite-border" size={48} color="#ccc" />
+        //     <Text style={styles.emptyText}>No favorites added yet</Text>
+        //     <Text style={styles.emptySubtext}>
+        //       Tap the heart icon on hotlines to save them here
+        //     </Text>
+        //   </View>
+        // }
         contentContainerStyle={styles.listContent}
       />
     </View>
@@ -301,9 +342,9 @@ const EmergencyHotlines = () => {
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <MaterialIcons name="location-off" size={48} color="#ccc" />
-              <Text style={styles.emptyText}>No emergency services found nearby</Text>
+              <Text style={styles.emptyText}>No emergency services found nearby.</Text>
               <Text style={styles.emptySubtext}>
-                Ensure location services are enabled and try again
+                Ensure location services are enabled and try again.
               </Text>
             </View>
           }
@@ -323,10 +364,11 @@ const EmergencyHotlines = () => {
       <Text style={styles.title}>Emergency Hotlines</Text>
       <TabView
         navigationState={{ index, routes }}
-        renderScene={SceneMap({
-          favorites: FavoritesTab,
-          all: AllTab,
-        })}
+        // renderScene={SceneMap({
+        //   favorites: FavoritesTab,
+        //   all: AllTab,
+        // })}
+        renderScene={renderScene}
         onIndexChange={setIndex}
         renderTabBar={props => (
           <TabBar
@@ -348,140 +390,141 @@ const EmergencyHotlines = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: hp(5),
     backgroundColor: '#f8f9fa',
   },
+
   title: {
-    fontSize: 24,
+    fontSize: wp(6),
     fontFamily: 'Epilogue-Bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: hp(2),
     color: '#071C34',
   },
+
   tabBar: {
     backgroundColor: '#004A8E',
     elevation: 2,
     shadowOpacity: 0.1,
-    marginHorizontal: 40,
-    marginBottom: 10,
-    borderRadius: 25,
+    marginHorizontal: wp(10),
+    marginBottom: hp(1),
+    borderRadius: wp(12),
     overflow: 'hidden',
   },
+
   indicator: {
     backgroundColor: '#00A8E8',
     height: '100%',
   },
+
   label: {
     color: '#071C34',
     fontFamily: 'Epilogue-Regular',
     textTransform: 'none',
-    fontSize: 15,
+    fontSize: wp(4),
   },
+
   tabContainer: {
     flex: 1,
   },
-  leftAction: {
-    backgroundColor: '#2A74C7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // paddingHorizontal: 20,
-    // marginBottom: 15,
-    marginHorizontal: 20,
-    borderRadius: 25,
-    flexDirection: 'row',
-    // gap: 10,
-  },
-  rightAction: {
-    backgroundColor: '#05173F',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // paddingHorizontal: 20,
-    // marginBottom: 15,
-    marginHorizontal: 20,
-    borderRadius: 25,
-    flexDirection: 'row',
-    // gap: 10,
-  },
-  icon: {
-    width: '35%', // Adjust size based on your icon
-    height: '35%',
-    resizeMode: 'contain',
-  }, 
+
+  // icon: {
+  //   width: wp(8),
+  //   height: wp(8),
+  //   resizeMode: 'contain',
+  // },
+
   card: {
     backgroundColor: '#fff',
-    padding: 15,
-    marginHorizontal: 20,
-    marginVertical: 8,
-    borderRadius: 10,
+    padding: wp(4),
+    marginHorizontal: wp('5%'),
+    marginVertical: hp(1),
+    borderRadius: wp(3),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: hp(0.2) },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: wp(1),
     elevation: 2,
   },
+
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   textContainer: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: wp(4),
   },
+
   name: {
-    fontSize: 16,
+    fontSize: wp(4),
     fontWeight: '600',
     color: '#333',
   },
+
   address: {
-    fontSize: 14,
+    fontSize: wp(3.5),
     color: '#666',
-    marginVertical: 2,
+    marginVertical: hp(0.5),
   },
+
   phone: {
-    fontSize: 16,
+    fontSize: wp(4),
     color: '#0A4D95',
   },
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   loadingText: {
-    marginTop: 10,
+    marginTop: hp(1),
     color: '#666',
   },
+
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 30,
+    padding: wp(8),
   },
+
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 15,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: wp(6),
+    fontFamily: 'Epilogue-Bold',
+    color: '#4682B4',
+    marginTop: hp(2),
     textAlign: 'center',
-    marginTop: 5,
-    lineHeight: 20,
   },
+
+  emptySubtext: {
+    fontSize: wp(4.5),
+    color: '#4682B4',
+    textAlign: 'center',
+    marginTop: hp(0.5),
+    marginBottom: hp(2),
+    lineHeight: hp(3),
+    fontFamily: 'Epilogue-Regular',
+  },
+
   errorContainer: {
     backgroundColor: '#FFEBEE',
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 20,
-    marginBottom: 10,
+    padding: wp(3),
+    borderRadius: wp(2),
+    marginHorizontal: wp(5),
+    marginBottom: hp(1),
   },
+
   errorText: {
     color: '#D32F2F',
     textAlign: 'center',
   },
+
   listContent: {
-    paddingBottom: 20,
+    paddingBottom: hp(3),
   },
 });
 

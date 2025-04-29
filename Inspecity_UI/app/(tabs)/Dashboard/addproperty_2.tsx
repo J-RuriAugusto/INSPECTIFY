@@ -23,7 +23,7 @@ const GettingStarted2 = () => {
   }
 
   const handleNavigateToGetStarted3 = () => {
-    router.push('/board/addproperty_3'); // Navigate to the next screen
+    router.push('/Dashboard/addproperty_3'); // Navigate to the next screen
   };
 
   const currentStep = 2; // Current progress step

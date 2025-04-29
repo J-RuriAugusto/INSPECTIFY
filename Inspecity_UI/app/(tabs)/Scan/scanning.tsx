@@ -1,33 +1,32 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { BlurView } from 'expo-blur';
-
-const { width, height } = Dimensions.get('window');
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const Scanning = () => {
   const params = useLocalSearchParams();
-  const router = useRouter();
+  // const router = useRouter();
   const photo = Array.isArray(params.photo) ? params.photo[0] : params.photo;
   const scanAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Scanning effect animation (moving up & down)
     Animated.loop(
-      Animated.sequence([ 
+      Animated.sequence([
         Animated.timing(scanAnim, {
-          toValue: height * 0.68, // Move scan line down
+          toValue: hp(66.7), // 68% height
           duration: 2000,
           useNativeDriver: true,
         }),
         Animated.timing(scanAnim, {
-          toValue: height * 0.01, // Move scan line up
+          toValue: hp(1), // 1% height
           duration: 2000,
           useNativeDriver: true,
         }),
       ])
     ).start();
-  }, [photo]);
+  }, [photo]);  
 
   return (
     <View style={styles.container}>
@@ -45,10 +44,10 @@ const Scanning = () => {
       <BlurView style={styles.rightBlur} intensity={10} tint="light" />
 
       {/* Scanning Overlay */}
-      <View style={styles.overlay}>
+      {/* <View style={styles.overlay}>
         <Text style={styles.title}>Analyzing the structures</Text>
         <Text style={styles.title}>for cracks and damages...</Text>
-      </View>
+      </View> */}
 
       {/* Corner Brackets */}
       <View style={styles.cornersContainer}>
@@ -70,8 +69,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#002B5B',
   },
   fullScreenImage: {
-    width: width,
-    height: height,
+    width: wp(100),
+    height: hp(100),
     resizeMode: 'cover',
   },
   topBlur: {
@@ -79,7 +78,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: '15%',
+    height: hp(15),
     zIndex: 1,
   },
   bottomBlur: {
@@ -87,59 +86,57 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: '15%',
+    height: hp(15),
     zIndex: 1,
   },
   leftBlur: {
     position: 'absolute',
-    top: '15%',
+    top: hp(15),
     left: 0,
-    bottom: '15%',
-    width: '10%',
+    bottom: hp(15),
+    width: wp(10),
     zIndex: 1,
   },
   rightBlur: {
     position: 'absolute',
-    top: '15%',
+    top: hp(15),
     right: 0,
-    bottom: '15%',
-    width: '10%',
+    bottom: hp(15),
+    width: wp(10),
     zIndex: 1,
   },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  title: {
-    fontSize: 18,
-    fontFamily: 'Epilogue-SemiBold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
+  // overlay: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   bottom: 0,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   zIndex: 2,
+  // },
+  // title: {
+  //   fontSize: wp(4.8),
+  //   fontFamily: 'Epilogue-SemiBold',
+  //   color: '#FFFFFF',
+  //   textAlign: 'center',
+  // },
   errorText: {
     color: '#FF5B5B',
-    fontSize: 18,
+    fontSize: wp(4.8),
     textAlign: 'center',
   },
-
-  // Corner Brackets
   cornersContainer: {
     position: 'absolute',
-    top: '15.5%',
-    left: '10%',
-    width: '80%',
-    height: '70%',
+    top: hp(15),
+    left: wp(10),
+    width: wp(80),
+    height: hp(67.5),
   },
   corner: {
     position: 'absolute',
-    width: '20%',
-    height: '15%',
+    width: wp(20),
+    height: hp(15),
     borderColor: '#00A8E8',
     borderWidth: 4,
   },
@@ -167,13 +164,11 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderTopWidth: 0,
   },
-
-  // Scanning Line
   scanLine: {
     position: 'absolute',
-    top: '15.5%',
-    left: '10%',
-    width: '80%',
+    top: hp(15.5),
+    left: wp(10),
+    width: wp(80),
     height: 4,
     backgroundColor: '#00A8E8',
     opacity: 0.8,

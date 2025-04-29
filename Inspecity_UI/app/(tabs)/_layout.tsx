@@ -1,48 +1,65 @@
 import React from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { Image, View, StyleSheet, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Import this!
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
+function renderTabLabel(label: string) {
+  return ({ focused }: { focused: boolean }) => (
+    <Text style={{
+      color: '#000000',
+      fontWeight: focused ? 'bold' : 'normal',
+      fontSize: 12,
+      marginTop: 5
+    }}>
+      {label}
+    </Text>
+  );
+}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}> {/* Wrap the whole Tabs inside this */}
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Tabs
-        initialRouteName="board"
+        initialRouteName="Dashboard"
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           tabBarInactiveTintColor: '#ccc',
           headerShown: false,
-          tabBarStyle: styles.tabBarStyle, // Standardized height
-          tabBarShowLabel: false, // Hides text labels
+          tabBarStyle: styles.tabBarStyle,
+          tabBarShowLabel: true,
+          // tabBarItemStyle: {
+          //   marginHorizontal: wp('1.5%'), // <-- Add horizontal margin between tabs
+          // },
         }}
       >
         {/* Dashboard Tab */}
         <Tabs.Screen
-          name="board"
+          name="Dashboard"
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
-                source={
-                  focused
-                    ? require('../../assets/images/report columns.png')
-                    : require('../../assets/images/report columns.png')
-                }
-                style={styles.icon}
+                source={require('../../assets/images/report columns.png')}
+                style={[
+                  styles.icon, // your default icon size
+                  { width: wp('6.5%'), height: wp('6.5%') }, // override here for Dashboard only
+                  focused && styles.focusedIcon, // optional color change if needed
+                ]}
               />
             ),
+            tabBarLabel: renderTabLabel('Dashboard'),
           }}
-          // Adding tabPress event to reset the screen on tab click
           listeners={({ navigation }) => ({
             tabPress: (e) => {
-              // Prevent default behavior and reset the screen
               e.preventDefault();
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'board' }],
+                routes: [{ name: 'Dashboard' }],
               });
             },
           })}
@@ -50,72 +67,74 @@ export default function TabLayout() {
 
         {/* Awareness Tool Tab */}
         <Tabs.Screen
-          name="awareness tool"
+          name="Forms"
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
-                source={
-                  focused
-                    ? require('../../assets/images/test results.png')
-                    : require('../../assets/images/test results.png')
-                }
-                style={styles.icon}
+                source={require('../../assets/images/test results.png')}
+                style={[
+                  styles.icon,
+                  focused && styles.focusedIcon,
+                ]}
               />
             ),
+            tabBarLabel: renderTabLabel('Forms'),
           }}
         />
 
         {/* Assess Structure Tab */}
         <Tabs.Screen
-          name="assess structure"
+          name="Scan"
           options={{
             tabBarIcon: ({ focused }) => (
-              <View style={styles.centeredIcon}>
-                <Image source={require('../../assets/images/rectangle.png')} style={styles.circle} />
+              <View style={[styles.centeredIcon, styles.scanButton]}>
+                <Image 
+                  source={require('../../assets/images/rectangle.png')} 
+                  style={styles.circle} 
+                />
                 <Image
-                  source={
-                    focused
-                      ? require('../../assets/images/scan_icon.png')
-                      : require('../../assets/images/scan_icon.png')
-                  }
-                  style={styles.icon}
+                  source={require('../../assets/images/scan_icon.png')}
+                  style={[
+                    styles.icon,
+                    { width: wp('7%'), height: wp('7%') },
+                    focused && styles.focusedIcon,
+                  ]}
                 />
               </View>
             ),
+            tabBarLabel: renderTabLabel('Scan'),
           }}
         />
 
         {/* Emergency Hotlines Tab */}
         <Tabs.Screen
-          name="emergency_hotlines"
+          name="Hotlines"
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
-                source={
-                  focused
-                    ? require('../../assets/images/duplicate contacts.png')
-                    : require('../../assets/images/duplicate contacts.png')
-                }
-                style={styles.icon}
+                source={require('../../assets/images/duplicate contacts.png')}
+                style={[
+                  styles.icon,
+                  focused && styles.focusedIcon,
+                ]}
               />
             ),
+            tabBarLabel: renderTabLabel('Hotlines'),
           }}
         />
 
         {/* Nearby Shops Tab */}
         <Tabs.Screen
-          name="nearby_shops"
+          name="Shops"
           options={{
             tabBarIcon: ({ focused }) => (
-              <Image
-                source={
-                  focused
-                    ? require('../../assets/images/group.png')
-                    : require('../../assets/images/group.png')
-                }
-                style={styles.icon}
+              <Ionicons
+                name={focused ? 'location-sharp' : 'location-outline'}
+                size={30}
+                color={focused ? '#007aff' : '#000000'}
               />
             ),
+            tabBarLabel: renderTabLabel('Shops'),
           }}
         />
       </Tabs>
@@ -123,25 +142,32 @@ export default function TabLayout() {
   );
 }
 
-// Styles for consistency
 const styles = StyleSheet.create({
   tabBarStyle: {
     backgroundColor: '#FFFFFF',
-    height: 65, // Increased height for better spacing
-    // paddingBottom: 10, // Adjust spacing
+    height: hp('9.5%'),
   },
   icon: {
-    width: 30, // Standardized icon size
-    height: 30,
+    width: wp('8%'),
+    height: wp('8%'),
     resizeMode: 'contain',
+  },
+  scanButton: {
+    marginBottom: hp('4.5%'),
   },
   centeredIcon: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   circle: {
-    width: 50,
-    height: 50,
+    width: wp('16%'),
+    height: wp('16%'),
     position: 'absolute',
+    borderRadius: wp('8%'),
+    borderWidth: wp('0.7%'),
+    borderColor: '#00A8E8',
+  },
+  focusedIcon: {
+    tintColor: '#007aff',
   },
 });

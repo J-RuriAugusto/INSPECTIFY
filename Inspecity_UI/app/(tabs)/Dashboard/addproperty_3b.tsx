@@ -29,7 +29,7 @@ const GettingStarted = () => {
   }
 
   const handleNavigateToGetStarted4 = () => {
-    router.push('/dashboard/MyProperties');
+    router.push('/Dashboard/MyProperties');
   };
   
   const currentStep = 4;
@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
   scrollView: { width: '100%' },
   scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
   pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
+  picker: { height: 50, width: '100%', color: '#000' },
   textBox: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
   button: {width:'70%', height: '15%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 10, marginHorizontal: 75 },
   buttonText: { color: '#FFFFFF', fontSize: 18, fontFamily: 'Archivo-Bold' },
