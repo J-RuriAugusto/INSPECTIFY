@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView 
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
-import MyProperties from './MyProperties';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const GettingStarted = () => {
+const GettingStarted3b = () => {
   const router = useRouter();
   const [selectedHouseType, setSelectedHouseType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState("");
@@ -169,7 +169,7 @@ const GettingStarted = () => {
         )}
       </ScrollView>
 
-      
+      {/* Next Button */}
       <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted4}>
         <Text style={styles.buttonText}>Add Property</Text>
       </TouchableOpacity>
@@ -180,29 +180,97 @@ const GettingStarted = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  upperSection: { flex: 1, backgroundColor: '#0B417D', justifyContent: 'center', alignItems: 'center' },
-  lowerSection: {
-    flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  image: { width: '100%', height: 400 },
-  progressBar: { flexDirection: 'row', justifyContent: 'space-between', width:'100%', marginBottom: 8 },
-  progressStep: { width: 50, height: 5, borderRadius: 10 },
-  progressStepActive: { backgroundColor: '#0B417D' },
-  progressStepInactive: { backgroundColor: '#E0E0E0' },
-  scrollView: { width: '100%' },
-  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
-  pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
-  picker: { height: 50, width: '100%', color: '#000' },
-  textBox: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
-  button: {width:'70%', height: '15%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 10, marginHorizontal: 75 },
-  buttonText: { color: '#FFFFFF', fontSize: 18, fontFamily: 'Archivo-Bold' },
-  title1: { fontSize: 23, color: '#05173F', textAlign: 'center', fontFamily: 'Epilogue-Black', letterSpacing: 1 },
-  subtitle1: { fontSize: 15, color: '#7C7C7C', textAlign: 'center', fontFamily: 'Archivo-Regular', marginBottom: 10, letterSpacing: 1 },
-  
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+  // progressBar: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   width: wp('90%'),
+  //   marginBottom: hp('1%'),
+  //   marginTop: hp('1%'),
+  // },
+  // progressStep: {
+  //   width: wp('13%'),
+  //   height: hp('0.6%'),
+  //   borderRadius: wp('2.5%'),
+  // },
+  // progressStepActive: {
+  //   backgroundColor: '#0B417D',
+  // },
+  // progressStepInactive: {
+  //   backgroundColor: '#E0E0E0',
+  // },
+  scrollView: {
+    width: wp('100%'),
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  pickerContainer: {
+    width: wp('70%'),
+    height: hp('7%'),
+    backgroundColor: '#D9D9D9',
+    borderRadius: wp('6%'),
+    marginBottom: hp('1.5%'),
+  },
+  picker: {
+    width: wp('70%'),
+    color: '#000',
+  },
+  textBox: {
+    width: wp('60%'),
+    padding: wp('2%'),
+    borderRadius: wp('6%'),
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.5%'),
+  },
+  button: {
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
+    padding: wp('3%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('2%'),
+    // marginHorizontal: wp('18%'),
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: wp('4.5%'),
+    fontFamily: 'Archivo-Bold',
+  },
+  title1: {
+    fontSize: wp('6%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: 1,
+    marginBottom: hp('0.4%'),
+  },
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    marginBottom: hp('1.5%'),
+    letterSpacing: 1,
+  },
 });
 
-export default GettingStarted;
+export default GettingStarted3b;

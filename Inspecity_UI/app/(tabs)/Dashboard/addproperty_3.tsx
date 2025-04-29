@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView}
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const GettingStarted = () => {
+const GettingStarted3 = () => {
   const router = useRouter();
   const [age, setAge] = useState(''); // Separate state for Age
   const [height, setHeight] = useState(''); // Separate state for Height
@@ -53,64 +54,64 @@ const GettingStarted = () => {
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
         {/* Scrollable form */}
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        {/* <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled"> */}
                 
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-            <Picker.Item label="Type of House" value="" enabled={false} />
-            <Picker.Item label="Single-detached" value="single" />
-            <Picker.Item label="Townhouse" value="town" />
-            <Picker.Item label="Apartment" value="apartment" />
-            <Picker.Item label="Stilt house" value="stilt" />
-            <Picker.Item label="Duplex" value="duplex" />
-            <Picker.Item label="Others" value="others" />
-          </Picker>
-        </View>
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+              <Picker.Item label="Type of House" value="" enabled={false} />
+              <Picker.Item label="Single-detached" value="single" />
+              <Picker.Item label="Townhouse" value="town" />
+              <Picker.Item label="Apartment" value="apartment" />
+              <Picker.Item label="Stilt house" value="stilt" />
+              <Picker.Item label="Duplex" value="duplex" />
+              <Picker.Item label="Others" value="others" />
+            </Picker>
+          </View>
 
-        {selectedHouseType === "others" && (
-          <TextInput
-            style={styles.textBox1}
-            placeholder="Specify other house type"
-            placeholderTextColor="#BBBBBB"
-            value={otherHouseType}
-            onChangeText={(text) => setOtherHouseType(text)}
-          />
-        )}
+          {selectedHouseType === "others" && (
+            <TextInput
+              style={styles.textBox1}
+              placeholder="Specify other house type"
+              placeholderTextColor="#BBBBBB"
+              value={otherHouseType}
+              onChangeText={(text) => setOtherHouseType(text)}
+            />
+          )}
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Enter the Height of the House</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="(1, 2, 3, etc.)" 
-            placeholderTextColor="#BBBBBB" 
-            value={height} 
-            onChangeText={(text) => setHeight(text)} 
-          />
-        </View>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>Enter the Height of the House</Text>
+            <TextInput 
+              style={styles.textBox} 
+              placeholder="(1, 2, 3, etc.)" 
+              placeholderTextColor="#BBBBBB" 
+              value={height} 
+              onChangeText={(text) => setHeight(text)} 
+            />
+          </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated lot area?</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="sqm" 
-            placeholderTextColor="#BBBBBB" 
-            value={lotArea} 
-            onChangeText={(text) => setLotArea(text)} 
-          />
-        </View>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>What is the estimated lot area?</Text>
+            <TextInput 
+              style={styles.textBox} 
+              placeholder="sqm" 
+              placeholderTextColor="#BBBBBB" 
+              value={lotArea} 
+              onChangeText={(text) => setLotArea(text)} 
+            />
+          </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated floor area?</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="sqm" 
-            placeholderTextColor="#BBBBBB" 
-            value={floorArea} 
-            onChangeText={(text) => setFloorArea(text)} 
-          />
-        </View>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>What is the estimated floor area?</Text>
+            <TextInput 
+              style={styles.textBox} 
+              placeholder="sqm" 
+              placeholderTextColor="#BBBBBB" 
+              value={floorArea} 
+              onChangeText={(text) => setFloorArea(text)} 
+            />
+          </View>
 
-        </ScrollView>
+        {/* </ScrollView> */}
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>Next</Text>
@@ -122,26 +123,147 @@ const GettingStarted = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  upperSection: { flex: 1, backgroundColor: '#0B417D', justifyContent: 'center', alignItems: 'center' },
-  image: { width: '100%', height: 400 },
-  lowerSection: { flex: 1.05, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title1: { fontSize: 23, color: '#05173F', textAlign: 'center', fontFamily: 'Epilogue-Black', letterSpacing: 1, marginBottom: 3, marginTop: -12 },
-  subtitle1: { fontSize: 15, color: '#7C7C7C', textAlign: 'center', fontFamily: 'Archivo-Regular', letterSpacing: 1, marginBottom: 10 },
-  progressBar: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 },
-  progressStep: { width: 50, height: 5, borderRadius: 10 },
-  progressStepActive: { backgroundColor: '#0B417D' },
-  progressStepInactive: { backgroundColor: '#E0E0E0' },
-  textBox1: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
-  textBox: { width: '40%', padding: 10, borderRadius: 25, fontFamily: 'Archivo-Regular', fontSize: 13, textAlign: 'center',textAlignVertical:'center', backgroundColor: '#D9D9D9', marginLeft:10 },
-  pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
-  picker: { height: 55, fontSize: 12, color: '#05173F', textAlign: 'center', textAlignVertical:'top' },
-  button: {width:'70%', height: '15%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 5, marginHorizontal: 75 },
-  buttonText: { fontSize: 18, color: '#FFFFFF', fontFamily: 'Archivo-Bold' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', marginBottom: 10, marginLeft: -45 },
-  label: { fontSize: 14, color: '#05173F', fontFamily: 'Archivo-Regular', textAlign: 'auto' },
-  scrollView: { width: '100%', height:'100%' },
-  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
-  
+
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+
+  title1: {
+    fontSize: wp('6%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('0.4%'),
+    // marginTop: hp('-1.5%'),
+  },
+
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('1.2%'),
+  },
+
+  // progressBar: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   width: wp('90%'),
+  //   // marginBottom: hp('2%'),
+  //   marginTop: -hp('2.5%'),
+  // },
+
+  // progressStep: {
+  //   width: wp('25%'),
+  //   height: hp('0.6%'),
+  //   borderRadius: wp('3%'),
+  // },
+
+  // progressStepActive: {
+  //   backgroundColor: '#0B417D',
+  // },
+
+  // progressStepInactive: {
+  //   backgroundColor: '#E0E0E0',
+  // },
+
+  textBox1: {
+    width: wp('80%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.2%'),
+  },
+
+  textBox: {
+    width: wp('30%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: '#D9D9D9',
+    marginLeft: wp('2.5%'),
+  },
+
+  pickerContainer: {
+    width: wp('80%'),
+    backgroundColor: '#D9D9D9',
+    borderRadius: wp('10%'),
+    marginBottom: hp('1.8%'),
+  },
+
+  picker: {
+    height: hp('7%'),
+    fontSize: wp('3%'),
+    color: '#05173F',
+    textAlign: 'center',
+    textAlignVertical: 'top',
+  },
+
+  button: {
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
+    padding: wp('2.5%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('2.5%'),
+  },
+
+  buttonText: {
+    fontSize: wp('4.5%'),
+    color: '#FFFFFF',
+    fontFamily: 'Archivo-Bold',
+  },
+
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: wp('80%'),
+    marginBottom: hp('1.2%'),
+    marginLeft: wp('-11%'),
+    paddingHorizontal: wp('3%'),
+  },
+
+  label: {
+    fontSize: wp('3.7%'),
+    color: '#05173F',
+    fontFamily: 'Archivo-Regular',
+    textAlign: 'auto',
+  },
+
+  // scrollView: {
+  //   width: wp('100%'),
+  // },
+
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   alignItems: 'center',
+  //   paddingBottom: hp('6%'),
+  //   backgroundColor: '#000',
+  //   paddingHorizontal: wp('5%'),
+  // },
 });
 
-export default GettingStarted;
+export default GettingStarted3;
