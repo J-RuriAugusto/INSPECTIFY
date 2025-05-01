@@ -96,6 +96,7 @@ const GettingStarted = () => {
     };
 
     try {
+      console.log(`sent: ${JSON.stringify(updatedHomeData)}`)
       const homeResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homes', {
         method: 'POST',
         headers: {

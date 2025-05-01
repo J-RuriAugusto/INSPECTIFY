@@ -114,7 +114,7 @@ const Dashboard = () => {
       }
   
       const data = await response.json();
-  
+      console.log(`default home data: ${JSON.stringify(data, null, 2)}`);
       setHouseName(data.home_name && data.home_name.trim() ? data.home_name : "NAME OF HOUSE");
       HomeDetails.setHomeId(data.home_id);
   

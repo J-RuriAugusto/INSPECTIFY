@@ -105,7 +105,7 @@ const MyProperties = () => {
   const uploadImageToCloudinary = async (uri: string) => {
     try {
       setIsUploading(true);
-
+      console.log(`Home image uri: ${uri}`)
       const fileInfo = await FileSystem.getInfoAsync(uri);
       if (!fileInfo.exists) {
         throw new Error(`File does not exist at path: ${uri}`);
@@ -308,6 +308,7 @@ const MyProperties = () => {
           onPress: async () => {
             setIsDeleting(true);
             try {
+              console.log(`id of home to be deleted: ${id}`)
               const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homes/${id}`, {
                 method: 'DELETE',
                 headers: {
@@ -813,6 +814,26 @@ const MyProperties = () => {
                   throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
+                const update = JSON.stringify({
+                  latitude: selectedProperty.latitude,
+                  longitude: selectedProperty.longitude, 
+                  home_name: selectedProperty.name,
+                  home_age: selectedProperty.home_age,
+                  primary_home_use: selectedProperty.primaryUse,
+                  renovations: selectedProperty.renovations,
+                  type_of_home: typeToSend,
+                  num_floor: selectedProperty.num_floor,
+                  lot_area: selectedProperty.lot_area,
+                  floor_area: selectedProperty.floor_area,
+                  primary_home_material: primaryMaterialToSend,
+                  roof_material: roofingMaterialToSend,
+                  floor_material: flooringToSend,
+                  wall_material: wallMaterialToSend,
+                  ceiling_material: ceilingMaterialToSend,
+                  home_img: imageUrl || null,})
+                
+                console.log(`changes: ${update}`)
+
                 const result = await response.json();
                 console.log('Update successful:', result);
                 

@@ -110,6 +110,7 @@ const PhotoDetails = () => {
   const uploadImageToCloudinary = async (uri: string) => {
     try {
       setIsUploading(true);
+      console.log(`user image uri: ${uri}`)
 
       const fileInfo = await FileSystem.getInfoAsync(uri);
       if (!fileInfo.exists) {

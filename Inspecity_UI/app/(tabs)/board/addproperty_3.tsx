@@ -117,7 +117,7 @@ const GettingStarted = () => {
             style={styles.textBox} 
             placeholder="(1, 2, 3, etc.)" 
             placeholderTextColor="#BBBBBB" 
-            value={lotArea} 
+            value={numFloor} 
             onChangeText={(text) => setNumFloor(text)} 
           />
         </View>

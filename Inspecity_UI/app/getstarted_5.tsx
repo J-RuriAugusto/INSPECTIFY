@@ -100,7 +100,7 @@ const GettingStarted = () => {
       if (!homeResponse.ok) {
         throw new Error('Failed to create home');
       }
-  
+      console.log(JSON.stringify(updatedHomeData))
       console.log('Home created successfully');
   
       await AsyncStorage.setItem('userId', userId);
