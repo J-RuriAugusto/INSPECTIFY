@@ -249,20 +249,21 @@ const PhotoDetails = () => {
   
       // Convert damageTypes (previously called issues) into <li> elements
       const processedDamageTypes = Array.isArray(damageTypes) 
-        ? damageTypes.filter(item => item && item.trim() !== '')
-        : [];
+      ? damageTypes.filter(item => item != null && String(item).trim() !== '')
+      : [];
+      
       const issuesHTML = processedDamageTypes.length > 0 
         ? `<ul>${processedDamageTypes.map(issue => `<li>${escapeHTML(issue)}</li>`).join('')}</ul>`
         : '<p>No issues detected</p>';
       
       // Split recommendations into an array if it's a string
-      const processedRecommendations = typeof recommendations === 'string'
-        ? recommendations.split('\n').filter(rec => rec.trim() !== '')
-        : [];
+      const processedRecommendations = recommendations 
+      ? String(recommendations).split('\n').filter(rec => rec.trim() !== '')
+      : [];
+      
       const recommendationsHTML = processedRecommendations.length > 0
         ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
         : '<p>No recommendations available</p>';
-  
       // Format dates properly
       const currentDate = new Date();
       const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -423,13 +424,18 @@ const PhotoDetails = () => {
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      alert(`Failed to generate the PDF report: ${error.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to generate the PDF report: ${errorMessage}`);
     }
   };
   
   // Helper function to escape HTML
-  const escapeHTML = (text) => {
-    if (!text) return '';
+  const escapeHTML = (text: string) => {
+    if (text === null || text === undefined) return '';
+    if (typeof text !== 'string') {
+      // Convert non-string values to string
+      text = String(text);
+    }
     return text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

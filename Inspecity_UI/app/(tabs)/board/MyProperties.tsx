@@ -268,9 +268,14 @@ const MyProperties = () => {
           setProperties(transformedProperties);
           setLoading(false);
         } catch (err) {
-          setError(err.message);
           setLoading(false);
           console.error("Failed to fetch homes:", err);
+          
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("An unknown error occurred");
+          }
         }
       };
       
