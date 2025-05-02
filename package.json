@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@react-native-community/netinfo": "^11.4.1",
+    "react-native-image-viewing": "^0.2.2",
+    "react-native-uuid": "^2.0.3"
+  }
+}
