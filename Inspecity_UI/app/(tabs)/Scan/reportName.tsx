@@ -1,25 +1,54 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
+import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
+import HomeDetails from '../../../constants/HomeDetails'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportName = () => {
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-  //   'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
+  });
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
-  
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [reportName, setReportName] = useState('');
   const router = useRouter();
+  const navigation = useNavigation();
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const saveImageToStorage = async (uri: string) => {
+    const filename = uri.split('/').pop();
+    
+    // Check if documentDirectory is not null
+    if (!FileSystem.documentDirectory) {
+      console.error('Document directory is not available');
+      return uri; // Fallback to the original URI
+    }
+  
+    const newPath = FileSystem.documentDirectory + filename;
+  
+    try {
+      await FileSystem.moveAsync({
+        from: uri,
+        to: newPath,
+      });
+      return newPath;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      return uri; // Fallback to the original URI
+    }
+  };
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -30,16 +59,24 @@ const ReportName = () => {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.canceled) {
+    // Check if result.assets is not null and contains at least one asset
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setIsUploading(true);
+      const savedUri = await saveImageToStorage(result.assets[0].uri);
       router.push({
-        pathname: "/Scan/photoDetails",
-        params: { photo: result.assets[0].uri }
+        pathname: "./photoDetails",
+        params: { 
+          photo: savedUri,
+          reportName: reportName,
+          homeId: HomeDetails.homeId
+        }
       });
+      setIsUploading(false);
     }
   };
 
@@ -51,21 +88,36 @@ const ReportName = () => {
     }
 
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: false,
+      allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.canceled) {
+    // Check if result.assets is not null and contains at least one asset
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setIsUploading(true);
+      const savedUri = await saveImageToStorage(result.assets[0].uri);
       router.push({
-        pathname: "/Scan/photoDetails",
-        params: { photo: result.assets[0].uri }
+        pathname: "./photoDetails",
+        params: { 
+          photo: savedUri,
+          reportName: reportName,
+          homeId: HomeDetails.homeId
+        }
       });
+      setIsUploading(false);
     }
   };
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.title1}>NAME YOUR REPORT</Text>
       <Text style={styles.title2}>Enter a report name</Text>
 
@@ -74,6 +126,8 @@ const ReportName = () => {
           style={styles.input}
           placeholder="Report Name"
           placeholderTextColor="#A0A0A0"
+          onChangeText={setReportName}
+          value={reportName}
         />
       </View>
 
@@ -102,9 +156,22 @@ const ReportName = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      {/* Uploading Modal */}
+      <Modal 
+        isVisible={isUploading} 
+        backdropOpacity={0.5}
+        style={styles.uploadingModal}
+      >
+        <View style={styles.uploadingModalContent}>
+          <ActivityIndicator size="large" color="#00A8E8" />
+          <Text style={styles.uploadingText}>Uploading...</Text>
+        </View>
+      </Modal>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -123,6 +190,15 @@ const styles = StyleSheet.create({
   //   justifyContent: 'space-between',
   //   alignItems: 'center',
   // },
+  header: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title1: {
     fontFamily: 'Epilogue-Black',
     fontSize: wp('8%'), // 30px ≈ 8% width
@@ -130,10 +206,13 @@ const styles = StyleSheet.create({
   },
   title2: {
     fontFamily: 'Epilogue-Medium',
-    fontSize: wp('4.8%'), // 18px ≈ 4.8%
+    fontSize: 18,
     color: '#4783C7',
-    marginBottom: hp('2.5%'), // 20px ≈ 2.5%
+    marginBottom: 20,
   },
+  backButton: { flexDirection: 'row', alignItems: 'center' },
+  backIcon: { width: 30, height: 30, marginRight: 5 },
+  backText: { fontSize: 17, color: '#FFFFFF' },
   inputContainer: {
     width: wp('70%'),
     backgroundColor: '#FFFFFF',
@@ -196,6 +275,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Medium',
     color: '#002B5B',
   },
+  uploadingModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadingModalContent: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  uploadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: 'Epilogue-Bold',
+    color: '#002B5B',
+  },
+  
 });
 
 export default ReportName;

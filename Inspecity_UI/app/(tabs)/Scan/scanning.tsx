@@ -1,32 +1,57 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const Scanning = () => {
+interface ScanningProps {
+  photo: string;
+}
+
+const { width, height } = Dimensions.get('window');
+
+const Scanning: React.FC<ScanningProps> = ({ photo }) => {
   const params = useLocalSearchParams();
-  // const router = useRouter();
-  const photo = Array.isArray(params.photo) ? params.photo[0] : params.photo;
+  const router = useRouter();
   const scanAnim = useRef(new Animated.Value(0)).current;
+  const [currentMessage, setCurrentMessage] = useState(0);
+
+  const messages = [
+    "Did you know? Regular inspections can uncover hidden damage long before it becomes costly.",
+    "Did you know? Homes with poor drainage are more prone to mold, rot, and foundation damage.",
+    "Did you know? Hairline cracks in drywall can be an early sign of foundation settling.",
+    "Did you know? A poorly ventilated attic can shorten your roof’s lifespan by up to 30%.",
+    "Did you know? Water stains on ceilings often point to hidden roof leaks or plumbing issues.",
+    "Did you know? Minor plumbing leaks can waste up to 10,000 gallons of water per year.",
+    "Did you know? Tree roots can crack foundations and underground pipes if planted too close.",
+    "Did you know? Replacing old weatherstripping can reduce energy bills by up to 20%.",
+    "Did you know? A sagging floor may indicate compromised joists or water damage below.",
+    "Did you know? Cracks wider than 1/4 inch in concrete may signal structural movement.",
+  ];
 
   useEffect(() => {
     // Scanning effect animation (moving up & down)
     Animated.loop(
-      Animated.sequence([
+      Animated.sequence([ 
         Animated.timing(scanAnim, {
-          toValue: hp(66.7), // 68% height
+          toValue: height * 0.68, // Move scan line down
           duration: 2000,
           useNativeDriver: true,
         }),
         Animated.timing(scanAnim, {
-          toValue: hp(1), // 1% height
+          toValue: height * 0.01, // Move scan line up
           duration: 2000,
           useNativeDriver: true,
         }),
       ])
     ).start();
-  }, [photo]);  
+
+    // Rotate through messages every 5 seconds
+    const messageInterval = setInterval(() => {
+      setCurrentMessage((prev) => (prev + 1) % messages.length);
+    }, 5000);
+
+    return () => clearInterval(messageInterval);
+  }, [photo]);
 
   return (
     <View style={styles.container}>
@@ -44,10 +69,14 @@ const Scanning = () => {
       <BlurView style={styles.rightBlur} intensity={10} tint="light" />
 
       {/* Scanning Overlay */}
-      {/* <View style={styles.overlay}>
+      <View style={styles.overlay}>
         <Text style={styles.title}>Analyzing the structures</Text>
         <Text style={styles.title}>for cracks and damages...</Text>
-      </View> */}
+        {/* Informative message box */}
+        <View style={styles.messageBox}>
+          <Text style={styles.messageText}>{messages[currentMessage]}</Text>
+        </View>
+      </View>
 
       {/* Corner Brackets */}
       <View style={styles.cornersContainer}>
@@ -69,8 +98,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#002B5B',
   },
   fullScreenImage: {
-    width: wp(100),
-    height: hp(100),
+    width: width,
+    height: height,
     resizeMode: 'cover',
   },
   topBlur: {
@@ -78,7 +107,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: hp(15),
+    height: '15%',
     zIndex: 1,
   },
   bottomBlur: {
@@ -86,57 +115,59 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: hp(15),
+    height: '15%',
     zIndex: 1,
   },
   leftBlur: {
     position: 'absolute',
-    top: hp(15),
+    top: '15%',
     left: 0,
-    bottom: hp(15),
-    width: wp(10),
+    bottom: '15%',
+    width: '10%',
     zIndex: 1,
   },
   rightBlur: {
     position: 'absolute',
-    top: hp(15),
+    top: '15%',
     right: 0,
-    bottom: hp(15),
-    width: wp(10),
+    bottom: '15%',
+    width: '10%',
     zIndex: 1,
   },
-  // overlay: {
-  //   position: 'absolute',
-  //   top: 0,
-  //   left: 0,
-  //   right: 0,
-  //   bottom: 0,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   zIndex: 2,
-  // },
-  // title: {
-  //   fontSize: wp(4.8),
-  //   fontFamily: 'Epilogue-SemiBold',
-  //   color: '#FFFFFF',
-  //   textAlign: 'center',
-  // },
-  errorText: {
-    color: '#FF5B5B',
-    fontSize: wp(4.8),
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: 'Epilogue-SemiBold',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
+  errorText: {
+    color: '#FF5B5B',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+
+  // Corner Brackets
   cornersContainer: {
     position: 'absolute',
-    top: hp(15),
-    left: wp(10),
-    width: wp(80),
-    height: hp(67.5),
+    top: '15.5%',
+    left: '10%',
+    width: '80%',
+    height: '70%',
   },
   corner: {
     position: 'absolute',
-    width: wp(20),
-    height: hp(15),
+    width: '20%',
+    height: '15%',
     borderColor: '#00A8E8',
     borderWidth: 4,
   },
@@ -164,14 +195,32 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderTopWidth: 0,
   },
+
+  // Scanning Line
   scanLine: {
     position: 'absolute',
-    top: hp(15.5),
-    left: wp(10),
-    width: wp(80),
+    top: '15.5%',
+    left: '10%',
+    width: '80%',
     height: 4,
     backgroundColor: '#00A8E8',
     opacity: 0.8,
+  },
+  messageBox: {
+    backgroundColor: 'transparent', 
+    paddingHorizontal: 24,         
+    marginTop: 30,                
+    maxWidth: '90%',              
+  },
+  messageText: {
+    fontSize: 15,              
+    fontFamily: 'Epilogue-Medium',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    lineHeight: 20,               
+    textShadowColor: 'rgba(0, 0, 0, 0.5)', 
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

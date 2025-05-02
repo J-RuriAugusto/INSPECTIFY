@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as Location from 'expo-location';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
+
 const GettingStarted4 = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
 
   // Load custom fonts
@@ -25,13 +28,13 @@ const GettingStarted4 = () => {
       Alert.alert(
         'Location Enabled',
         'You have enabled location access!',
-        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+        [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
       );
     } else {
       Alert.alert(
         'Location Denied',
         'You have denied location access.',
-        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+        [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
       );
     }
   };
@@ -40,13 +43,16 @@ const GettingStarted4 = () => {
     Alert.alert(
       'Remind Me Later',
       'You can enable location services anytime in settings.',
-      [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+      [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
     );
   };
 
 
   const handleNavigateToGetStarted5 = () => {
-    router.push('/getstarted_5'); // Navigate to the next screen
+    router.push({
+      pathname: '/getstarted_5',
+      params: { homeData },
+    });
   };
 
   const currentStep = 5; // Current progress step
