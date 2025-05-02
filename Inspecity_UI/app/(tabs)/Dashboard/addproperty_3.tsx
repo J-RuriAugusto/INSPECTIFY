@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted3 = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
   const [age, setAge] = useState(''); // Separate state for Age
-  const [height, setHeight] = useState(''); // Separate state for Height
+  const [numFloor, setNumFloor] = useState(''); // Separate state for Height
   const [lotArea, setLotArea] = useState(''); // Separate state for lot area
   const [floorArea, setFloorArea] = useState(''); // Separate state for floor area
   const [selectedHouseType, setSelectedHouseType] = useState(""); // Separate state for house type
@@ -26,10 +28,42 @@ const GettingStarted3 = () => {
     return null;
   }
 
-  const handleNavigateToGetStarted3b = () => {
-    router.push('/Dashboard/addproperty_3b');
-  };
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
 
+  const handleNavigateToGetStarted3b = () => {
+    if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
+      alert("Number of house floors must be a positive whole number.");
+      return;
+    }
+  
+    if (lotArea.trim() !== "" && (isNaN(parseFloat(lotArea)) || parseFloat(lotArea) <= 0)) {
+      alert("Estimated lot area must be a positive number.");
+      return;
+    }
+  
+    if (floorArea.trim() !== "" && (isNaN(parseFloat(floorArea)) || parseFloat(floorArea) <= 0)) {
+      alert("Estimated floor area must be a positive number.");
+      return;
+    }
+  
+    const updatedHomeData = {
+      ...parsedHomeData,
+      typeOfHouse: selectedHouseType === "others" 
+    ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+    : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+      numFloor: numFloor.trim() !== "" ? parseInt(numFloor) : null,
+      lotArea: lotArea.trim() !== "" ? parseFloat(lotArea) : null,
+      floorArea: floorArea.trim() !== "" ? parseFloat(floorArea) : null,
+    };
+  
+    router.push({
+      pathname: './addproperty_3b',
+      params: { homeData: JSON.stringify(updatedHomeData) },
+    });
+  };
+  
   const currentStep = 3;
 
   return (
@@ -54,64 +88,64 @@ const GettingStarted3 = () => {
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
         {/* Scrollable form */}
-        {/* <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled"> */}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
                 
-          <View style={styles.pickerContainer}>
-            <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-              <Picker.Item label="Type of House" value="" enabled={false} />
-              <Picker.Item label="Single-detached" value="single" />
-              <Picker.Item label="Townhouse" value="town" />
-              <Picker.Item label="Apartment" value="apartment" />
-              <Picker.Item label="Stilt house" value="stilt" />
-              <Picker.Item label="Duplex" value="duplex" />
-              <Picker.Item label="Others" value="others" />
-            </Picker>
-          </View>
+        <View style={styles.pickerContainer}>
+          <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+            <Picker.Item label="Type of House" value="" enabled={false} />
+            <Picker.Item label="Single-detached" value="single" />
+            <Picker.Item label="Townhouse" value="town" />
+            <Picker.Item label="Apartment" value="apartment" />
+            <Picker.Item label="Stilt house" value="stilt" />
+            <Picker.Item label="Duplex" value="duplex" />
+            <Picker.Item label="Others" value="others" />
+          </Picker>
+        </View>
 
-          {selectedHouseType === "others" && (
-            <TextInput
-              style={styles.textBox1}
-              placeholder="Specify other house type"
-              placeholderTextColor="#BBBBBB"
-              value={otherHouseType}
-              onChangeText={(text) => setOtherHouseType(text)}
-            />
-          )}
+        {selectedHouseType === "others" && (
+          <TextInput
+            style={styles.textBox1}
+            placeholder="Specify other house type"
+            placeholderTextColor="#BBBBBB"
+            value={otherHouseType}
+            onChangeText={(text) => setOtherHouseType(text)}
+          />
+        )}
 
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Enter the Height of the House</Text>
-            <TextInput 
-              style={styles.textBox} 
-              placeholder="(1, 2, 3, etc.)" 
-              placeholderTextColor="#BBBBBB" 
-              value={height} 
-              onChangeText={(text) => setHeight(text)} 
-            />
-          </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Enter the Height of the House</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="(1, 2, 3, etc.)" 
+            placeholderTextColor="#BBBBBB" 
+            value={numFloor} 
+            onChangeText={(text) => setNumFloor(text)} 
+          />
+        </View>
 
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>What is the estimated lot area?</Text>
-            <TextInput 
-              style={styles.textBox} 
-              placeholder="sqm" 
-              placeholderTextColor="#BBBBBB" 
-              value={lotArea} 
-              onChangeText={(text) => setLotArea(text)} 
-            />
-          </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>What is the estimated lot area?</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="sqm" 
+            placeholderTextColor="#BBBBBB" 
+            value={lotArea} 
+            onChangeText={(text) => setLotArea(text)} 
+          />
+        </View>
 
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>What is the estimated floor area?</Text>
-            <TextInput 
-              style={styles.textBox} 
-              placeholder="sqm" 
-              placeholderTextColor="#BBBBBB" 
-              value={floorArea} 
-              onChangeText={(text) => setFloorArea(text)} 
-            />
-          </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>What is the estimated floor area?</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="sqm" 
+            placeholderTextColor="#BBBBBB" 
+            value={floorArea} 
+            onChangeText={(text) => setFloorArea(text)} 
+          />
+        </View>
 
-        {/* </ScrollView> */}
+        </ScrollView>
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>Next</Text>
@@ -252,6 +286,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Archivo-Regular',
     textAlign: 'auto',
   },
+  scrollView: { width: '100%', height:'100%' },
+  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
 
   // scrollView: {
   //   width: wp('100%'),

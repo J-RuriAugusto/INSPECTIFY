@@ -5,55 +5,55 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-// import { useFonts } from 'expo-font';
+import { useSettings, defaultSettings } from './settingsContext'; // Add defaultSettings to the import
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const Settings = () => {
-    // const [fontsLoaded] = useFonts({
-    //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-    //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-    //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-    //   'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
-    // });
-  
-    // if (!fontsLoaded) {
-    //   return null;
-    // }
-  
   const navigation = useNavigation();
-
-  // Initial state
-  const initialSettings = {
-    darkMode: false,
-    language: 'English',
-    reportFormat: 'PDF',
-    autoSave: false,
-    backupLocation: null,
-  };
-
-  const [settings, setSettings] = useState(initialSettings);
-  const [backupLocation, setBackupLocation] = useState<string | null>(null);
+  const { settings, updateSettings } = useSettings();
+  const [backupLocation, setBackupLocation] = useState<string | null>(settings.backupLocation);
   const [changesMade, setChangesMade] = useState(false);
+  const [localSettings, setLocalSettings] = useState(settings);
 
   // Check for changes
   useEffect(() => {
     const isChanged =
-      settings.darkMode !== initialSettings.darkMode ||
-      settings.language !== initialSettings.language ||
-      settings.reportFormat !== initialSettings.reportFormat ||
-      settings.autoSave !== initialSettings.autoSave ||
-      settings.backupLocation !== initialSettings.backupLocation;
+      localSettings.darkMode !== settings.darkMode ||
+      localSettings.language !== settings.language ||
+      localSettings.reportFormat !== settings.reportFormat ||
+      localSettings.autoSave !== settings.autoSave ||
+      localSettings.backupLocation !== settings.backupLocation;
     setChangesMade(isChanged);
-  }, [settings]);
+  }, [localSettings, settings]);
 
-  const updateSetting = (key: string, value: any) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+  const updateLocalSetting = (key: keyof typeof localSettings, value: any) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const clearCache = () => {
-    Alert.alert('Clear Cache', 'Are you sure you want to clear cache?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', onPress: () => console.log('Cache Cleared'), style: 'destructive' },
-    ]);
+  const clearCache = async () => {
+    Alert.alert(
+      'Clear Cache',
+      'Are you sure you want to clear all app data?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear Data',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              updateSettings(defaultSettings);
+              setLocalSettings(defaultSettings);
+              router.replace('../../../getstarted_1');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear cache');
+              console.error(error);
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
   };
 
   const chooseBackupLocation = async () => {
@@ -64,7 +64,7 @@ const Settings = () => {
   
       const file = result.assets[0];
       setBackupLocation(file.uri);
-      updateSetting('backupLocation', file.uri);
+      updateLocalSetting('backupLocation', file.uri);
   
       Alert.alert('Backup Location Selected', `Your backup will be saved to:\n${file.uri}`);
     } catch (error) {
@@ -74,13 +74,14 @@ const Settings = () => {
   };  
 
   const backupData = async () => {
-    if (!backupLocation) {
+    const location = localSettings.backupLocation || backupLocation;
+    if (!location) {
       Alert.alert('Backup Error', 'Please select a backup location first.');
       return;
     }
 
     try {
-      const backupFilePath = `${backupLocation}/inspectify_backup.json`;
+      const backupFilePath = `${location}/inspectify_backup.json`;
       await FileSystem.writeAsStringAsync(backupFilePath, JSON.stringify({ data: 'Your backup data' }));
       Alert.alert('Backup Success', `Data has been backed up to:\n${backupFilePath}`);
     } catch (error) {
@@ -90,18 +91,9 @@ const Settings = () => {
   };
 
   const saveChanges = () => {
+    updateSettings(localSettings);
     Alert.alert('Settings Saved', 'Your changes have been saved successfully.');
-    
-    initialSettings.darkMode = settings.darkMode;
-    initialSettings.language = settings.language;
-    initialSettings.reportFormat = settings.reportFormat;
-    initialSettings.autoSave = settings.autoSave;
-    initialSettings.backupLocation = settings.backupLocation;
-
-    setChangesMade(false);
-
-    // Navigate back to dashboard
-    navigation.goBack(); // or navigation.navigate('Dashboard');
+    navigation.goBack();
   };
 
   return (
@@ -114,19 +106,22 @@ const Settings = () => {
 
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Dark Mode</Text>
-          <Switch value={settings.darkMode} onValueChange={() => updateSetting('darkMode', !settings.darkMode)} />
+          <Switch 
+            value={localSettings.darkMode} 
+            onValueChange={() => updateLocalSetting('darkMode', !localSettings.darkMode)} 
+          />
         </View>
 
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Language</Text>
           <Picker
-            selectedValue={settings.language}
+            selectedValue={localSettings.language}
             style={styles.picker}
-            onValueChange={(itemValue) => updateSetting('language', itemValue)}
+            onValueChange={(itemValue) => updateLocalSetting('language', itemValue)}
           >
             <Picker.Item label="English" value="English" />
-            <Picker.Item label="Spanish" value="Spanish" />
-            <Picker.Item label="French" value="French" />
+            <Picker.Item label="Tagalog" value="Tagalog" />
+            <Picker.Item label="Cebuano" value="Cebuano" />
           </Picker>
         </View>
 
@@ -136,9 +131,9 @@ const Settings = () => {
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Default Report Format</Text>
           <Picker
-            selectedValue={settings.reportFormat}
+            selectedValue={localSettings.reportFormat}
             style={styles.picker}
-            onValueChange={(itemValue) => updateSetting('reportFormat', itemValue)}
+            onValueChange={(itemValue) => updateLocalSetting('reportFormat', itemValue)}
           >
             <Picker.Item label="PDF" value="PDF" />
             <Picker.Item label="DOCX" value="DOCX" />
@@ -149,7 +144,10 @@ const Settings = () => {
 
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Auto-Save Inspections</Text>
-          <Switch value={settings.autoSave} onValueChange={() => updateSetting('autoSave', !settings.autoSave)} />
+          <Switch 
+            value={localSettings.autoSave} 
+            onValueChange={() => updateLocalSetting('autoSave', !localSettings.autoSave)} 
+          />
         </View>
 
         {/* App Management */}
@@ -186,7 +184,6 @@ const Settings = () => {
         >
           <Text style={styles.saveButtonText}>Save Changes</Text>
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );
