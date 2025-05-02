@@ -65,8 +65,8 @@ const ConcentricWaves = ({ riskLevel = 'medium', color = '#7C4DFF' }) => {
                 height: BASE_SIZE,
                 borderRadius: BASE_SIZE / 2,
                 transform: [{ scale }],
-                opacity:
-              },
+                opacity: 0.5
+              }
             ]}
           />
         );

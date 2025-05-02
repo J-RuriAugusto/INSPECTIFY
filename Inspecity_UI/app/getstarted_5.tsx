@@ -66,82 +66,82 @@ const GettingStarted5 = () => {
   );
 };
 
-const getStyles = (width: number, height: number) => StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    upperSection: {
-      flex: 1,
-      backgroundColor: '#0B417D',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    image: {
-      width: width * 1,
-      height: height * 1,
-    },
-    lowerSection: {
-      flex: 1.05,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: width * 0.05,
-    },
-    title1: {
-      fontSize: 25,
-      color: '#05173F',
-      textAlign: 'center',
-      fontFamily: 'Epilogue-Black',
-      letterSpacing: 1,
-      marginBottom: 5,
-      marginTop: height * 0.05,
-    },
-    subtitle1: {
-      fontSize: 15,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      fontFamily: 'Archivo-Regular',
-      letterSpacing: 1,
-    },
-    subtitle2: {
-      fontSize: width * 0.04,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      marginBottom: height * 0.05,
-      fontFamily: 'Archivo-Regular',
-      letterSpacing: 1,
-    },
-    progressBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginBottom: 35,
-      marginTop: -height * 0.04,
-    },
-    progressStep: {
-      width: width * 0.13,
-      height: 5,
-      borderRadius: 10,
-    },
-    progressStepActive: {
-      backgroundColor: '#0B417D',
-    },
-    progressStepInactive: {
-      backgroundColor: '#E0E0E0',
-    },
-    button: {
-      backgroundColor: '#08294E',
-      paddingVertical: 12,
-      paddingHorizontal: width * 0.25,
-      borderRadius: 30,
-      alignItems: 'center',
-      marginTop: height * 0.03,
-    },
-    buttonText: {
-      fontSize: 16,
-      color: '#FFFFFF',
-      fontFamily: 'Archivo-Bold',
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'), // 400px ~ 50% of screen height on most devices
+  },
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+  title1: {
+    fontSize: wp('6.5%'), // ~25px
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: 1,
+    marginBottom: hp('1.2%'),
+    marginTop: hp('6%'),
+  },
+  subtitle1: {
+    fontSize: wp('4%'), // ~15px
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+  },
+  subtitle2: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    marginBottom: hp('6%'),
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+  },
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('90%'),
+    marginBottom: hp('2.5%'),
+    marginTop: hp('-5%'),
+  },
+  progressStep: {
+    width: wp('13%'),
+    height: hp('0.6%'),
+    borderRadius: wp('2.5%'),
+  },
+  progressStepActive: {
+    backgroundColor: '#0B417D',
+  },
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0',
+  },
+  button: {
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('24%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginTop: hp('9%'),
+  },
+  buttonText: {
+    fontSize: wp('4.2%'),
+    color: '#FFFFFF',
+    fontFamily: 'Archivo-Bold',
+  },
+});
 
 export default GettingStarted5;
