@@ -1,55 +1,70 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as Location from 'expo-location';
-import { StyleSheet, Dimensions } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted4 = () => {
   const router = useRouter();
+
+  // Load custom fonts
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
     'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
   });
 
-  if (!fontsLoaded) return null;
-
-  const styles = getStyles(width, height);
+  if (!fontsLoaded) {
+    return null; // Show nothing until fonts are loaded
+  }
 
   const handleTurnOnLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === 'granted') {
-      Alert.alert('Location Enabled', 'You have enabled location access!', [
-        { text: 'OK', onPress: () => router.push('/getstarted_5') },
-      ]);
+      Alert.alert(
+        'Location Enabled',
+        'You have enabled location access!',
+        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+      );
     } else {
-      Alert.alert('Location Denied', 'You have denied location access.', [
-        { text: 'OK', onPress: () => router.push('/getstarted_5') },
-      ]);
+      Alert.alert(
+        'Location Denied',
+        'You have denied location access.',
+        [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+      );
     }
   };
 
   const handleSkipForNow = () => {
-    Alert.alert('Remind Me Later', 'You can enable location services anytime in settings.', [
-      { text: 'OK', onPress: () => router.push('/getstarted_5') },
-    ]);
+    Alert.alert(
+      'Remind Me Later',
+      'You can enable location services anytime in settings.',
+      [{ text: 'OK', onPress: () => router.push('/getstarted_5') }] // Navigate to the next screen
+    );
   };
 
-  const currentStep = 5;
+
+  const handleNavigateToGetStarted5 = () => {
+    router.push('/getstarted_5'); // Navigate to the next screen
+  };
+
+  const currentStep = 5; // Current progress step
 
   return (
     <View style={styles.container}>
+      {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
-          source={require('../assets/images/houseGS4.png')}
+          source={require('../assets/images/houseGS4.png')} // Path to your image
           style={styles.image}
-          resizeMode="contain"
+          resizeMode="contain" // Ensure the image fits well
         />
       </View>
+
+      {/* Lower White Section */}
       <View style={styles.lowerSection}>
+        {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
           {Array.from({ length: 6 }).map((_, index) => (
             <View
@@ -63,10 +78,9 @@ const GettingStarted4 = () => {
         </View>
 
         <Text style={styles.title1}>Enable Your Location Access</Text>
-        <Text style={styles.subtitle1}>
-          Turn on location services to find nearby hardware shops and get accurate suggestions.
-        </Text>
+        <Text style={styles.subtitle1}>Turn on location services to find nearby hardware shops and get accurate suggestions.</Text>
 
+        {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleTurnOnLocation}>
           <Text style={styles.buttonText}>Turn on Location</Text>
         </TouchableOpacity>
@@ -78,85 +92,80 @@ const GettingStarted4 = () => {
   );
 };
 
-const getStyles = (width: number, height: number) => StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    upperSection: {
-      flex: 1,
-      backgroundColor: '#0B417D',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    image: {
-      width: width * 1,
-      height: height * 1,
-    },
-    lowerSection: {
-      flex: 1.05,
-      backgroundColor: '#FFFFFF',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: width * 0.05,
-      paddingVertical: height * 0.03,
-    },
-    title1: {
-      fontSize: 25,
-      color: '#05173F',
-      textAlign: 'center',
-      fontFamily: 'Epilogue-Black',
-      letterSpacing: 1,
-      marginBottom: 5,
-    },
-    subtitle1: {
-      fontSize: 15,
-      color: '#7C7C7C',
-      textAlign: 'center',
-      fontFamily: 'Archivo-Regular',
-      letterSpacing: 1,
-      marginBottom: 5,
-    },
-    progressBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginBottom: 50,
-      marginTop: -height * 0.05,
-    },
-    progressStep: {
-      width: width * 0.13,
-      height: 5,
-      borderRadius: 10,
-    },
-    progressStepActive: {
-      backgroundColor: '#0B417D',
-    },
-    progressStepInactive: {
-      backgroundColor: '#E0E0E0',
-    },
-    button: {
-      backgroundColor: '#08294E',
-      paddingVertical: 12,
-      paddingHorizontal: width * 0.2,
-      borderRadius: 30,
-      alignItems: 'center',
-      marginBottom: 5,
-      marginTop: height * 0.05,
-    },
-    button1: {
-      backgroundColor: '#38516D',
-      paddingVertical: 12,
-      paddingHorizontal: width * 0.25,
-      borderRadius: 30,
-      alignItems: 'center',
-      marginBottom: 5,
-      marginTop: 10,
-    },
-    buttonText: {
-      fontSize: 16,
-      color: '#FFFFFF',
-      fontFamily: 'Archivo-Bold',
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+  title1: {
+    fontSize: wp('6%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: 1,
+    marginBottom: hp('1%'),
+  },
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: 1,
+    marginBottom: hp('7.5%'),
+  },
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('90%'),
+    marginBottom: hp('7.5%'),
+  },
+  progressStep: {
+    width: wp('13%'),
+    height: hp('0.6%'),
+    borderRadius: wp('2.5%'),
+  },
+  progressStepActive: {
+    backgroundColor: '#0B417D',
+  },
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0',
+  },
+  button: {
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('20%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('1%'),
+  },
+  button1: {
+    backgroundColor: '#38516D',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('24%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: wp('4.2%'),
+    color: '#FFFFFF',
+    fontFamily: 'Archivo-Bold',
+  },
+});
 
 export default GettingStarted4;

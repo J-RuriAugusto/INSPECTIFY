@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted2 = () => {
   const router = useRouter();
@@ -41,7 +42,18 @@ const GettingStarted2 = () => {
 
       {/* Lower White Section */}
       <View style={styles.lowerSection}>
-
+        {/* Custom Progress Bar */}
+        {/* <View style={styles.progressBar}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <View
+              key={index}
+              style={[ 
+                styles.progressStep, 
+                index < currentStep ? styles.progressStepActive : styles.progressStepInactive 
+              ]}
+            />
+          ))}
+        </View> */}
 
         <Text style={styles.title1}>Add New Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your</Text>
@@ -101,101 +113,102 @@ const styles = StyleSheet.create({
   },
   upperSection: {
     flex: 1,
-    backgroundColor: '#0B417D', // Blue background
+    backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: 400, // Adjust height as needed
+    width: wp('100%'),
+    height: hp('50%'),
   },
   lowerSection: {
     flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: wp('5%'),
   },
   title1: {
-    fontSize: 25,
+    fontSize: wp('6%'),
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
-    letterSpacing: 1,
-    marginBottom: 5,
-  },
-  title2: {
-    fontSize: 40,
-    color: '#2852AE',
-    textAlign: 'center',
-    marginTop: -10,
-    marginBottom: 15,
-    fontFamily: 'Epilogue-Black',
-    letterSpacing: 1.5,
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('0.4%'),
+    marginTop: hp('0.5%'),
   },
   subtitle1: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
+    letterSpacing: wp('0.25%'),
   },
   subtitle2: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: hp('1.2%'),
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
-    marginTop: -10,
+    letterSpacing: wp('0.25%'),
+    marginTop: hp('-1.2%'),
   },
   label: {
-    fontSize: 14,
+    fontSize: wp('3.7%'),
     color: '#05173F',
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: hp('0.7%'),
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
-    marginTop: -10,
+    letterSpacing: wp('0.25%'),
+    marginTop: hp('-1.2%'),
   },
-  progressBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 6,
-    marginTop: -25,
-
+  // progressBar: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   width: wp('90%'),
+  //   // marginBottom: hp('2%'),
+  //   marginTop: -hp('2.5%'),
+  // },
+  // progressStep: {
+  //   width: wp('25%'),
+  //   height: hp('0.6%'),
+  //   borderRadius: wp('3%'),
+  // },
+  // progressStepActive: {
+  //   backgroundColor: '#0B417D',
+  // },
+  // progressStepInactive: {
+  //   backgroundColor: '#E0E0E0',
+  // },
+  textBox: {
+    width: wp('80%'),
+    height: hp('4.5%'),
+    padding: wp('1%'),
+    borderRadius: wp('10%'),
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('4%'),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.2%'),
   },
-  progressStep: {
-    width: 50,
-    height: 5,
-    borderRadius: 10,
-  },
-  progressStepActive: {
-    backgroundColor: '#0B417D', // Active color
-  },
-  progressStepInactive: {
-    backgroundColor: '#E0E0E0', // Inactive color
-  },
-
-  textBox: { width: '80%', height: 35, padding: 3, borderRadius: 25, fontFamily: 'Archivo-Regular', fontSize: 15, textAlign: 'center',textAlignVertical:'center', backgroundColor: '#D9D9D9', marginBottom: 10 },
-
-
   button: {
-    backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 12,
-    paddingHorizontal: 90,
-    borderRadius: 30,
+    marginBottom: hp('1%'),
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    borderRadius: wp('8%'),
     alignItems: 'center',
-  
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: wp('4.5%'),
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
-  lowerPlaceholder: { textAlignVertical: 'bottom', paddingBottom: 5 },
+  lowerPlaceholder: {
+    textAlignVertical: 'bottom',
+    paddingBottom: hp('0.7%'),
+  },
 });
-
 
 export default GettingStarted2;

@@ -1,39 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StatusBar, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
-
-const { width, height } = Dimensions.get('window');
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const GettingStarted5 = () => {
   const router = useRouter();
+
+  // Load custom fonts
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
     'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
   });
 
-  if (!fontsLoaded) return null;
-
-  const styles = getStyles(width, height); // ✅ Use responsive styles
+  if (!fontsLoaded) {
+    return null; // Show nothing until fonts are loaded
+  }
 
   const handleNavigateToDashboard = () => {
-    router.push('/Dashboard/board');
+    router.push('/Dashboard/board'); // Navigate to the next screen
   };
 
-  const currentStep = 6;
+  const currentStep = 6; // Current progress step
 
   return (
     <View style={styles.container}>
+      {/* Hide Status Bar */}
       <StatusBar hidden={true} />
+
+      {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
-          source={require('../assets/images/houseGS5.png')}
+          source={require('../assets/images/houseGS5.png')} // Path to your image
           style={styles.image}
-          resizeMode="contain"
+          resizeMode="contain" // Ensure the image fits well
         />
       </View>
+
+      {/* Lower White Section */}
       <View style={styles.lowerSection}>
+        {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
           {Array.from({ length: 6 }).map((_, index) => (
             <View
@@ -50,6 +57,7 @@ const GettingStarted5 = () => {
         <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
         <Text style={styles.subtitle2}>inspect your home.</Text>
 
+        {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToDashboard}>
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
@@ -108,7 +116,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
       justifyContent: 'space-between',
       width: '100%',
       marginBottom: 35,
-      marginTop: -height * 0.08,
+      marginTop: -height * 0.04,
     },
     progressStep: {
       width: width * 0.13,
@@ -127,7 +135,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
       paddingHorizontal: width * 0.25,
       borderRadius: 30,
       alignItems: 'center',
-      marginTop: height * 0.08,
+      marginTop: height * 0.03,
     },
     buttonText: {
       fontSize: 16,
