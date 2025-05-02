@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const GettingStarted = () => {
+
+const GettingStarted3 = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
   const [age, setAge] = useState(''); // Separate state for Age
-  const [height, setHeight] = useState(''); // Separate state for Height
+  const [numFloor, setNumFloor] = useState(''); // Separate state for Height
   const [lotArea, setLotArea] = useState(''); // Separate state for lot area
   const [floorArea, setFloorArea] = useState(''); // Separate state for floor area
   const [selectedHouseType, setSelectedHouseType] = useState(""); // Separate state for house type
@@ -25,9 +29,42 @@ const GettingStarted = () => {
     return null;
   }
 
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
   const handleNavigateToGetStarted3b = () => {
-    router.push('/getstarted_3b');
+    if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
+      alert("Number of house floors must be a positive whole number.");
+      return;
+    }
+  
+    if (lotArea.trim() !== "" && (isNaN(parseFloat(lotArea)) || parseFloat(lotArea) <= 0)) {
+      alert("Estimated lot area must be a positive number.");
+      return;
+    }
+  
+    if (floorArea.trim() !== "" && (isNaN(parseFloat(floorArea)) || parseFloat(floorArea) <= 0)) {
+      alert("Estimated floor area must be a positive number.");
+      return;
+    }
+  
+    const updatedHomeData = {
+      ...parsedHomeData,
+      typeOfHouse: selectedHouseType === "others" 
+    ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+    : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+      numFloor: numFloor.trim() !== "" ? parseInt(numFloor) : null,
+      lotArea: lotArea.trim() !== "" ? parseFloat(lotArea) : null,
+      floorArea: floorArea.trim() !== "" ? parseFloat(floorArea) : null,
+    };
+  
+    router.push({
+      pathname: "/getstarted_3b",
+      params: { homeData: JSON.stringify(updatedHomeData) },
+    });
   };
+  
 
   const currentStep = 3;
 
@@ -78,13 +115,13 @@ const GettingStarted = () => {
         )}
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>Enter the Height of the House</Text>
+          <Text style={styles.label}>Number of house floors</Text>
           <TextInput 
             style={styles.textBox} 
             placeholder="(1, 2, 3, etc.)" 
             placeholderTextColor="#BBBBBB" 
-            value={height} 
-            onChangeText={(text) => setHeight(text)} 
+            value={numFloor} 
+            onChangeText={(text) => setNumFloor(text)} 
           />
         </View>
 
@@ -122,26 +159,149 @@ const GettingStarted = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  upperSection: { flex: 1, backgroundColor: '#0B417D', justifyContent: 'center', alignItems: 'center' },
-  image: { width: '100%', height: 400 },
-  lowerSection: { flex: 1.05, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title1: { fontSize: 23, color: '#05173F', textAlign: 'center', fontFamily: 'Epilogue-Black', letterSpacing: 1, marginBottom: 3, marginTop: -12 },
-  subtitle1: { fontSize: 15, color: '#7C7C7C', textAlign: 'center', fontFamily: 'Archivo-Regular', letterSpacing: 1, marginBottom: 10 },
-  progressBar: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 },
-  progressStep: { width: 50, height: 5, borderRadius: 10 },
-  progressStepActive: { backgroundColor: '#0B417D' },
-  progressStepInactive: { backgroundColor: '#E0E0E0' },
-  textBox1: { width: '80%', padding: 10, borderRadius: 25, backgroundColor: '#D9D9D9', marginBottom: 10 },
-  textBox: { width: '40%', padding: 10, borderRadius: 25, fontFamily: 'Archivo-Regular', fontSize: 13, textAlign: 'center',textAlignVertical:'center', backgroundColor: '#D9D9D9', marginLeft:10 },
-  pickerContainer: { width: '80%', backgroundColor: '#D9D9D9', borderRadius: 25, marginBottom: 15 },
-  picker: { height: 55, fontSize: 12, color: '#05173F', textAlign: 'center', textAlignVertical:'top' },
-  button: {width:'70%', height: '12%', backgroundColor: '#08294E', padding: 10, borderRadius: 30, alignItems: 'center', marginBottom: 20, marginHorizontal: 75 },
-  buttonText: { fontSize: 18, color: '#FFFFFF', fontFamily: 'Archivo-Bold' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', marginBottom: 10, marginLeft: -45 },
-  label: { fontSize: 14, color: '#05173F', fontFamily: 'Archivo-Regular', textAlign: 'auto' },
+
+  upperSection: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+
+  lowerSection: {
+    flex: 1.05,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: wp('5%'),
+  },
+
+  title1: {
+    fontSize: wp('6%'),
+    color: '#05173F',
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Black',
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('0.4%'),
+    // marginTop: hp('-1.5%'),
+  },
+
+  subtitle1: {
+    fontSize: wp('4%'),
+    color: '#7C7C7C',
+    textAlign: 'center',
+    fontFamily: 'Archivo-Regular',
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('1.2%'),
+  },
+
+  progressBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('90%'),
+    marginBottom: hp('1%'),
+    // marginTop: -hp('2.5%'),
+  },
+
+  progressStep: {
+    width: wp('12%'),
+    height: hp('0.6%'),
+    borderRadius: wp('3%'),
+  },
+
+  progressStepActive: {
+    backgroundColor: '#0B417D',
+  },
+
+  progressStepInactive: {
+    backgroundColor: '#E0E0E0',
+  },
+
+  textBox1: {
+    width: wp('80%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.2%'),
+  },
+
+  textBox: {
+    width: wp('30%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: '#D9D9D9',
+    marginLeft: wp('2.5%'),
+  },
+
+  pickerContainer: {
+    width: wp('80%'),
+    backgroundColor: '#D9D9D9',
+    borderRadius: wp('10%'),
+    marginBottom: hp('1.8%'),
+  },
+
+  picker: {
+    height: hp('7%'),
+    fontSize: wp('3%'),
+    color: '#05173F',
+    textAlign: 'center',
+    textAlignVertical: 'top',
+  },
+
+  button: {
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
+    padding: wp('2.5%'),
+    borderRadius: wp('8%'),
+    alignItems: 'center',
+    marginBottom: hp('2.5%'),
+  },
+
+  buttonText: {
+    fontSize: wp('4.5%'),
+    color: '#FFFFFF',
+    fontFamily: 'Archivo-Bold',
+  },
+
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: wp('80%'),
+    marginBottom: hp('1.2%'),
+    marginLeft: wp('-11%'),
+    paddingHorizontal: wp('3%'),
+  },
+
+  label: {
+    fontSize: wp('3.7%'),
+    color: '#05173F',
+    fontFamily: 'Archivo-Regular',
+    textAlign: 'auto',
+  },
   scrollView: { width: '100%' },
   scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
-  
+
+  // scrollView: {
+  //   width: wp('100%'),
+  // },
+
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   alignItems: 'center',
+  //   paddingBottom: hp('6%'),
+  //   backgroundColor: '#000',
+  //   paddingHorizontal: wp('5%'),
+  // },
 });
 
-export default GettingStarted;
+export default GettingStarted3;

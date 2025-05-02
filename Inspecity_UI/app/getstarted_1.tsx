@@ -1,12 +1,30 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
+import React, { useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
-
-const GettingStarted = () => {
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useFocusEffect } from '@react-navigation/native';
+const GettingStarted1 = () => {
   const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction
+      );
+
+      return () => backHandler.remove();
+    }, [])
+  );
+
 
   // Load custom fonts
   const [fontsLoaded] = useFonts({
@@ -82,83 +100,83 @@ const styles = StyleSheet.create({
   },
   upperSection: {
     flex: 1,
-    backgroundColor: '#0B417D', // Blue background
+    backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: 400, // Adjust height as needed
+    width: wp('100%'),
+    height: hp('50%'),
   },
   lowerSection: {
     flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: wp('5%'),
   },
   title1: {
-    fontSize: 30,
+    fontSize: wp('7%'),
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
-    letterSpacing: 1,
+    letterSpacing: wp('0.25%'),
   },
   title2: {
-    fontSize: 50,
+    fontSize: wp('11%'),
     color: '#2852AE',
     textAlign: 'center',
-    marginTop: -10,
-    marginBottom: 15,
+    marginTop: hp('-1.2%'),
+    marginBottom: hp('1.8%'),
     fontFamily: 'Epilogue-Black',
-    letterSpacing: 1.5,
+    letterSpacing: wp('0.4%'),
   },
   subtitle1: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
+    letterSpacing: wp('0.3%'),
   },
   subtitle2: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: hp('2.5%'),
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
+    letterSpacing: wp('0.3%'),
   },
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 50,
-    marginTop: -45,
+    width: wp('90%'),
+    marginBottom: hp('8%'),
+    marginTop: -hp('8%'),
   },
   progressStep: {
-    width: 50,
-    height: 5,
-    borderRadius: 10,
+    width: wp('12%'),
+    height: hp('0.6%'),
+    borderRadius: wp('3%'),
   },
   progressStepActive: {
-    backgroundColor: '#0B417D', // Active color
+    backgroundColor: '#0B417D',
   },
   progressStepInactive: {
-    backgroundColor: '#E0E0E0', // Inactive color
+    backgroundColor: '#E0E0E0',
   },
   button: {
-    backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 12,
-    paddingHorizontal: 90,
-    borderRadius: 30,
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    borderRadius: wp('8%'),
     alignItems: 'center',
-    marginTop: 50
+    marginTop: hp('6%'),
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: wp('4.5%'),
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
 });
 
-export default GettingStarted;
+export default GettingStarted1;

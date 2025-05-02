@@ -8,20 +8,28 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.Inspecity_UI",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCjrTBgOdlHHmzh1yf7v_EAo29uytUwOCU"
+        }
+      }
+    },
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.anonymous.Inspecity_UI"
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyCjrTBgOdlHHmzh1yf7v_EAo29uytUwOCU"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -35,5 +43,6 @@
     "experiments": {
       "typedRoutes": true
     }
+    
   }
 }
