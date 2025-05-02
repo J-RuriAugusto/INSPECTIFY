@@ -108,7 +108,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
       justifyContent: 'space-between',
       width: '100%',
       marginBottom: 35,
-      marginTop: -height * 0.04,
+      marginTop: -height * 0.08,
     },
     progressStep: {
       width: width * 0.13,
@@ -127,7 +127,7 @@ const getStyles = (width: number, height: number) => StyleSheet.create({
       paddingHorizontal: width * 0.25,
       borderRadius: 30,
       alignItems: 'center',
-      marginTop: height * 0.03,
+      marginTop: height * 0.08,
     },
     buttonText: {
       fontSize: 16,

@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     width: wp('8%'),
-    height: wp('8%'),
+    height: wp('8.5%'),
   },
   title1: {
     fontSize: wp('6.5%'),
@@ -177,9 +177,9 @@ const styles = StyleSheet.create({
   },
   shopImage: {
     width: wp('30%'),
-    height: wp('30%'),
+    height: wp('33%'),
     borderRadius: wp('3%'),
-    marginHorizontal: wp('2.5%'),
+    marginHorizontal: wp('2.0%'),
     marginBottom: hp('10%'),
   },
   reportsContainer: {
