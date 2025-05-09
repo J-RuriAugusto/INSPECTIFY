@@ -7,9 +7,11 @@ import Modal from 'react-native-modal';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import HomeDetails from '../../../constants/HomeDetails'
+import { useTranslation } from '../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportName = () => {
+  const { t } = useTranslation();
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -115,16 +117,16 @@ const ReportName = () => {
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{t('BACK')}</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.title1}>NAME YOUR REPORT</Text>
-      <Text style={styles.title2}>Enter a report name</Text>
+      <Text style={styles.title1}>{t('NAME_YOUR_REPORT')}</Text>
+      <Text style={styles.title2}>{t('ENTER_REPORT_NAME')}</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Report Name"
+          placeholder={t('ENTER_REPORT_NAME')}
           placeholderTextColor="#A0A0A0"
           onChangeText={setReportName}
           value={reportName}
@@ -132,7 +134,7 @@ const ReportName = () => {
       </View>
 
       <TouchableOpacity style={styles.nextButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.nextButtonText}>Next</Text>
+        <Text style={styles.nextButtonText}>{t('NEXT')}</Text>
       </TouchableOpacity>
 
       <Modal 
@@ -141,18 +143,18 @@ const ReportName = () => {
         style={styles.modal}
       >
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Capture Image</Text>
+          <Text style={styles.modalTitle}>{t('CAPTURE_IMAGE')}</Text>
           
           <TouchableOpacity style={styles.modalButton} onPress={takePhoto}>
-            <Text style={styles.modalButtonText}>Take a Photo</Text>
+            <Text style={styles.modalButtonText}>{t('TAKE_PHOTO')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.modalButton} onPress={pickImage}>
-            <Text style={styles.modalButtonText}>Pick from Gallery</Text>
+            <Text style={styles.modalButtonText}>{t('PICK_GALLERY')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>{t('CLOSE')}</Text>
           </TouchableOpacity>
         </View>
       </Modal>

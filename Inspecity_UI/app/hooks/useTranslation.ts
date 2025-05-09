@@ -1,0 +1,27 @@
+import { useSettings } from '../(tabs)/Dashboard/settingsContext'
+import en from '../locales/en'
+import tgl from '../locales/tl';
+import ceb from '../locales/ceb';
+
+const translations: Record<string, any> = {
+  English: en,
+  Tagalog: tgl,
+  Cebuano: ceb,
+};
+
+export const useTranslation = () => {
+    const { settings } = useSettings();
+    
+    const t = (key: string): string => {
+      const language = settings.language || 'English';
+      return translations[language]?.[key] || translations['English'][key] || key;
+    };
+  
+    const translateMessages = (): string[] => {
+      const language = settings.language || 'English';
+      return translations[language]?.HOME_TIPS || 
+             translations['English'].HOME_TIPS;
+    };
+  
+    return { t, translateMessages };
+  };

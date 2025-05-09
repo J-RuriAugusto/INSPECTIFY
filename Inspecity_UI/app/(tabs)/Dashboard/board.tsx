@@ -10,6 +10,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import HomeDetails from '../../../constants/HomeDetails'
 import { Link } from 'expo-router';
 import NetInfo from '@react-native-community/netinfo';
+import { useTranslation } from '../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 interface Report {
@@ -18,6 +19,7 @@ interface Report {
 }
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = React.useState('');
   const userId = useUserID();
   const [houseName, setHouseName] = useState('NAME OF HOUSE');
@@ -37,10 +39,10 @@ const Dashboard = () => {
     const unsubscribe = NetInfo.addEventListener(state => {
       if (!state.isConnected) {
         Alert.alert(
-          "No Internet Connection",
-          "Please check your internet connection and try again.",
+          t('NO_INTERNET_TITLE'),
+          t('NO_INTERNET_MESSAGE'),
           [
-            { text: "OK", onPress: () => BackHandler.exitApp() }
+            { text: t('OK'), onPress: () => BackHandler.exitApp() }
           ]
         );
       }
@@ -117,7 +119,7 @@ const Dashboard = () => {
   
       const data = await response.json();
       console.log(`default home data: ${JSON.stringify(data, null, 2)}`);
-      setHouseName(data.home_name && data.home_name.trim() ? data.home_name : "NAME OF HOUSE");
+      setHouseName(data.home_name && data.home_name.trim() ? data.home_name : t('HOUSE_NAME_PLACEHOLDER'));
       HomeDetails.setHomeId(data.home_id);
   
       if (data.latitude && data.longitude) {
@@ -147,7 +149,7 @@ const Dashboard = () => {
           setLocation(`${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`);
         }
       } else {
-        setLocation("LOCATION");
+        setLocation(t('LOCATION_PLACEHOLDER'));
       }
     } catch (error) {
       let errorMessage = "Backend is not accessible.";
@@ -155,9 +157,9 @@ const Dashboard = () => {
         errorMessage = error.message;
       }
       console.log("Error fetching house details:", errorMessage);
-      Alert.alert("Error fetching house details", errorMessage);
-      setHouseName("NAME OF HOUSE");
-      setLocation("LOCATION");
+      Alert.alert(t('ERROR_FETCHING_HOUSE'), errorMessage);
+      setHouseName(t('HOUSE_NAME_PLACEHOLDER'));
+      setLocation(t('LOCATION_PLACEHOLDER'));
     }
   };
   
@@ -178,7 +180,7 @@ const Dashboard = () => {
       const data = await response.json();
       return data.reports;
     } catch (error) {
-      Alert.alert("Error fetching report titles.");
+      Alert.alert(t('ERROR_FETCHING_REPORTS'));
       return [];
     }
   };
@@ -252,14 +254,14 @@ const Dashboard = () => {
         {/* Search Bar */}
         <TextInput
           style={styles.searchBar}
-          placeholder="Search here..."
+          placeholder={t('SEARCH_PLACEHOLDER')}
           placeholderTextColor="#AFAFAF"
           value={search}
           onChangeText={setSearch}
         />
 
         {/* Saved Shops (Horizontal Scroll) */}
-        <Text style={styles.title3}>Saved Shops</Text>
+        <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
         <FlatList
           data={savedShops}
           horizontal
@@ -273,12 +275,12 @@ const Dashboard = () => {
         />
 
         {/* Reports Section (Vertical Scroll) */}
-        <Text style={styles.title4}>Reports</Text>
+        <Text style={styles.title4}>{t('REPORTS')}</Text>
                 <View style={{ flex: 1, backgroundColor: 'FFFFFF' }}>
                   <ScrollView contentContainerStyle={styles.reportsContainer}>
                     {reportsTitleID.length === 0 ? (
                       <View style={styles.noReportsContainer}>
-                        <Text style={styles.noReportsText}>No reports yet</Text>
+                        <Text style={styles.noReportsText}>{t('NO_REPORTS')}</Text>
                       </View>
                     ) : (
                       reportsTitleID.map((report) => (
@@ -292,7 +294,7 @@ const Dashboard = () => {
                               source={require('../../../assets/images/report_icon.png')} 
                               style={styles.reportIcon}
                             />
-                            <Text style={styles.reportText}>{report.report_name}</Text>
+                            <Text style={styles.reportText}>{report.report_name || t('UNTITLED')}</Text>
                           </View>
                         </TouchableOpacity>
                       ))
