@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },  
   questionText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: width * 0.09,
+    fontSize: 25,
     color: '#030F1C',
     textAlign: 'center',
   },
