@@ -38,7 +38,8 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/earthquake-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>EARTHQUAKE</Text>
+            <Text style={styles.buttonText}>EARTH-</Text>
+            <Text style={styles.buttonText2}>QUAKE</Text>
           </TouchableOpacity>
         </Link>
       </View>
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   title2: {
-    fontSize: wp('4.8%'), // replaces 18px
+    fontSize: wp('5%'), // replaces 18px
     color: '#4783C7',
     fontFamily: 'Epilogue-Medium',
     marginBottom: hp('6%'), // replaces 40px
@@ -111,6 +112,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Black',
     color: '#FFFFFF',
     marginTop: hp('1.2%'), // replaces 10px
+    textAlign: 'center',
+  },
+  buttonText2: {
+    fontSize: wp('6.5%'), // replaces 25px
+    fontFamily: 'Epilogue-Black',
+    color: '#FFFFFF',
+    marginTop: hp('-0.9%'), // replaces 10px
     textAlign: 'center',
   },
   icon: {

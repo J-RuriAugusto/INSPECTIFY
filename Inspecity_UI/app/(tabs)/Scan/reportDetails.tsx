@@ -9,9 +9,11 @@ import * as FileSystem from 'expo-file-system';
 import * as Print from 'expo-print';
 import ImageView from 'react-native-image-viewing';
 import { Asset } from 'expo-asset';
+import { useTranslation } from '../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportDetails = () => {
+  const { t } = useTranslation();
   const params = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const router = useRouter();
@@ -45,16 +47,16 @@ const ReportDetails = () => {
       );
   
       if (response.status === 200) {
-        Alert.alert("Success", "Report deleted successfully");
+        Alert.alert(t('SUCCESS'), t('DELETED_REPORT_SUCCESSFULLY'));
         setReportModalVisible(false);
         // router.replace('../board/dashboard'); // Navigate back after deletion
         navigation.goBack();
       } else {
-        Alert.alert("Error", "Failed to delete report");
+        Alert.alert(t('ERROR'), t('FAILED_REPORT_DELETE'));
       }
     } catch (error) {
       console.error("Error deleting report:", error);
-      Alert.alert("Error", "An error occurred while deleting the report");
+      Alert.alert(t('ERROR'), t('DELETE_REPORT_ERROR'));
     }
   };
 
@@ -82,6 +84,7 @@ const ReportDetails = () => {
     }, [reportID])
   );
 
+  // Update the fetchReportDetails function
   const fetchReportDetails = async (reportId:number) => {
     try {
       const response = await axios.get(`https://flask-railway-sample-production.up.railway.app/reports/${reportId}`, {
@@ -93,16 +96,20 @@ const ReportDetails = () => {
       if (response.data) {
         setReportName(response.data.report_name)
         setAnnotatedImage(response.data.annotated_image);
-        setCondition(response.data.condition);
-        setMaterial(response.data.material);
+        setCondition(t(response.data.condition) || response.data.condition);
+        setMaterial(t(response.data.material) || response.data.material);
         setMaterialAge(response.data.material_age);
-        setRecommendations(response.data.recommendations);
-        setDamageTypes(response.data.damage_types || []);
+        setRecommendations(t(response.data.recommendations) || response.data.recommendations);
+        setDamageTypes(
+          response.data.damage_types 
+            ? response.data.damage_types.map((damage: string) => t(damage) || damage)
+            : []
+        );
         setDateCreated(response.data.date_created);
       }
     } catch (error) {
       console.error('Error fetching report details: ', error);
-      Alert.alert('Error', 'Failed to fetch report details');
+      Alert.alert(t('ERROR'), t('FAILED_FETCH_REPORT'));
     }
   };
 
@@ -122,13 +129,13 @@ const ReportDetails = () => {
       }
     } catch (error) {
       console.error('Error fetching notes: ', error);
-      Alert.alert('Error', 'Failed to fetch notes');
+      Alert.alert(t('ERROR'), t('FAILED_FETCH_NOTES'));
     }
   };
 
   const updateNote = async () => {
     if (!reportID) {
-      Alert.alert("Error", "Report ID is missing.");
+      Alert.alert(t('ERROR'), t('MISSING_REPORT_ID'));
       return;
     }
 
@@ -145,21 +152,21 @@ const ReportDetails = () => {
       );
 
       if (response.status === 200) {
-        Alert.alert("Success", "Note updated successfully");
+        Alert.alert(t('SUCCESS'), t('UPDATED_NOTE_SUCCESSFULLY'));
         setEditNoteModalVisible(false);
       } else {
-        Alert.alert("Error", "Failed to update note");
+        Alert.alert(t('ERROR'), t('FAILED_NOTE_UPDATE'));
       }
     } catch (error) {
       console.error("Error updating note:", error);
-      Alert.alert("Error", "An error occurred while updating the note");
+      Alert.alert(t('ERROR'), t('ERROR_UPDATING_NOTE'));
     }
   };
 
   const shareReportAsPDF = async () => {
       try {
         if (!(await Sharing.isAvailableAsync())) {
-          alert("Sharing is not available on this device");
+          alert(t('UNAVAILABLE_SHARING'));
           return;
         }
     
@@ -173,7 +180,7 @@ const ReportDetails = () => {
         
         const issuesHTML = processedDamageTypes.length > 0 
           ? `<ul>${processedDamageTypes.map(issue => `<li>${escapeHTML(issue)}</li>`).join('')}</ul>`
-          : '<p>No issues detected</p>';
+          : `<p>${t('NO_ISSUES')}</p>`;
         
         // Split recommendations into an array if it's a string
         const processedRecommendations = recommendations 
@@ -182,7 +189,7 @@ const ReportDetails = () => {
         
         const recommendationsHTML = processedRecommendations.length > 0
           ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
-          : '<p>No recommendations available</p>';
+          : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
         // Format dates properly
         const currentDate = new Date();
         const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -208,7 +215,7 @@ const ReportDetails = () => {
             <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Inspectify Hazard Assessment Report</title>
+              <title>${t('REPORT_HAZARD_TITLE')}</title>
               <style>
                 body { 
                   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -292,37 +299,37 @@ const ReportDetails = () => {
               <div class="header">
                 <img src="${logoBase64}" alt="Inspectify Logo" />
                 <div class="header-text">
-                  <h1>Inspectify Structural Assessment Report</h1>
-                  <p>Comprehensive structural assessment report</p>
+                  <h1>${t('REPORT_HAZARD_TITLE')}</h1>
+                  <p>${t('COMPREHENSIVE ASSESSMENT')}</p>
                 </div>
               </div>
     
               <div class="meta">
-                <p><strong>Report For:</strong> ${escapeHTML(reportName || 'Living Room - Left Wall')}</p>
-                <p><strong>Date:</strong> ${formattedReportDate}</p>
-                <p><strong>Location:</strong> University of the Philippines</p>
-                <p><strong>Coordinates:</strong> 123.90467, 10.41196</p>
+                <p><strong>${t('REPORT_FOR')}</strong> ${escapeHTML(reportName || 'Untitled')}</p>
+                <p><strong>${t('DATE')}</strong> ${formattedReportDate}</p>
+                <p><strong>${t('LOCATION_S')}</strong> University of the Philippines</p>
+                <p><strong>${t('COORDINATES')}</strong> 123.90467, 10.41196</p>
               </div>
     
-              <h2>Condition</h2>
-              <p>${escapeHTML(condition || 'No condition specified')} ${materialAge ? `(Age: ${escapeHTML(materialAge)})` : ''}</p>
+              <h2>${t('OVERALL_CONDITION')}</h2>
+              <p>${escapeHTML(condition || 'No condition specified')} ${materialAge ? `(${t('Age')}: ${escapeHTML(materialAge)})` : ''}</p>
     
-              <h2>Detected Issues</h2>
+              <h2>${t('DETECTED_ISSUES')}</h2>
               ${issuesHTML}
     
-              <h2>Recommendations</h2>
+              <h2>${t('RECOMMENDATIONS')}</h2>
               ${recommendationsHTML}
     
-              <h2>Notes</h2>
-              <p>${escapeHTML(notes || 'No notes added.')}</p>
+              <h2>${t('NOTES')}</h2>
+              <p>${escapeHTML(notes || t('NO_NOTES'))}</p>
     
-              <h2>Scanned Image</h2>
+              <h2>${t('SCANNED_IMAGE')}</h2>
               <div class="image-container">
-                ${annotatedImage ? `<img src="${annotatedImage}" alt="Annotated scan of the assessed area" />` : '<p>No image available</p>'}
+                ${annotatedImage ? `<img src="${annotatedImage}" alt=${t('ANNOTATED_SCAN')} />` : `<p>${t('NO_IMAGE_AVAILABLE')}</p>`}
               </div>
     
               <div class="footer">
-                <p>This report was generated automatically by Inspectify. For official documentation, please consult a licensed structural engineer.</p>
+                <p>${t('GENERATED_REPORT_DISCLAIMER')}</p>
                 <p>© ${currentDate.getFullYear()} Inspectify. All rights reserved.</p>
               </div>
             </body>
@@ -343,8 +350,8 @@ const ReportDetails = () => {
         });
       } catch (error) {
         console.error("Error generating PDF:", error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        alert(`Failed to generate the PDF report: ${errorMessage}`);
+        const errorMessage = error instanceof Error ? error.message : t('UNKNOWN_ERROR');
+        alert(`${t('PDF_ERROR')}: ${errorMessage}`);
       }
     };
   
@@ -370,13 +377,13 @@ const ReportDetails = () => {
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
               <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-              <Text style={styles.backText}>Back</Text>
+              <Text style={styles.backText}>{t('BACK')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.shareButton} onPress={shareReportAsPDF}>
               <Image source={require('../../../assets/images/share-icon.png')} style={styles.shareIcon} />
             </TouchableOpacity>
-          </View>
-          <Text style={styles.title}>Fetching Details</Text>
+          </View> 
+          <Text style={styles.title}>{t('FETCHING_DETAILS')}</Text>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
           </TouchableOpacity>
@@ -393,7 +400,7 @@ const ReportDetails = () => {
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-            <Text style={styles.backText}>Back</Text>
+            <Text style={styles.backText}>{t('BACK')}</Text>
           </TouchableOpacity>
 
           {/* Save/Delete Report Button */}
@@ -417,61 +424,61 @@ const ReportDetails = () => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>
-                {reportName ? reportName : "Living Room - Left Wall"}
+                {reportName ? reportName : t('UNTITLED')}
               </Text>
-              <Text style={styles.subtitle}>{dateCreated || 'Loading date...'}</Text>
+              <Text style={styles.subtitle}>{dateCreated || t('LOADING_DATE')}</Text>
   
               {/* Captured Image from Camera */}
               <View style={styles.imageWrapper}>
                 <TouchableOpacity onPress={() => setImageModalVisible(true)}>
                   <Image source={{ uri: annotatedImage }} style={styles.capturedImage} />
                 </TouchableOpacity>
-                <Text style={styles.scannedImageText}>Scanned Image</Text>
+                <Text style={styles.scannedImageText}>{t('SCANNED_IMAGE')}</Text>
               </View>
 
                 {/* Condition Details */}
                 <View style={styles.conditionWrapper}>
-                  <Text style={styles.conditionText}>Overall Condition:</Text>
+                  <Text style={styles.conditionText}>{t('OVERALL_CONDITION')}</Text>
                   <Text style={styles.conditionBadge}>{condition}</Text>
                   <View style={styles.rowContainer}>
-                    <Text style={styles.ageText}>Age:</Text>
+                    <Text style={styles.ageText}>{t('AGE')}</Text>
                     <Text style={styles.ageNumText}>
-                      {materialAge != null ? `${materialAge} years` : "N/A"}
+                      {materialAge != null ? `${materialAge} ${t('YEARS')}` : "N/A"}
                     </Text>
                   </View>
                 </View>
 
   
               {/* Detected Issues */}
-              <Text style={styles.sectionTitle}>Detected Issues:</Text>
+              <Text style={styles.sectionTitle}>{t('DETECTED_ISSUES_2')}</Text>
               {damageTypes.map((damage, index) => (
                 <Text key={index} style={styles.detailText}>• {damage}</Text>
               ))}
 
 
-              <Text style={styles.sectionTitle}>Material:</Text>
+              <Text style={styles.sectionTitle}>{t('MATERIAL')}</Text>
               <View style={styles.rowContainer}>
                 <Text style={styles.concText}>• {material} </Text>
               </View>
   
-              <Text style={styles.sectionTitle}>Recommendations:</Text>
+              <Text style={styles.sectionTitle}>{t('RECOMMENDATIONS')}</Text>
               <Text style={styles.detailText}>• {recommendations}</Text>
               <TouchableOpacity 
                 style={styles.shopButton} 
                 onPress={() => router.push('/(tabs)/Shops')}
               >
-                <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
+                <Text style={styles.shopButtonText}>{t('FIND_SHOPS')}</Text>
               </TouchableOpacity>
   
               <View style={styles.rowContainer}>
-                <Text style={styles.sectionTitle}>Notes</Text>
+                <Text style={styles.sectionTitle}>{t('NOTES')}</Text>
                 <TouchableOpacity style={styles.editButton} onPress={() => setEditNoteModalVisible(true)}>
-                  <Text style={styles.editButtonText}>Edit Note</Text>
+                  <Text style={styles.editButtonText}>{t('EDIT_NOTE')}</Text>
                 </TouchableOpacity>
               </View>
                 <TextInput
                   style={styles.notesInput}
-                  placeholder={notes ? notes : "Click edit note to add/edit a note."}
+                  placeholder={notes ? notes : t('CLICK_EDIT')}
                   placeholderTextColor="#A0A0A0"
                   value={notes}
                   editable={false}
@@ -491,7 +498,7 @@ const ReportDetails = () => {
           <TouchableWithoutFeedback onPress={() => setReportModalVisible(false)}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Manage Report</Text>
+                <Text style={styles.modalTitle}>{t('MANAGE_REPORT')}</Text>
 
                 {/* Delete Report Button */}
                 <TouchableOpacity 
@@ -501,7 +508,7 @@ const ReportDetails = () => {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.modalButtonText}>Delete Report</Text>
+                  <Text style={styles.modalButtonText}>{t('DELETE_REPORT')}</Text>
                 </TouchableOpacity>
 
                 {/* Close Button */}
@@ -510,7 +517,7 @@ const ReportDetails = () => {
                   onPress={() => setReportModalVisible(false)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Text style={styles.closeButtonText}>{t('CLOSE')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -539,13 +546,13 @@ const ReportDetails = () => {
             </TouchableOpacity>
 
             <View style={styles.modalEditContent}>
-              <Text style={styles.modalEditTitle}>Edit Note</Text>
+              <Text style={styles.modalEditTitle}>{t('EDIT_NOTE')}</Text>
               
               <TextInput
                 style={styles.editNotesInput}
                 value={notes} 
                 onChangeText={setNotes}
-                placeholder="Enter your note here."
+                placeholder={t('EDIT_NOTE_HERE')}
                 placeholderTextColor="#A0A0A0"
                 multiline
               />
@@ -554,7 +561,7 @@ const ReportDetails = () => {
                 style={styles.saveButton} 
                 onPress={updateNote}
               >
-                <Text style={styles.saveButtonText}>Save Note</Text>
+                <Text style={styles.saveButtonText}>{t('SAVE_NOTE')}</Text>
               </TouchableOpacity>
             </View>
           </View>
