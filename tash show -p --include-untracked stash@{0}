@@ -1,0 +1,165 @@
+[1mdiff --git a/Inspecity_UI/app/(tabs)/Dashboard/settingsContext.tsx b/Inspecity_UI/app/(tabs)/Dashboard/settingsContext.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0ca2353[m
+[1m--- /dev/null[m
+[1m+++ b/Inspecity_UI/app/(tabs)/Dashboard/settingsContext.tsx[m
+[36m@@ -0,0 +1,89 @@[m
+[32m+[m[32mimport React, { createContext, useContext, useEffect, useState } from 'react';[m
+[32m+[m[32mimport AsyncStorage from '@react-native-async-storage/async-storage';[m
+[32m+[m
+[32m+[m[32m// Define the settings type[m
+[32m+[m[32mexport type SettingsType = {[m
+[32m+[m[32m  darkMode: boolean;[m
+[32m+[m[32m  language: string;[m
+[32m+[m[32m  reportFormat: string;[m
+[32m+[m[32m  autoSave: boolean;[m
+[32m+[m[32m  backupLocation: string | null;[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32m// Corrected - single declaration with export[m
+[32m+[m[32mexport const defaultSettings: SettingsType = {[m
+[32m+[m[32m  darkMode: false,[m
+[32m+[m[32m  language: 'English',[m
+[32m+[m[32m  reportFormat: 'PDF',[m
+[32m+[m[32m  autoSave: true,[m
+[32m+[m[32m  backupLocation: null,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32m// Create context[m
+[32m+[m[32mconst SettingsContext = createContext<{[m
+[32m+[m[32m  settings: SettingsType;[m
+[32m+[m[32m  updateSettings: (newSettings: Partial<SettingsType>) => void;[m
+[32m+[m[32m  resetSettings: () => void;[m
+[32m+[m[32m}>({[m
+[32m+[m[32m  settings: defaultSettings,[m
+[32m+[m[32m  updateSettings: () => {},[m
+[32m+[m[32m  resetSettings: () => {},[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32m// Settings provider component[m
+[32m+[m[32mexport const SettingsProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {[m
+[32m+[m[32m  const [settings, setSettings] = useState<SettingsType>(defaultSettings);[m
+[32m+[m[32m  const [isLoaded, setIsLoaded] = useState(false);[m
+[32m+[m
+[32m+[m[32m  // Load settings from storage on initial render[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    const loadSettings = async () => {[m
+[32m+[m[32m      try {[m
+[32m+[m[32m        const savedSettings = await AsyncStorage.getItem('@settings');[m
+[32m+[m[32m        if (savedSettings) {[m
+[32m+[m[32m          setSettings({ ...defaultSettings, ...JSON.parse(savedSettings) });[m
+[32m+[m[32m        }[m
+[32m+[m[32m      } catch (error) {[m
+[32m+[m[32m        console.error('Failed to load settings:', error);[m
+[32m+[m[32m      } finally {[m
+[32m+[m[32m        setIsLoaded(true);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    loadSettings();[m
+[32m+[m[32m  }, []);[m
+[32m+[m
+[32m+[m[32m  // Save settings to storage whenever they change[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    if (!isLoaded) return;[m
+[32m+[m[41m    [m
+[32m+[m[32m    const saveSettings = async () => {[m
+[32m+[m[32m      try {[m
+[32m+[m[32m        await AsyncStorage.setItem('@settings', JSON.stringify(settings));[m
+[32m+[m[32m      } catch (error) {[m
+[32m+[m[32m        console.error('Failed to save settings:', error);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    saveSettings();[m
+[32m+[m[32m  }, [settings, isLoaded]);[m
+[32m+[m
+[32m+[m[32m  const updateSettings = (newSettings: Partial<SettingsType>) => {[m
+[32m+[m[32m    setSettings(prev => ({ ...prev, ...newSettings }));[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const resetSettings = () => {[m
+[32m+[m[32m    setSettings(defaultSettings);[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <SettingsContext.Provider value={{ settings, updateSettings, resetSettings }}>[m
+[32m+[m[32m      {children}[m
+[32m+[m[32m    </SettingsContext.Provider>[m
+[32m+[m[32m  );[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32m// Custom hook to use settings[m
+[32m+[m[32mexport const useSettings = () => {[m
+[32m+[m[32m  return useContext(SettingsContext);[m
+[32m+[m[32m};[m
+\ No newline at end of file[m
+[1mdiff --git a/Inspecity_UI/app/(tabs)/Scan/reportDetails.tsx b/Inspecity_UI/app/(tabs)/Scan/reportDetails.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f2855fd[m
+[1m--- /dev/null[m
+[1m+++ b/Inspecity_UI/app/(tabs)/Scan/reportDetails.tsx[m
+[36m@@ -0,0 +1,650 @@[m
+[32m+[m[32mimport React, { useState, useEffect } from 'react';[m
+[32m+[m[32mimport { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, BackHandler, Modal } from 'react-native';[m
+[32m+[m[32mimport { useLocalSearchParams, useRouter } from 'expo-router';[m
+[32m+[m[32mimport * as Sharing from 'expo-sharing';[m
+[32m+[m[32mimport { useNavigation, useFocusEffect } from '@react-navigation/native';[m
+[32m+[m[32m// import Modal from 'react-native-modal'; // Only import Modal from react-native-modal[m
+[32m+[m[32mimport axios from 'axios';[m
+[32m+[m[32mimport * as FileSystem from 'expo-file-system';[m
+[32m+[m[32mimport * as Print from 'expo-print';[m
+[32m+[m[32mimport ImageView from 'react-native-image-viewing';[m
+[32m+[m[32mimport { Asset } from 'expo-asset';[m
+[32m+[m[32mimport { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';[m
+[32m+[m
+[32m+[m[32mconst ReportDetails = () => {[m
+[32m+[m[32m  const params = useLocalSearchParams();[m
+[32m+[m[32m  const navigation = useNavigation<any>();[m
+[32m+[m[32m  const router = useRouter();[m
+[32m+[m[32m  const reportID = parseInt(Array.isArray(params.report_id) ? params.report_id[0] : params.report_id, 10);[m
+[32m+[m[32m  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';[m
+[32m+[m
+[32m+[m[32m  const [editModalVisible, setEditNoteModalVisible] = useState(false);[m
+[32m+[m[32m  const [notes, setNotes] = useState('');[m
+[32m+[m[32m  const [isUploading, setIsUploading] = useState(false);[m
+[32m+[m[32m  const [reportName, setReportName] = useState('');[m
+[32m+[m[32m  // const [locationName, setLocationName] = useState('');[m
+[32m+[m[32m  const [condition, setCondition] = useState('');[m
+[32m+[m[32m  const [annotatedImage, setAnnotatedImage] = useState('');[m
+[32m+[m[32m  const [material, setMaterial] = useState('');[m
+[32m+[m[32m  const [materialAge, setMaterialAge] = useState('');[m
+[32m+[m[32m  const [recommendations, setRecommendations] = useState('');[m
+[32m+[m[32m  const [damageTypes, setDamageTypes] = useState<string[]>([]);[m
+[32m+[m[32m  const [isImageModalVisible, setImageModalVisible] = useState(false);[m
+[32m+[m[32m  const [dateCreated, setDateCreated] = useState('');[m
+[32m+[m[32m  const [reportModalVisible, setReportModalVisible] = useState(false);[m
+[32m+[m
+[32m+[m[32m  const deleteReport = async () => {[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const response = await axios.delete([m
+[32m+[m[32m        `https://flask-railway-sample-production.up.railway.app/reports/${reportID}`,[m
+[32m+[m[32m        {[m
+[32m+[m[32m          headers: {[m
+[32m+[m[32m            'X-API-KEY': API_KEY,[m
+[32m+[m[32m          },[m
+[32m+[m[32m        }[m
+[32m+[m[32m      );[m
+[32m+[m[41m  [m
+[32m+[m[32m      if (response.status === 200) {[m
+[32m+[m[32m        Alert.alert("Success", "Report deleted successfully");[m
+[32m+[m[32m        setReportModalVisible(false);[m
+[32m+[m[32m        // router.replace('../board/dashboard'); // Navigate back after deletion[m
+[32m+[m[32m        navigation.goBack();[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        Alert.alert("Error", "Failed to delete report");[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (error) {[m
+[32m+[m[32m      console.error("Error deleting report:", error);[m
+[32m+[m[32m      Alert.alert("Error", "An error occurred while deleting the report");[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  useFocusEffect([m
+[32m+[m[32m    React.useCallback(() => {[m
+[32m

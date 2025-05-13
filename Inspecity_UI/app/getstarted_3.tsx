@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Import the Picker component
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
-const GettingStarted = () => {
+const GettingStarted3 = () => {
+  const { homeData } = useLocalSearchParams();
+  console.log(homeData)
   const router = useRouter();
-  const [Age, setAge] = useState('');
-  const [Height, setHeight] = useState('');
-  const [selectedOption, setSelectedOption] = useState(""); // State for dropdown selection
+  const [age, setAge] = useState(''); // Separate state for Age
+  const [numFloor, setNumFloor] = useState(''); // Separate state for Height
+  const [lotArea, setLotArea] = useState(''); // Separate state for lot area
+  const [floorArea, setFloorArea] = useState(''); // Separate state for floor area
+  const [selectedHouseType, setSelectedHouseType] = useState(""); // Separate state for house type
+  const [selectedMaterial, setSelectedMaterial] = useState(""); // Separate state for material
+  const [otherMaterial, setOtherMaterial] = useState(''); // Separate state for other material
+  const [otherHouseType, setOtherHouseType] = useState(''); // Separate state for other house type
 
-
-  // Load custom fonts
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
@@ -20,36 +26,62 @@ const GettingStarted = () => {
   });
 
   if (!fontsLoaded) {
-    return null; // Show nothing until fonts are loaded
+    return null;
   }
 
-  const handleNavigateToGetStarted4 = () => {
-    router.push('/getstarted_4'); // Navigate to the dashboard when the button is pressed
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
+  const handleNavigateToGetStarted3b = () => {
+    if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
+      alert("Number of house floors must be a positive whole number.");
+      return;
+    }
+  
+    if (lotArea.trim() !== "" && (isNaN(parseFloat(lotArea)) || parseFloat(lotArea) <= 0)) {
+      alert("Estimated lot area must be a positive number.");
+      return;
+    }
+  
+    if (floorArea.trim() !== "" && (isNaN(parseFloat(floorArea)) || parseFloat(floorArea) <= 0)) {
+      alert("Estimated floor area must be a positive number.");
+      return;
+    }
+  
+    const updatedHomeData = {
+      ...parsedHomeData,
+      typeOfHouse: selectedHouseType === "others" 
+    ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
+    : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
+      numFloor: numFloor.trim() !== "" ? parseInt(numFloor) : null,
+      lotArea: lotArea.trim() !== "" ? parseFloat(lotArea) : null,
+      floorArea: floorArea.trim() !== "" ? parseFloat(floorArea) : null,
+    };
+  
+    router.push({
+      pathname: "/getstarted_3b",
+      params: { homeData: JSON.stringify(updatedHomeData) },
+    });
   };
+  
 
   const currentStep = 3;
 
   return (
     <View style={styles.container}>
-      {/* Upper Blue Section */}
       <View style={styles.upperSection}>
-        <Image
-          source={require('../assets/images/houseGS3.png')} // Path to your image
-          style={styles.image}
-          resizeMode="contain" // Ensure the image fits well
-        />
+        <Image source={require('../assets/images/houseGS3.png')} style={styles.image} resizeMode="contain" />
       </View>
 
-      {/* Lower White Section */}
       <View style={styles.lowerSection}>
-        {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <View
               key={index}
-              style={[
-                styles.progressStep,
-                index < currentStep ? styles.progressStepActive : styles.progressStepInactive,
+              style={[ 
+                styles.progressStep, 
+                index < currentStep ? styles.progressStepActive : styles.progressStepInactive 
               ]}
             />
           ))}
@@ -57,55 +89,67 @@ const GettingStarted = () => {
 
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
+        {/* Scrollable form */}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+                
         <View style={styles.pickerContainer}>
-        <Picker
-  selectedValue={selectedOption}
-  onValueChange={(itemValue) => setSelectedOption(itemValue)}
-  style={[
-    styles.picker,
-    { fontSize: 12, color: selectedOption ? '#05173F' : '#BBBBBB' }, // Dynamic font size and color
-  ]}
-  itemStyle={styles.pickerItem} // Styles for options (iOS only)
->
-  {/* Placeholder */}
-  {selectedOption === "" && (
-    <Picker.Item 
-      label="Select a Material" 
-      value="" 
-      style={styles.placeholder} 
-      enabled={false} // Disable the placeholder option
-    />
-  )}
-  {/* Actual Options */}
-  <Picker.Item label="Brick" value="brick" />
-  <Picker.Item label="Wood" value="wood" />
-  <Picker.Item label="Concrete" value="concrete" />
-  <Picker.Item label="Mixed" value="mixed" />
-</Picker>
-
+          <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+            <Picker.Item label="Type of House" value="" enabled={false} />
+            <Picker.Item label="Single-detached" value="single" />
+            <Picker.Item label="Townhouse" value="town" />
+            <Picker.Item label="Apartment" value="apartment" />
+            <Picker.Item label="Stilt house" value="stilt" />
+            <Picker.Item label="Duplex" value="duplex" />
+            <Picker.Item label="Others" value="others" />
+          </Picker>
         </View>
 
+        {selectedHouseType === "others" && (
+          <TextInput
+            style={styles.textBox1}
+            placeholder="Specify other house type"
+            placeholderTextColor="#BBBBBB"
+            value={otherHouseType}
+            onChangeText={(text) => setOtherHouseType(text)}
+          />
+        )}
 
-        {/* Text Input Box */}
-        <TextInput
-          style={styles.textBox}
-          placeholder="Enter the Age of the House"
-          placeholderTextColor="#BBBBBB"
-          value={Age}
-          onChangeText={(text) => setAge(text)}
-        />
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Number of house floors</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="(1, 2, 3, etc.)" 
+            placeholderTextColor="#BBBBBB" 
+            value={numFloor} 
+            onChangeText={(text) => setNumFloor(text)} 
+          />
+        </View>
 
-        {/* Text Input Box */}
-        <TextInput
-          style={styles.textBox}
-          placeholder="Enter the Height of the House"
-          placeholderTextColor="#BBBBBB"
-          value={Height}
-          onChangeText={(text) => setHeight(text)}
-        />
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>What is the estimated lot area?</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="sqm" 
+            placeholderTextColor="#BBBBBB" 
+            value={lotArea} 
+            onChangeText={(text) => setLotArea(text)} 
+          />
+        </View>
 
-        {/* Custom Button */}
-        <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted4}>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>What is the estimated floor area?</Text>
+          <TextInput 
+            style={styles.textBox} 
+            placeholder="sqm" 
+            placeholderTextColor="#BBBBBB" 
+            value={floorArea} 
+            onChangeText={(text) => setFloorArea(text)} 
+          />
+        </View>
+
+        </ScrollView>
+
+        <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
@@ -114,139 +158,150 @@ const GettingStarted = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+
   upperSection: {
-    flex: 1.5,
-    backgroundColor: '#0B417D', // Blue background
+    flex: 1,
+    backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   image: {
-    width: '100%',
-    height: 400, // Adjust height as needed
+    width: wp('100%'),
+    height: hp('50%'),
   },
+
   lowerSection: {
     flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: wp('5%'),
   },
+
   title1: {
-    fontSize: 23,
+    fontSize: wp('6%'),
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
-    letterSpacing: 1,
-    marginBottom: 3,
-    marginTop: -12,
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('0.4%'),
+    // marginTop: hp('-1.5%'),
   },
-  title2: {
-    fontSize: 40,
-    color: '#2852AE',
-    textAlign: 'center',
-    marginTop: -10,
-    marginBottom: 15,
-    fontFamily: 'Epilogue-Black',
-    letterSpacing: 1.5,
-  },
+
   subtitle1: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
-    marginBottom: 10,
+    letterSpacing: wp('0.25%'),
+    marginBottom: hp('1.2%'),
   },
-  subtitle2: {
-    fontSize: 15,
-    color: '#7C7C7C',
-    textAlign: 'center',
-    marginBottom: 10,
-    fontFamily: 'Archivo-Regular',
-    letterSpacing: 1,
-  },
+
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 20,
-    marginTop:5,
+    width: wp('90%'),
+    marginBottom: hp('1%'),
+    // marginTop: -hp('2.5%'),
+  },
 
-  },
   progressStep: {
-    width: 50,
-    height: 5,
-    borderRadius: 10,
+    width: wp('12%'),
+    height: hp('0.6%'),
+    borderRadius: wp('3%'),
   },
+
   progressStepActive: {
-    backgroundColor: '#0B417D', // Active color
+    backgroundColor: '#0B417D',
   },
+
   progressStepInactive: {
-    backgroundColor: '#E0E0E0', // Inactive color
+    backgroundColor: '#E0E0E0',
+  },
+
+  textBox1: {
+    width: wp('80%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
+    backgroundColor: '#D9D9D9',
+    marginBottom: hp('1.2%'),
   },
 
   textBox: {
-    width: '70%',
-    height: 40,
-    borderColor: '#A0A0A0',
-    borderWidth: 2,
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    marginTop:-5,
+    width: wp('30%'),
+    padding: wp('3%'),
+    borderRadius: wp('10%'),
     fontFamily: 'Archivo-Regular',
-    fontSize: 13,
+    fontSize: wp('3.5%'),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: '#D9D9D9',
+    marginLeft: wp('2.5%'),
+  },
+
+  pickerContainer: {
+    width: wp('80%'),
+    backgroundColor: '#D9D9D9',
+    borderRadius: wp('10%'),
+    marginBottom: hp('1.8%'),
+  },
+
+  picker: {
+    height: hp('7%'),
+    fontSize: wp('3%'),
     color: '#05173F',
     textAlign: 'center',
-    backgroundColor: '#D9D9D9',
+    textAlignVertical: 'top',
   },
-    pickerContainer: {
-      width: '60%',
-      backgroundColor: '#D9D9D9', // Light gray background
-      borderRadius: 25, // Smooth rounded corners
-      borderWidth: 2,
-      borderColor: '#A0A0A0',
-      overflow: 'hidden', // Ensures the borderRadius is applied
-      marginBottom: 10,
-      marginTop: -5,
-      fontSize: 12,
-      height: 50,
-      textAlign: 'center',
-      textAlignVertical: 'top',
-    },
-    picker: {
-      height: 50,
-      fontSize: 12, // Font size for the picked option
-      color: '#05173F', // Color for the picked option
-      textAlignVertical: 'top',
-    },
-    pickerItem: {
-      fontSize: 12, // Font size for options (iOS only)
-      color: '#05173F', // Color for options
-      textAlignVertical: 'top',
-    },
-    placeholder: {
-      fontSize: 14,
-      color: '#BBBBBB', // Placeholder text color
-      textAlignVertical: 'top',
-    },
-  
+
   button: {
-    backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 10,
-    paddingHorizontal: 90,
-    borderRadius: 30,
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
+    padding: wp('2.5%'),
+    borderRadius: wp('8%'),
     alignItems: 'center',
-    marginTop: -5,
+    marginBottom: hp('2.5%'),
   },
+
   buttonText: {
-    fontSize: 18,
+    fontSize: wp('4.5%'),
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
+
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: wp('80%'),
+    marginBottom: hp('1.2%'),
+    marginLeft: wp('-11%'),
+    paddingHorizontal: wp('3%'),
+  },
+
+  label: {
+    fontSize: wp('3.7%'),
+    color: '#05173F',
+    fontFamily: 'Archivo-Regular',
+    textAlign: 'auto',
+  },
+  scrollView: { width: '100%' },
+  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
+
+  // scrollView: {
+  //   width: wp('100%'),
+  // },
+
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   alignItems: 'center',
+  //   paddingBottom: hp('6%'),
+  //   backgroundColor: '#000',
+  //   paddingHorizontal: wp('5%'),
+  // },
 });
 
-export default GettingStarted;
+export default GettingStarted3;
