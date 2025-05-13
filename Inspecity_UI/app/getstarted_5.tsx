@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, Alert, BackHandler } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
+import 'react-native-get-random-values';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import * as Location from 'expo-location';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const GettingStarted = () => {
+
+const GettingStarted5 = () => {
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const { homeData } = useLocalSearchParams();
+  const userId = uuid.v4();
+  const API_KEY = '***REMOVED***';
+  console.log(homeData)
+
   const router = useRouter();
-
 
   // Load custom fonts
   const [fontsLoaded] = useFonts({
@@ -14,18 +26,108 @@ const GettingStarted = () => {
     'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
   });
 
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        
+        if (status !== 'granted') {
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        setLatitude(location.coords.latitude);
+        setLongitude(location.coords.longitude);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
+    getLocation();
+  }, []);
+
+  const parsedHomeData = homeData 
+  ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
+  : {};
+
+  const handleNavigateToDashboard = () => {
+    const requiredFields = ['address', 'homeType', 'yearBuilt']; // Add all required fields
+    const missingFields = requiredFields.filter((field) => !parsedHomeData[field]);
+  
+    if (missingFields.length > 0) {
+      Alert.alert(
+        'Reminder',
+        `Some fields are skipped.\nYou can update them in Settings for better AI recommendations.`,
+        [{ text: 'OK', onPress: () => navigateToDashboard() }]
+      );
+    } else {
+      navigateToDashboard();
+    }
+  };
+  
+  const navigateToDashboard = async () => {
+    const updatedHomeData = {
+      ...parsedHomeData,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+      homeowner_id: userId,
+      is_default: true,
+    };
+
+    try {
+      const homeownerResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homeowners', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY, // Add the API key header
+        },
+        body: JSON.stringify({
+          homeowner_id: userId, // Use the generated UUID
+        }),
+      });
+      if (!homeownerResponse.ok) {
+        throw new Error('Failed to create homeowner');
+      }
+      console.log('Homeowner created successfully');
+    
+      const homeResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY, // Add the API key header
+        },
+        body: JSON.stringify(updatedHomeData),
+      });
+
+      if (!homeResponse.ok) {
+        throw new Error('Failed to create home');
+      }
+      console.log(JSON.stringify(updatedHomeData))
+      console.log('Home created successfully');
+  
+      await AsyncStorage.setItem('userId', userId);
+  
+      router.push('/(tabs)/Dashboard/board');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'Failed to create homeowner. Try again later.',
+        [{ text: 'OK', onPress: () => BackHandler.exitApp() }]
+      );
+    }
+  };
+
   if (!fontsLoaded) {
     return null; // Show nothing until fonts are loaded
   }
 
-  const handleNavigateToDashboard = () => {
-    router.push('/dashboard'); // Navigate to the next screen
-  };
-
-  const currentStep = 5; // Current progress step
+  const currentStep = 6; // Current progress step
 
   return (
     <View style={styles.container}>
+      {/* Hide Status Bar */}
+      <StatusBar hidden={true} />
+
       {/* Upper Blue Section */}
       <View style={styles.upperSection}>
         <Image
@@ -39,7 +141,7 @@ const GettingStarted = () => {
       <View style={styles.lowerSection}>
         {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <View
               key={index}
               style={[
@@ -50,7 +152,7 @@ const GettingStarted = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Your're All Set!</Text>
+        <Text style={styles.title1}>You're All Set!</Text>
         <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
         <Text style={styles.subtitle2}>inspect your home.</Text>
 
@@ -68,102 +170,76 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 1.5,
-    backgroundColor: '#0B417D', // Blue background
+    flex: 1,
+    backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: 400, // Adjust height as needed
+    width: wp('100%'),
+    height: hp('50%'),
   },
   lowerSection: {
     flex: 1.05,
-    backgroundColor: '#FFFFFF', // White background
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: wp('5%'),
   },
   title1: {
-    fontSize: 25,
+    fontSize: wp('6.5%'),
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
     letterSpacing: 1,
-    marginBottom: 5,
-  },
-  title2: {
-    fontSize: 40,
-    color: '#2852AE',
-    textAlign: 'center',
-    marginTop: -10,
-    marginBottom: 15,
-    fontFamily: 'Epilogue-Black',
-    letterSpacing: 1.5,
+    marginBottom: hp('1.2%'),
+    marginTop: hp('6%'),
   },
   subtitle1: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
   },
   subtitle2: {
-    fontSize: 15,
+    fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
-    marginBottom: 50,
+    marginBottom: hp('7.5%'),
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
   },
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 20,
-    marginTop:5,
-
+    width: wp('90%'),
+    marginBottom: hp('5%'),
   },
   progressStep: {
-    width: 50,
-    height: 5,
-    borderRadius: 10,
+    width: wp('13%'),
+    height: hp('0.6%'),
+    borderRadius: wp('2.5%'),
   },
   progressStepActive: {
-    backgroundColor: '#0B417D', // Active color
+    backgroundColor: '#0B417D',
   },
   progressStepInactive: {
-    backgroundColor: '#E0E0E0', // Inactive color
+    backgroundColor: '#E0E0E0',
   },
-
-  textBox: {
-    width: '80%',
-    height: 50,
-    borderColor: '#A0A0A0',
-    borderWidth: 2,
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    fontFamily: 'Archivo-Regular',
-    fontSize: 16,
-    color: '#05173F',
-    textAlign: 'center',
-    backgroundColor: '#D9D9D9',
-  },
-
   button: {
-    backgroundColor: '#08294E', // Custom button color
-    paddingVertical: 12,
-    paddingHorizontal: 90,
-    borderRadius: 30,
+    backgroundColor: '#08294E',
+    paddingVertical: hp('1.5%'),
+    paddingHorizontal: wp('24%'),
+    borderRadius: wp('8%'),
     alignItems: 'center',
+    marginBottom: hp('4%'),
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: wp('4.2%'),
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
 });
 
-
-export default GettingStarted;
+export default GettingStarted5;

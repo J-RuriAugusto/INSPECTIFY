@@ -1,81 +1,173 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
+import { Image, View, StyleSheet, Text } from 'react-native';
+import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+function renderTabLabel(label: string) {
+  return ({ focused }: { focused: boolean }) => (
+    <Text style={{
+      color: '#000000',
+      fontWeight: focused ? 'bold' : 'normal',
+      fontSize: 12,
+      marginTop: 5
+    }}>
+      {label}
+    </Text>
+  );
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      initialRouteName='dashboard'
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="dashboard"
-        options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Tabs
+        initialRouteName="Dashboard"
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          tabBarInactiveTintColor: '#ccc',
+          headerShown: false,
+          tabBarStyle: styles.tabBarStyle,
+          tabBarShowLabel: true,
+          // tabBarItemStyle: {
+          //   marginHorizontal: wp('1.5%'), // <-- Add horizontal margin between tabs
+          // },
         }}
-      />
-      <Tabs.Screen
-        name="awareness_tool"
-        options={{
-          title: 'Awareness Tool',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    <Tabs.Screen
-        name="assess_structure"
-        options={{
-          title: 'Assess Structure',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    <Tabs.Screen
-        name="emergency_hotlines"
-        options={{
-          title: 'Emergency Hotlines',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    <Tabs.Screen
-        name="nearby_shops"
-        options={{
-          title: 'Nearby Shops',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        {/* Dashboard Tab */}
+        <Tabs.Screen
+          name="Dashboard"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../../assets/images/report columns.png')}
+                style={[
+                  styles.icon, // your default icon size
+                  { width: wp('6.5%'), height: wp('6.5%') }, // override here for Dashboard only
+                  focused && styles.focusedIcon, // optional color change if needed
+                ]}
+              />
+            ),
+            tabBarLabel: renderTabLabel('Dashboard'),
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Dashboard' }],
+              });
+            },
+          })}
+        />
+
+        {/* Awareness Tool Tab */}
+        <Tabs.Screen
+          name="Forms"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../../assets/images/test results.png')}
+                style={[
+                  styles.icon,
+                  focused && styles.focusedIcon,
+                ]}
+              />
+            ),
+            tabBarLabel: renderTabLabel('Forms'),
+          }}
+        />
+
+        {/* Assess Structure Tab */}
+        <Tabs.Screen
+          name="Scan"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View style={[styles.centeredIcon, styles.scanButton]}>
+                <Image 
+                  source={require('../../assets/images/rectangle.png')} 
+                  style={styles.circle} 
+                />
+                <Image
+                  source={require('../../assets/images/scan_icon.png')}
+                  style={[
+                    styles.icon,
+                    { width: wp('7%'), height: wp('7%') },
+                    focused && styles.focusedIcon,
+                  ]}
+                />
+              </View>
+            ),
+            tabBarLabel: renderTabLabel('Scan'),
+          }}
+        />
+
+        {/* Emergency Hotlines Tab */}
+        <Tabs.Screen
+          name="Hotlines"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../../assets/images/duplicate contacts.png')}
+                style={[
+                  styles.icon,
+                  focused && styles.focusedIcon,
+                ]}
+              />
+            ),
+            tabBarLabel: renderTabLabel('Hotlines'),
+          }}
+        />
+
+        {/* Nearby Shops Tab */}
+        <Tabs.Screen
+          name="Shops"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? 'location-sharp' : 'location-outline'}
+                size={30}
+                color={focused ? '#007aff' : '#000000'}
+              />
+            ),
+            tabBarLabel: renderTabLabel('Shops'),
+          }}
+        />
+      </Tabs>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBarStyle: {
+    backgroundColor: '#FFFFFF',
+    height: hp('9.5%'),
+  },
+  icon: {
+    width: wp('8%'),
+    height: wp('8%'),
+    resizeMode: 'contain',
+  },
+  scanButton: {
+    marginBottom: hp('4.5%'),
+  },
+  centeredIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  circle: {
+    width: wp('16%'),
+    height: wp('16%'),
+    position: 'absolute',
+    borderRadius: wp('8%'),
+    borderWidth: wp('0.7%'),
+    borderColor: '#00A8E8',
+  },
+  focusedIcon: {
+    tintColor: '#007aff',
+  },
+});

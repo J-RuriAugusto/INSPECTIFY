@@ -5,20 +5,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+import { SettingsProvider } from './(tabs)/Dashboard/settingsContext';
+export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -27,7 +21,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -49,17 +42,20 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="getstarted_1" options={{ headerShown: false }} />
-        <Stack.Screen name="getstarted_2" options={{ headerShown: false }} />
-        <Stack.Screen name="getstarted_3" options={{ headerShown: false }} />
-        <Stack.Screen name="getstarted_4" options={{ headerShown: false }} />
-        <Stack.Screen name="getstarted_5" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <SettingsProvider> {/* Wrap everything with SettingsProvider */}
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_1" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_2" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_3" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_3b" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_4" options={{ headerShown: false }} />
+          <Stack.Screen name="getstarted_5" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </ThemeProvider>
+    </SettingsProvider>
   );
 }

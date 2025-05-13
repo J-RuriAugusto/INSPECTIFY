@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9a17bb22-087b-473b-9b6b-1de2beb62bec" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/assess structure/reportName.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/assess structure/reportName.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/assess structure/scanning.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/assess structure/scanning.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/MyProperties.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/MyProperties.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3b.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/addproperty_3b.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/board/settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/board/settings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/emergency_hotlines.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/emergency_hotlines.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_1.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_1.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_2.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_2.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_3.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_3.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_3b.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_3b.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_4.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_4.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/getstarted_5.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/getstarted_5.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/app">
+          <activation />
+        </task>
+        <projects_view />
+      </state>
+    </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2uD0kKBOeAIFQzfCXrHXtw7Bv2W" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI.executor": "Run",
+    "Gradle.C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI/app.executor": "Coverage",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "Jam",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI",
+    "settings.editor.selected.configurable": "AndroidSdkUpdater"
+  }
+}]]></component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="open" />
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="C:/Documents/My Files/3rd Yr/2nd Semester/INSPECTIFY/Inspecity_UI/app" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/app" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9a17bb22-087b-473b-9b6b-1de2beb62bec" name="Changes" comment="" />
+      <created>1741767980694</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741767980694</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Inspecity_UI$C__Documents_My_Files_3rd_Yr_2nd_Semester_INSPECTIFY_Inspecity_UI_app.ic" NAME="$PROJECT_DIR$/app Coverage Results" MODIFIED="1741837909145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
+  </component>
+</project>
