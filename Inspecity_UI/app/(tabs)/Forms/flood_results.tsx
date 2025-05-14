@@ -71,10 +71,10 @@ const Results = () => {
       {/* Always-Open Modal */}
       <Modalize
         ref={modalRef}
-        alwaysOpen={90}
+        alwaysOpen={70}
         modalStyle={styles.modal}
         handleStyle={styles.handle}
-        modalHeight={height - 300}
+        modalHeight={height - 350}
         panGestureEnabled
         onPositionChange={handlePositionChange}
         scrollViewProps={{
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   score: {
     fontSize: 16,
-    color: '#ffffff',
+    color: '#fffff',
     textAlign: 'center',
     marginBottom: 8,
   },

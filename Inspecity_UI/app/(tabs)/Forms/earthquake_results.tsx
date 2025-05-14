@@ -61,7 +61,7 @@ const Results = () => {
         modalStyle={styles.modal}
         handleStyle={styles.handle}
         panGestureEnabled
-        modalHeight={height - 400}
+        modalHeight={height - 350}
         onPositionChange={handlePositionChange}
         scrollViewProps={{
           scrollEnabled: isModalOpen,
