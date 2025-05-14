@@ -61,13 +61,10 @@
     "react-native-tab-view": "^4.0.5",
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
-<<<<<<< HEAD
     "react-native-web": "~0.19.13",
     "expo-location": "~18.0.4",
     "expo-av": "~15.0.2"
-=======
     "react-native-web": "~0.19.13"
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
