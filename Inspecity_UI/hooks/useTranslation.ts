@@ -1,7 +1,7 @@
-import { useSettings } from '../(tabs)/Dashboard/settingsContext'
-import en from '../locales/en'
-import tgl from '../locales/tl';
-import ceb from '../locales/ceb';
+import { useSettings } from '../app/(tabs)/Dashboard/settingsContext'
+import en from '../app/locales/en'
+import tgl from '../app/locales/tl';
+import ceb from '../app/locales/ceb';
 
 const translations: Record<string, any> = {
   English: en,

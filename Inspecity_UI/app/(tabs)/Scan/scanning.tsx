@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
-import { useTranslation } from '../../hooks/useTranslation';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 
 

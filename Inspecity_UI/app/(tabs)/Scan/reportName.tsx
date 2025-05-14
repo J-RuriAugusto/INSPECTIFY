@@ -7,7 +7,7 @@ import Modal from 'react-native-modal';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import HomeDetails from '../../../constants/HomeDetails'
-import { useTranslation } from '../../hooks/useTranslation';
+import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportName = () => {
