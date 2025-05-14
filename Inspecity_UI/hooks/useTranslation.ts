@@ -1,4 +1,4 @@
-import { useSettings } from '../(tabs)/Dashboard/settingsContext'
+import { useSettings } from '../app/(tabs)/Dashboard/settingsContext'
 import en from '../locales/en'
 import tgl from '../locales/tl';
 import ceb from '../locales/ceb';

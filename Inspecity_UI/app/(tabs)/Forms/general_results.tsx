@@ -1,67 +1,111 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { Modalize } from 'react-native-modalize';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import TriangleGrid from '../../../components/TriangleGrid';
+import { Video } from 'expo-av';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
+
+
 
 const Results = () => {
+  const modalRef = useRef<Modalize>(null);
   const params = useLocalSearchParams();
   const scoreParam = Array.isArray(params.score) ? params.score[0] : params.score;
   const numericScore = parseInt(scoreParam || '0', 10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handlePositionChange = (position: 'initial' | 'top') => {
+    setIsModalOpen(position === 'top');
+  };
 
   const getRiskLevel = () => {
-    if (numericScore <= 5) return { label: 'Low Risk', color: '#2E8532' };
-    if (numericScore <= 10) return { label: 'Moderate Risk', color: '#DD940E' };
-    return { label: 'High Risk', color: '#A9241A' };
+    if (numericScore <= 5) return { label: 'Low Risk', color: '#4CAF50' };
+    if (numericScore <= 10) return { label: 'Moderate Risk', color: '#FFC107' };
+    return { label: 'High Risk', color: '#F44336' };
   };
 
   const { label, color } = getRiskLevel();
 
-  const getColorByPercentage = () => {
-    if (numericScore <= 5) return '#4CAF50';
-    if (numericScore <= 10) return '#FFC107';
-    return '#F44336';
-  };
-
-  const waveColor = getColorByPercentage();
-
-  const facilities = [
-    { icon: 'local-hospital', color: '#F44336', label: 'Cebu City Medical Center' },
-    { icon: 'local-police', color: '#2196F3', label: 'Police Station 1 - Near Fuente Osmeña' },
-    { icon: 'home-work', color: '#4CAF50', label: 'Barangay Hall - Capitol Site' },
-    { icon: 'local-hospital', color: '#F44336', label: 'North General Hospital' },
-    { icon: 'home-work', color: '#4CAF50', label: 'Talamban National High School' },
-    { icon: 'emoji-people', color: '#FFC107', label: 'Evacuation Center - Cebu Sports Complex' },
-  ];
-
   return (
     <View style={styles.container}>
-      <TriangleGrid percentage={numericScore / 15} color={waveColor} />
+      {/* Background Video */}
+      <Video
+        source={require('../../../assets/videos/houses4.mp4')}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+        shouldPlay
+        isMuted
+        isLooping
+      />
 
-      <ScrollView style={styles.wrapper} contentContainerStyle={styles.scrollContent}>
+      {/* Top Content */}
+      <View style={styles.content}>
+        <Text style={styles.title}>General Preparedness Result</Text>
+        
         <Text style={[styles.riskLevel, { color }]}>{label}</Text>
-        <Text style={styles.title}>Preparedness Score</Text>
+        <View style={styles.barContainer}>
+          <View
+            style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
+          />
+        </View>
         <Text style={styles.score}>You answered {numericScore} out of 15</Text>
+        <Text style={styles.swipeUpLabel}>⬆ Swipe up for recommendations</Text>
+      </View>
 
-        <View style={styles.recommendation}>
-          <Text style={styles.sectionTitle}>Recommendations</Text>
-          <Text style={styles.recommendationText}>
-            Disasters can strike without warning—whether earthquakes, typhoons, fires, or other emergencies. Regardless of your current preparedness level, now is the best time to take action. Prepare a go-bag with essentials like food, water, medicine, flashlight, and documents. Know your local emergency numbers, stay informed through official channels, and make sure your family has a communication and evacuation plan.
+      {/* Always-Open Modal */}
+      <Modalize
+        ref={modalRef}
+        alwaysOpen={70}
+        modalStyle={styles.modal}
+        handleStyle={styles.handle}
+        panGestureEnabled
+        modalHeight={height - 400}
+        onPositionChange={handlePositionChange}
+        scrollViewProps={{
+          scrollEnabled: isModalOpen,
+          showsVerticalScrollIndicator: false,
+        }}
+      >
+
+        {/* This section is always visible when modal is collapsed */}
+        <View style={styles.collapsedHeader}>
+          <Text style={styles.collapsedLabel}>Recommendations & Critical Facilities</Text>
+        </View>
+
+        {/* Full content shown when expanded */}
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Recommendations</Text>
+          <Text style={styles.modalText}>
+            Start by learning your community’s flood warning systems, identifying nearby evacuation
+            centers, and preparing a go-bag with water, flashlight, medicine, and documents.
           </Text>
-        </View>
 
-        <View style={styles.criticalFacilities}>
-          <Text style={styles.sectionTitle}>Critical Facilities Near You</Text>
-          {facilities.map((facility, index) => (
-            <View key={index} style={styles.facilityItem}>
-              <MaterialIcons name={facility.icon} size={24} color={facility.color} />
-              <Text style={styles.facilityText}>{facility.label}</Text>
-            </View>
-          ))}
+          <Text style={styles.modalTitle}>Critical Facilities Near You</Text>
+
+          <View style={styles.facilityItem}>
+            <MaterialIcons name="local-hospital" size={20} color="#F44336" />
+            <Text style={styles.facilityText}>Cebu City Medical Center</Text>
+          </View>
+
+          <View style={styles.facilityItem}>
+            <MaterialIcons name="local-police" size={20} color="#2196F3" />
+            <Text style={styles.facilityText}>Police Station - Fuente Osmeña</Text>
+          </View>
+
+          <View style={styles.facilityItem}>
+            <MaterialIcons name="home-work" size={20} color="#4CAF50" />
+            <Text style={styles.facilityText}>Barangay Hall - Capitol Site</Text>
+          </View>
+
+          <View style={styles.facilityItem}>
+            <MaterialIcons name="emoji-people" size={20} color="#FFC107" />
+            <Text style={styles.facilityText}>Evacuation Center - Cebu Sports Complex</Text>
+          </View>
         </View>
-      </ScrollView>
+      </Modalize>
+
     </View>
   );
 };
@@ -69,72 +113,101 @@ const Results = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
     position: 'relative',
   },
-  wrapper: {
-    flex: 1,
-    paddingHorizontal: width * 0.05,
-    paddingTop: height * 0.05,
-  },
-  scrollContent: {
-    paddingBottom: height * 0.1,
+  content: {
+    marginTop: 60,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
   },
   title: {
-    fontSize: width * 0.05,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#030F1C',
-    marginBottom: 10,
+    color: '#19477B',
+    marginTop: -10,
     textAlign: 'center',
   },
   score: {
-    fontSize: width * 0.04,
-    marginBottom: 20,
+    fontSize: 16,
+    color: '#fffff',
     textAlign: 'center',
-    marginTop: -5,
+    marginBottom: 8,
+  },
+  barContainer: {
+    width: '90%',
+    height: 10,
+    backgroundColor: '#ffff',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  bar: {
+    height: '100%',
+    borderRadius: 6,
   },
   riskLevel: {
-    fontSize: width * 0.1,
-    fontWeight: '900',
-    marginBottom: 3,
+    fontSize: 35,
+    fontWeight: '800',
     textAlign: 'center',
+    marginBottom: 10,
+    marginTop:10,
   },
-  recommendation: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    borderRadius: 12,
-    padding: width * 0.04,
-    marginBottom: 16,
-    elevation: 2,
+  swipeUpLabel: {
+    color: '#848484',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontSize: 12,
   },
-  recommendationText: {
-    fontSize: width * 0.035,
+  modal: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  handle: {
+    backgroundColor: '#ccc',
+    width: 60,
+  },
+  modalContent: {
+    paddingBottom: 100,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  modalText: {
+    fontSize: 14,
     lineHeight: 20,
     textAlign: 'justify',
     color: '#333',
   },
-  criticalFacilities: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    borderRadius: 12,
-    padding: width * 0.04,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    color: '#030F1C',
-    marginBottom: 10,
-  },
   facilityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 10,
   },
   facilityText: {
-    fontSize: width * 0.037,
     marginLeft: 10,
+    fontSize: 14,
     color: '#333',
-    flexShrink: 1,
   },
+
+  collapsedHeader: {
+  paddingTop: 10,
+  paddingBottom: 10,
+  marginBottom: 10,
+  alignItems: 'center',
+  borderBottomWidth: 2,
+  borderBottomColor: '#eee',
+},
+collapsedLabel: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#444',
+},
+
 });
 
 export default Results;
