@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: wp('100%'),
-    height: hp('50%'),
+    height: hp('50%'), // 400px ~ 50% of screen height on most devices
   },
   lowerSection: {
     flex: 1.05,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     padding: wp('5%'),
   },
   title1: {
-    fontSize: wp('6.5%'),
+    fontSize: wp('6.5%'), // ~25px
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Epilogue-Black',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginTop: hp('6%'),
   },
   subtitle1: {
-    fontSize: wp('4%'),
+    fontSize: wp('4%'), // ~15px
     color: '#7C7C7C',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: wp('4%'),
     color: '#7C7C7C',
     textAlign: 'center',
-    marginBottom: hp('7.5%'),
+    marginBottom: hp('6%'),
     fontFamily: 'Archivo-Regular',
     letterSpacing: 1,
   },
@@ -214,7 +214,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: wp('90%'),
-    marginBottom: hp('5%'),
+    marginBottom: hp('2.5%'),
+    marginTop: hp('-5%'),
   },
   progressStep: {
     width: wp('13%'),
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp('24%'),
     borderRadius: wp('8%'),
     alignItems: 'center',
-    marginBottom: hp('4%'),
+    marginTop: hp('9%'),
   },
   buttonText: {
     fontSize: wp('4.2%'),
