@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Video, ResizeMode } from 'expo-av';
-=======
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -11,17 +5,10 @@ import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import useUserID from "./useUserID";
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
 
 const LoadingScreen = () => {
   const router = useRouter();
   const video = useRef(null);
-<<<<<<< HEAD
-
-  const handlePlaybackStatusUpdate = (status) => {
-    if (status.didJustFinish) {
-      router.replace('/getstarted_1'); // replace instead of push to avoid back to loading
-=======
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const userId = useUserID();
   const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
@@ -95,7 +82,6 @@ const LoadingScreen = () => {
       );
     } finally {
       setIsCheckingUser(false);
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
     }
   };
 
