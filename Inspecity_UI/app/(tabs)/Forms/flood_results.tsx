@@ -19,12 +19,29 @@ const Results = () => {
   };
 
   const getRiskLevel = () => {
-    if (numericScore <= 5) return { label: 'Low Risk', color: '#4CAF50' };
-    if (numericScore <= 10) return { label: 'Moderate Risk', color: '#FFC107' };
-    return { label: 'High Risk', color: '#F44336' };
+    if (numericScore <= 5) return { label: 'Low Risk', color: '#2E8532' };
+    if (numericScore <= 10) return { label: 'Moderate Risk', color: '#DD940E' };
+    return { label: 'High Risk', color: '#A9241A' };
   };
 
   const { label, color } = getRiskLevel();
+
+  const getColorByPercentage = () => {
+    if (numericScore <= 5) return '#4CAF50';
+    if (numericScore <= 10) return '#FFC107';
+    return '#F44336';
+  };
+
+  const waveColor = getColorByPercentage();
+
+  const facilities = [
+    { icon: 'local-hospital', color: '#F44336', label: 'Cebu City Medical Center' },
+    { icon: 'local-police', color: '#2196F3', label: 'Police Station 1 - Near Fuente Osmeña' },
+    { icon: 'home-work', color: '#4CAF50', label: 'Barangay Hall - Capitol Site' },
+    { icon: 'local-hospital', color: '#F44336', label: 'North General Hospital' },
+    { icon: 'home-work', color: '#4CAF50', label: 'Talamban National High School' },
+    { icon: 'emoji-people', color: '#FFC107', label: 'Evacuation Center - Cebu Sports Complex' },
+  ];
 
   return (
     <View style={styles.container}>
@@ -200,6 +217,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 14,
     color: '#333',
+    flexShrink: 1,
   },
 });
 
