@@ -1,22 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 
-type RiskLevel = 'low' | 'medium' | 'high';
-
-interface RiskSettings {
-  rings: number;
-  scale: number;
-  duration: number;
-}
-
-interface ConcentricWavesProps {
-  riskLevel?: RiskLevel;
-  color?: string;
-}
-
 const { width, height } = Dimensions.get('window');
 
-const riskSettings: Record<RiskLevel, RiskSettings> = {
+const riskSettings = {
   low: {
     rings: 10,
     scale: 3,
@@ -34,7 +21,7 @@ const riskSettings: Record<RiskLevel, RiskSettings> = {
   },
 };
 
-const ConcentricWaves = ({ riskLevel = 'medium', color = '#7C4DFF' }: ConcentricWavesProps) => {
+const ConcentricWaves = ({ riskLevel = 'medium', color = '#7C4DFF' }) => {
   const { rings: NUM_RINGS, scale: MAX_SCALE, duration: DURATION } =
     riskSettings[riskLevel] || riskSettings.medium;
 
@@ -78,8 +65,8 @@ const ConcentricWaves = ({ riskLevel = 'medium', color = '#7C4DFF' }: Concentric
                 height: BASE_SIZE,
                 borderRadius: BASE_SIZE / 2,
                 transform: [{ scale }],
-                opacity: opacity,
-              },
+                opacity: 0.5
+              }
             ]}
           />
         );
