@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
