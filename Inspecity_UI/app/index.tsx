@@ -116,7 +116,6 @@ const LoadingScreen = () => {
       <Video
         ref={video}
         style={styles.video}
-        source={require('../assets/videos/LOADINGSCREEN.mp4')}
         source={require('../assets/videos/LOADINGSCREEN2.mp4')}
         resizeMode={ResizeMode.CONTAIN}
         shouldPlay
@@ -124,6 +123,24 @@ const LoadingScreen = () => {
         onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
       />
       <Text style={styles.description}>Loading animation is here.</Text>
+      {isCheckingUser && <ActivityIndicator size="small" color="#0000ff" />}
+          {showLanguageOverlay && (
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>Choose Your Language</Text>
+          <Text style={styles.modalSubtitle}>Your language preference can be changed at any time in Settings</Text>
+
+          <View style={styles.languageButtons}>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
+ 
+
+
+          </View>
+        </View>
+      </View>
+    )}
     </View>
   );
 };
@@ -145,9 +162,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   video: {
-    width: 500,
-    height: 200,
-  },
     width: 1000,
     height: 800,
     marginRight: 7
