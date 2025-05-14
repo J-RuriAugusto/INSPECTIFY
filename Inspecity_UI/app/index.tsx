@@ -150,6 +150,9 @@ const LoadingScreen = () => {
               <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
               <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
               <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
+ 
+
+
             </View>
           </View>
         </View>
@@ -225,6 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
+
   },
   languageOption: {
     fontSize: 18,
