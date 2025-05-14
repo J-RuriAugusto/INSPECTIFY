@@ -12,6 +12,9 @@ const LoadingScreen = () => {
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const userId = useUserID();
   const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY';
+  const [showLanguageOverlay, setShowLanguageOverlay] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false); // to prevent double nav
+
 
   useEffect(() => {
     // Check internet connection
@@ -83,16 +86,26 @@ const LoadingScreen = () => {
   };
 
   const handlePlaybackStatusUpdate = async (status) => {
-    if (status.didJustFinish) {
+    if (status.didJustFinish && !isNavigating) {
+      setIsNavigating(true); // avoid repeated calls
       if (userId) {
-        // If we have a userId, check if it exists in backend
         await checkUserIdInDatabase(userId);
       } else {
-        // No userId, go directly to getstarted_1
-        router.replace('/getstarted_1');
+        setShowLanguageOverlay(true);
       }
     }
   };
+
+  const handleLanguageSelect = async (lang: string) => {
+    try {
+      await AsyncStorage.setItem('preferredLanguage', lang);
+    } catch (err) {
+      console.error('Error saving language:', err);
+    }
+    router.replace('/getstarted_1');
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -111,6 +124,23 @@ const LoadingScreen = () => {
       />
       <Text style={styles.description}>Loading animation is here.</Text>
       {isCheckingUser && <ActivityIndicator size="small" color="#0000ff" />}
+          {showLanguageOverlay && (
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>Choose Your Language</Text>
+          <Text style={styles.modalSubtitle}>Your language preference can be changed at any time in Settings</Text>
+
+          <View style={styles.languageButtons}>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
+            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
+ 
+
+
+          </View>
+        </View>
+      </View>
+    )}
     </View>
   );
 };
@@ -136,6 +166,51 @@ const styles = StyleSheet.create({
     height: 800,
     marginRight: 7
   },
+    overlay: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 10,
+},
+modal: {
+  backgroundColor: 'white',
+  padding: 20,
+  borderRadius: 20,
+  alignItems: 'center',
+  width: '85%',
+},
+modalTitle: {
+  fontSize: 25,
+  fontWeight: 'bold',
+  marginBottom: 10,
+  textAlign: 'center',
+},
+modalSubtitle: {
+  fontSize: 14,
+  color: '#555',
+  marginBottom: 20,
+  textAlign: 'center',
+},
+languageButtons: {
+  flexDirection: 'column',
+  alignItems: 'center',
+  width: '100%',
+
+},
+languageOption: {
+  fontSize: 18,
+  color: '#FFFFFF',
+  marginVertical: 3,
+  paddingVertical: 10,
+  justifyContent: 'center',
+  backgroundColor: '#08294E',
+  borderRadius: 30,
+
+
+},
+
 });
 
 export default LoadingScreen;

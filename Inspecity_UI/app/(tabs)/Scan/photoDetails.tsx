@@ -9,10 +9,12 @@ import * as FileSystem from 'expo-file-system';
 import * as Print from 'expo-print';
 import Scanning from './scanning';
 import ImageView from 'react-native-image-viewing';
+import { useTranslation } from '../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
 const PhotoDetails = () => {
+  const { t } = useTranslation();
   const params = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const router = useRouter();
@@ -381,7 +383,7 @@ const PhotoDetails = () => {
             </div>
   
             <div class="meta">
-              <p><strong>Report For:</strong> ${escapeHTML(reportName || 'Living Room - Left Wall')}</p>
+              <p><strong>Report For:</strong> ${escapeHTML(reportName || 'Untitled')}</p>
               <p><strong>Date:</strong> ${formattedReportDate}</p>
               <p><strong>Location:</strong> University of the Philippines</p>
               <p><strong>Coordinates:</strong> 123.90467, 10.41196</p>
@@ -519,7 +521,7 @@ const PhotoDetails = () => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>
-                {reportName ? reportName : "Living Room - Left Wall"}
+                {reportName ? reportName : "Untiled"}
               </Text>
               <Text style={styles.subtitle}>{dateCreated || 'Loading date...'}</Text>
   
@@ -533,10 +535,10 @@ const PhotoDetails = () => {
 
                 {/* Condition Details */}
                 <View style={styles.conditionWrapper}>
-                  <Text style={styles.conditionText}>Overall Condition:</Text>
+                  <Text style={styles.conditionText}>{t('OVERALL_CONDITION')}</Text>
                   <Text style={styles.conditionBadge}>{condition}</Text>
                   <View style={styles.rowContainer}>
-                    <Text style={styles.ageText}>Age:</Text>
+                    <Text style={styles.ageText}>{t('AGE')}</Text>
                     <Text style={styles.ageNumText}>
                       {materialAge != null ? `${materialAge} years` : "N/A"}
                     </Text>

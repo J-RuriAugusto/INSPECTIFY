@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Animated } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { useTranslation } from '../../hooks/useTranslation';
+
+
 
 interface ScanningProps {
   photo: string;
@@ -10,23 +13,13 @@ interface ScanningProps {
 const { width, height } = Dimensions.get('window');
 
 const Scanning: React.FC<ScanningProps> = ({ photo }) => {
+  const { t, translateMessages } = useTranslation();
   const params = useLocalSearchParams();
   const router = useRouter();
   const scanAnim = useRef(new Animated.Value(0)).current;
   const [currentMessage, setCurrentMessage] = useState(0);
 
-  const messages = [
-    "Did you know? Regular inspections can uncover hidden damage long before it becomes costly.",
-    "Did you know? Homes with poor drainage are more prone to mold, rot, and foundation damage.",
-    "Did you know? Hairline cracks in drywall can be an early sign of foundation settling.",
-    "Did you know? A poorly ventilated attic can shorten your roof’s lifespan by up to 30%.",
-    "Did you know? Water stains on ceilings often point to hidden roof leaks or plumbing issues.",
-    "Did you know? Minor plumbing leaks can waste up to 10,000 gallons of water per year.",
-    "Did you know? Tree roots can crack foundations and underground pipes if planted too close.",
-    "Did you know? Replacing old weatherstripping can reduce energy bills by up to 20%.",
-    "Did you know? A sagging floor may indicate compromised joists or water damage below.",
-    "Did you know? Cracks wider than 1/4 inch in concrete may signal structural movement.",
-  ];
+  const messages = translateMessages()
 
   useEffect(() => {
     // Scanning effect animation (moving up & down)
@@ -59,7 +52,7 @@ const Scanning: React.FC<ScanningProps> = ({ photo }) => {
       {photo ? (
         <Image source={{ uri: photo }} style={styles.fullScreenImage} />
       ) : (
-        <Text style={styles.errorText}>No photo available</Text>
+        <Text style={styles.errorText}>{t('NO_PHOTO')}</Text>
       )}
 
       {/* Blur overlay effect - top, bottom, left, and right */}
@@ -70,8 +63,8 @@ const Scanning: React.FC<ScanningProps> = ({ photo }) => {
 
       {/* Scanning Overlay */}
       <View style={styles.overlay}>
-        <Text style={styles.title}>Analyzing the structures</Text>
-        <Text style={styles.title}>for cracks and damages...</Text>
+        <Text style={styles.title}>{t('ANALYZING_STRUCTURES')}</Text>
+        <Text style={styles.title}>{t('FOR_CRACKS')}</Text>
         {/* Informative message box */}
         <View style={styles.messageBox}>
           <Text style={styles.messageText}>{messages[currentMessage]}</Text>
