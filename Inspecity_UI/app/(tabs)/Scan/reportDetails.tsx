@@ -9,7 +9,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Print from 'expo-print';
 import ImageView from 'react-native-image-viewing';
 import { Asset } from 'expo-asset';
-import { useTranslation } from '../../hooks/useTranslation';
+import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportDetails = () => {

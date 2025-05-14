@@ -7,7 +7,7 @@ import Slider from "@react-native-community/slider";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const GOOGLE_MAPS_API_KEY = "AlzaSySZFvzyUdbkL9C3c7KoH3yuL4Oe7qa9nEs";
+const GOOGLE_MAPS_API_KEY = "AlzaSyYLRdCo6-T9fl1vaZ7lMRLRIT0_3HbZpwn";
 
 type Store = {
   id: string;
