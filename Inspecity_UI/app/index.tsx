@@ -109,48 +109,21 @@ const LoadingScreen = () => {
 
   return (
     <View style={styles.container}>
-<<<<<<< HEAD
-=======
       {/* Hide Status Bar */}
       <StatusBar hidden={true} />
       
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
       <Text style={styles.title}>LOADING VIDEO</Text>
       <Video
         ref={video}
         style={styles.video}
-<<<<<<< HEAD
         source={require('../assets/videos/LOADINGSCREEN.mp4')}
-=======
         source={require('../assets/videos/LOADINGSCREEN2.mp4')}
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
         resizeMode={ResizeMode.CONTAIN}
         shouldPlay
         isMuted
         onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
       />
       <Text style={styles.description}>Loading animation is here.</Text>
-<<<<<<< HEAD
-=======
-      {isCheckingUser && <ActivityIndicator size="small" color="#0000ff" />}
-          {showLanguageOverlay && (
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <Text style={styles.modalTitle}>Choose Your Language</Text>
-          <Text style={styles.modalSubtitle}>Your language preference can be changed at any time in Settings</Text>
-
-          <View style={styles.languageButtons}>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
- 
-
-
-          </View>
-        </View>
-      </View>
-    )}
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
     </View>
   );
 };
@@ -172,11 +145,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   video: {
-<<<<<<< HEAD
     width: 500,
     height: 200,
   },
-=======
     width: 1000,
     height: 800,
     marginRight: 7
@@ -226,7 +197,6 @@ languageOption: {
 
 },
 
->>>>>>> 8f84b034af9e8d5daff095ed3c8f5ad6cd4a08a6
 });
 
 export default LoadingScreen;
