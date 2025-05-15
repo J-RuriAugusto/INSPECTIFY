@@ -63,8 +63,8 @@ const Scanning: React.FC<ScanningProps> = ({ photo }) => {
 
       {/* Scanning Overlay */}
       <View style={styles.overlay}>
-        <Text style={styles.title}>{t('ANALYZING_STRUCTURES')}</Text>
-        <Text style={styles.title}>{t('FOR_CRACKS')}</Text>
+        {/* <Text style={styles.title}>{t('ANALYZING_STRUCTURES')}</Text>
+        <Text style={styles.title}>{t('FOR_CRACKS')}</Text> */}
         {/* Informative message box */}
         <View style={styles.messageBox}>
           <Text style={styles.messageText}>{messages[currentMessage]}</Text>
