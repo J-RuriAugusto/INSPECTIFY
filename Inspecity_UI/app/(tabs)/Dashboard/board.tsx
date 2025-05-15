@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler, RefreshControl } from 'react-native';
-import { Dimensions } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+// import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
 import useUserID from "../../useUserID";
@@ -10,6 +11,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import HomeDetails from '../../../constants/HomeDetails'
 import { Link } from 'expo-router';
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -210,15 +212,31 @@ const Dashboard = () => {
     return null; 
   }
 
-  const savedShops = [
-    { id: '1', image: require('../../../assets/images/shop1.png') },
-    { id: '2', image: require('../../../assets/images/shop2.png') },
-    { id: '3', image: require('../../../assets/images/shop2.png') },
-    { id: '4', image: require('../../../assets/images/shop2.png') },
-  ];
+  // Inside your Dashboard component
+  const [savedShops, setSavedShops] = useState<{ id: string; name: string; image: string }[]>([]);
 
+  // Load saved bookmarks from AsyncStorage on focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadBookmarkedShops = async () => {
+        try {
+          const saved = await AsyncStorage.getItem('savedShops');
+          const parsed = saved ? JSON.parse(saved) : [];
+          setSavedShops(parsed);
+        } catch (error) {
+          console.error('Failed to load saved shops:', error);
+        }
+      };
+      loadBookmarkedShops();
+    }, [])
+  );
+
+  // When a shop is tapped, navigate to the map and pass the shop ID
   const handleShopPress = (id: string) => {
-    Alert.alert(`Shop ${id} Pressed!`);
+    router.push({
+      pathname: '/(tabs)/Shops', // make sure your Shops.tsx is routed here
+      params: { shopId: id },
+    });
   };
 
   const handleReportPress = (id: string) => {
@@ -262,17 +280,108 @@ const Dashboard = () => {
 
       {/* Saved Shops (Horizontal Scroll) */}
       <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
-      <FlatList
-        data={savedShops}
-        horizontal
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleShopPress(item.id)}>
-            <Image source={item.image} style={styles.shopImage} />
-          </TouchableOpacity>
-        )}
-      />
+      {savedShops.length > 0 ? (
+        <FlatList
+          data={savedShops}
+          horizontal
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleShopPress(item.id)}
+              style={{
+                backgroundColor: '#0B417D',
+                padding: wp(3),
+                borderRadius: wp(3),
+                marginHorizontal: wp(1.5),
+                marginTop: hp(2),
+                marginBottom: hp(3),
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: wp(70),
+                height: hp(15),
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: hp(0.25) },
+                shadowOpacity: 0.1,
+                shadowRadius: wp(1),
+                elevation: 3,
+              }}
+            >
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  width: wp(20),
+                  height: wp(20),
+                  borderRadius: wp(2),
+                  marginRight: wp(2.5),
+                }}
+              />
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: hp(0.25),
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{ fontSize: wp(3.5), fontWeight: 'bold', color: '#fff', flex: 1 }}
+                  >
+                    {item.name}
+                  </Text>
+                  <View
+                    style={{
+                      width: wp(7),
+                      height: wp(7),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
+                  </View>
+                </View>
+                <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on map</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: hp(2),
+            paddingHorizontal: wp(5),
+          }}
+        >
+          <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
+          <Text
+            style={{
+              fontSize: wp('4.1%'),
+              fontWeight: '600',
+              fontFamily: 'Archivo-Bold',
+              color: '#777',
+              marginTop: hp(1),
+              textAlign: 'center',
+            }}
+          >
+            You haven’t bookmarked any shops yet.
+          </Text>
+          <Text
+            style={{
+              fontSize: wp('3.8%'),
+              fontFamily: 'Archivo-Regular',
+              color: '#AFAFAF',
+              // marginTop: hp(0.5),
+              textAlign: 'center',
+            }}
+          >
+            Go to the Shops and tap the heart icon on a store to save it here.
+          </Text>
+        </View>
+      )}
 
       {/* Reports Section (Vertical Scroll) */}
       <Text style={styles.title4}>{t('REPORTS')}</Text>
@@ -379,7 +488,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    paddingBottom: hp('6%'),
+    paddingBottom: hp('12%'),
   },
   noReportsText: {
     fontSize: wp('4.5%'),
@@ -389,7 +498,7 @@ const styles = StyleSheet.create({
   },
   reportsContainer: {
     width: '100%',
-    paddingBottom: hp('27%'),
+    paddingBottom: hp('33%'),
   },
   reportItem: {
     padding: wp('4%'),
