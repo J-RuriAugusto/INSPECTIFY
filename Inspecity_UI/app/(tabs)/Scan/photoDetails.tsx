@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
   scannedImageText: { marginTop: hp('1%'), fontFamily: 'Epilogue-Regular', fontSize: wp('2.5%'), color: '#000', textAlign: 'center' },
 
   // Details Section
-  detailsWrapper: { height: hp('69%'), width: wp('100%'), backgroundColor: '#F6F6F6', borderTopLeftRadius: wp('6%'), borderTopRightRadius: wp('6%'), overflow: 'hidden', position: 'absolute', bottom: 0, paddingTop: hp('3%') },
+  detailsWrapper: { height: hp('69%'), width: wp('100%'), backgroundColor: '#F6F6F6', borderTopLeftRadius: wp('6%'), borderTopRightRadius: wp('6%'), overflow: 'hidden', position: 'absolute', bottom: 0, paddingTop: hp('3%'), paddingBottom: hp('3%') },
   scrollContent: { padding: wp('5%') },
   detailsContainer: { flexGrow: 1 },
   title: { fontFamily: 'Epilogue-Bold', fontSize: wp('6.5%'), color: '#2B3C62', textAlign: 'center' },
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   modalButtonText: { color: '#FFF', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold' },
   closeButton: { paddingTop: hp('1%'), alignItems: 'center' },
   closeButtonText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium' },
-  concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000' }
+  concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%') }
 });
 
 export default PhotoDetails;
