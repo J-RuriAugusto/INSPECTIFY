@@ -165,7 +165,7 @@ const Results = () => {
         <Text style={[styles.riskLevel, { color }]}>{label}</Text>
         <View style={styles.barContainer}>
           <View
-            style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
+            style={[styles.bar, { width: ${(numericScore / 15) * 100}%, backgroundColor: color }]}
           />
         </View>
         <Text style={styles.score}>You answered {numericScore} out of 15</Text>
