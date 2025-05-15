@@ -6,8 +6,10 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'; // ✅ Added
 import { useColorScheme } from '@/components/useColorScheme';
 import { SettingsProvider } from './(tabs)/Dashboard/settingsContext';
+
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
@@ -36,14 +38,18 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}> {/* ✅ Gesture handler wrapper */}
+      <RootLayoutNav />
+    </GestureHandlerRootView>
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <SettingsProvider> {/* Wrap everything with SettingsProvider */}
+    <SettingsProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

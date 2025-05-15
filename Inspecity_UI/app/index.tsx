@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -105,7 +105,13 @@ const LoadingScreen = () => {
     router.replace('/getstarted_1');
   };
 
-
+  const handleSkip = () => {
+    if (userId) {
+      checkUserIdInDatabase(userId);
+    } else {
+      setShowLanguageOverlay(true);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -122,25 +128,35 @@ const LoadingScreen = () => {
         isMuted
         onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
       />
+      
+      {/* Conditionally render the Skip button only if there's user data (userId) */}
+      {userId && (
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+          <Text style={styles.skipText}>SKIP</Text>
+        </TouchableOpacity>
+      )}
+      
       <Text style={styles.description}>Loading animation is here.</Text>
+      
       {isCheckingUser && <ActivityIndicator size="small" color="#0000ff" />}
-          {showLanguageOverlay && (
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <Text style={styles.modalTitle}>Choose Your Language</Text>
-          <Text style={styles.modalSubtitle}>Your language preference can be changed at any time in Settings</Text>
+      
+      {showLanguageOverlay && (
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <Text style={styles.modalTitle}>Choose Your Language</Text>
+            <Text style={styles.modalSubtitle}>Your language preference can be changed at any time in Settings</Text>
 
-          <View style={styles.languageButtons}>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
-            <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
+            <View style={styles.languageButtons}>
+              <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
+              <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
+              <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
  
 
 
+            </View>
           </View>
         </View>
-      </View>
-    )}
+      )}
     </View>
   );
 };
@@ -166,51 +182,63 @@ const styles = StyleSheet.create({
     height: 800,
     marginRight: 7
   },
-    overlay: {
-  position: 'absolute',
-  top: 0, left: 0, right: 0, bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 10,
-},
-modal: {
-  backgroundColor: 'white',
-  padding: 20,
-  borderRadius: 20,
-  alignItems: 'center',
-  width: '85%',
-},
-modalTitle: {
-  fontSize: 25,
-  fontWeight: 'bold',
-  marginBottom: 10,
-  textAlign: 'center',
-},
-modalSubtitle: {
-  fontSize: 14,
-  color: '#555',
-  marginBottom: 20,
-  textAlign: 'center',
-},
-languageButtons: {
-  flexDirection: 'column',
-  alignItems: 'center',
-  width: '100%',
+  skipButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#00000080', // semi-transparent background
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  skipText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modal: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    width: '85%',
+  },
+  modalTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  languageButtons: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
 
-},
-languageOption: {
-  fontSize: 18,
-  color: '#FFFFFF',
-  marginVertical: 3,
-  paddingVertical: 10,
-  justifyContent: 'center',
-  backgroundColor: '#08294E',
-  borderRadius: 30,
-
-
-},
-
+  },
+  languageOption: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginVertical: 3,
+    paddingVertical: 10,
+    justifyContent: 'center',
+    backgroundColor: '#08294E',
+    borderRadius: 30,
+  },
 });
 
 export default LoadingScreen;

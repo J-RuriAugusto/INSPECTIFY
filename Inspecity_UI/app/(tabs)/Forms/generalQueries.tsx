@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import {
+  StyleSheet,
+  Image,
+  Text,
+  View,
+  TouchableOpacity,
+  ImageBackground,
+  Dimensions,
+} from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 
-const router = useRouter();
 const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const questions = [
+  const initialQuestions = [
     'Do you have an emergency kit with basic supplies (e.g., flashlight, first aid, food, water)?',
     'Do you have a family emergency plan in case of disasters?',
     'Do you know the nearest evacuation center in your area?',
@@ -24,8 +30,12 @@ const Questions = () => {
     'Do you have a fire extinguisher at home? ',
     'Do you regularly participate in community disaster drills?  ',
     'Do you have a plan for communicating with family members during disasters? ',
-    'Do you know the basic first aid procedures (e.g., CPR, wound care)?',  
-    ];
+    'Do you know the basic first aid procedures (e.g., CPR, wound care)?',
+  ];
+
+  const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -35,28 +45,38 @@ const Questions = () => {
   });
 
   const navigation = useNavigation();
+  const router = useRouter();
 
   if (!fontsLoaded) return null;
 
-  const [score, setScore] = useState(0);
-
-  
-  // Inside your component:
   const handleAnswer = (answer: string) => {
     if (answer === 'Yes') {
-      setScore(prev => prev + 1);
+      setScore((prev) => prev + 1);
     }
-  
-    if (questionIndex < questions.length - 1) {
-      setQuestionIndex(prev => prev + 1);
+
+    const nextIndex = questionIndex + 1;
+
+    if (nextIndex < questionsQueue.length) {
+      setQuestionIndex(nextIndex);
     } else {
       router.push({
         pathname: '/Forms/general_results',
-        params: { score: score.toString() }, // Must stringify numbers
+        params: { score: (answer === 'Yes' ? score + 1 : score).toString() },
       });
     }
   };
-    
+
+  const handleSkip = () => {
+    const skippedQuestion = questionsQueue[questionIndex];
+    const updatedQueue = [...questionsQueue.slice(0, questionIndex), ...questionsQueue.slice(questionIndex + 1), skippedQuestion];
+
+    setQuestionsQueue(updatedQueue);
+    if (questionIndex < updatedQueue.length - 1) {
+      setQuestionIndex(questionIndex); // Stay at same index (next question comes forward)
+    } else {
+      setQuestionIndex(updatedQueue.length - 1);
+    }
+  };
 
   return (
     <ImageBackground
@@ -65,58 +85,56 @@ const Questions = () => {
       resizeMode="cover"
     >
       {/* Top Header Row */}
-        <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-            </TouchableOpacity>
+      <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image
+            source={require('../../../assets/images/back-icon.png')}
+            style={styles.backIcon}
+          />
+        </TouchableOpacity>
 
-            <Text style={styles.categoryTitle}>GENERAL</Text>
+        <Text style={styles.categoryTitle}>GENERAL</Text>
 
-            <TouchableOpacity onPress={() => {
-                if (questionIndex < questions.length - 1) {
-                    setQuestionIndex(prev => prev + 1);
-                } else {
-                    // Optionally, navigate or show a result/completion
-                    console.log("Finished all questions");
-                }
-                }}>
-                <Text style={styles.skipText}>SKIP</Text>
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={handleSkip}>
+          <Text style={styles.skipText}>SKIP</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-            <View
-            style={[
-                styles.progressBar,
-                { width: `${((questionIndex + 1) / questions.length) * 100}%` },
-            ]}
-            />
-        </View>
+      <View style={styles.progressContainer}>
+        <View
+          style={[
+            styles.progressBar,
+            { width: `${((questionIndex + 1) / questionsQueue.length) * 100}%` },
+          ]}
+        />
+      </View>
 
-        {/* Modal-like Container for Questions */}
-        <View style={styles.contentWrapper}>
-            <View style={styles.modal}>
-                <View style={styles.questionContainer}>
-                    <Text style={styles.questionText}>{questions[questionIndex]}</Text>
-                </View>
+      {/* Modal-like Container for Questions */}
+      <View style={styles.contentWrapper}>
+        <View style={styles.modal}>
+          <View style={styles.questionContainer}>
+            <Text style={styles.questionText}>
+              {questionsQueue[questionIndex]}
+            </Text>
+          </View>
 
-                <View style={styles.optionsContainer}>
-                    <TouchableOpacity
-                        style={styles.optionButton}
-                        onPress={() => handleAnswer('Yes')}
-                    >
-                        <Text style={styles.optionText}>Yes</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.optionButton}
-                        onPress={() => handleAnswer('No')}
-                    >
-                        <Text style={styles.optionText}>No</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={() => handleAnswer('Yes')}
+            >
+              <Text style={styles.optionText}>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={() => handleAnswer('No')}
+            >
+              <Text style={styles.optionText}>No</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+      </View>
     </ImageBackground>
   );
 };
@@ -181,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: height * 0.12,
     paddingHorizontal: width * 0.1,
-  },  
+  },
   modal: {
     width: '100%',
     height: '90%',
@@ -190,7 +208,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.8)',
     alignItems: 'center',
     justifyContent: 'center',
-  },  
+  },
   questionText: {
     fontFamily: 'Epilogue-Bold',
     fontSize: 25,
@@ -198,24 +216,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   questionContainer: {
-    minHeight: height * 0.15, // Adjust as needed
+    minHeight: height * 0.15,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-  },  
+  },
   optionsContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '8%', // or marginVertical in optionButton
-    marginTop: '10%', // space between question and buttons
-  },  
+    gap: '8%',
+    marginTop: '10%',
+  },
   optionButton: {
     backgroundColor: '#030F1C',
     paddingVertical: '5%',
     paddingHorizontal: '40%',
     borderRadius: 15,
-    // marginVertical: '1%'
   },
   optionText: {
     fontFamily: 'Epilogue-Bold',
