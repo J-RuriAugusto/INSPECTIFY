@@ -68,7 +68,7 @@ const ReportDetails = () => {
         const fetchData = async () => {
           try {
             await fetchReportDetails(reportID);
-            await fetchNotes(reportID);
+            // await fetchNotes(reportID);
           } catch (error) {
             if (isActive) {
               console.error('Error fetching data:', error);
@@ -106,6 +106,7 @@ const ReportDetails = () => {
             : []
         );
         setDateCreated(response.data.date_created);
+        setNotes(response.data.note)
       }
     } catch (error) {
       console.error('Error fetching report details: ', error);
@@ -113,25 +114,25 @@ const ReportDetails = () => {
     }
   };
 
-  const fetchNotes = async (reportId: number) => {
-    try {
-      const response = await axios.get(
-        `https://flask-railway-sample-production.up.railway.app/report/${reportId}/note`,
-        {
-          headers: {
-            'X-API-KEY': API_KEY,
-          },
-        }
-      );
+  // const fetchNotes = async (reportId: number) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://flask-railway-sample-production.up.railway.app/report/${reportId}/note`,
+  //       {
+  //         headers: {
+  //           'X-API-KEY': API_KEY,
+  //         },
+  //       }
+  //     );
   
-      if (response.data && response.data.note) {
-        setNotes(response.data.note); // Update the notes state with the fetched note
-      }
-    } catch (error) {
-      console.error('Error fetching notes: ', error);
-      Alert.alert(t('ERROR'), t('FAILED_FETCH_NOTES'));
-    }
-  };
+  //     if (response.data && response.data.note) {
+  //       setNotes(response.data.note); // Update the notes state with the fetched note
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching notes: ', error);
+  //     Alert.alert(t('ERROR'), t('FAILED_FETCH_NOTES'));
+  //   }
+  // };
 
   const updateNote = async () => {
     if (!reportID) {

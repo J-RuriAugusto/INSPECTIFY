@@ -41,6 +41,7 @@ const PhotoDetails = () => {
   const [isImageModalVisible, setImageModalVisible] = useState(false); // State for full-screen image modal
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportCreationFailed, setReportCreationFailed] = useState(false);
 
   const saveReport = () => {
     Alert.alert(
@@ -81,53 +82,54 @@ const PhotoDetails = () => {
     }
   }, [photo]);
   
-  useEffect(() => {
-    if (reportID) {
-      fetchReportDetails(reportID);
-    }
-  }, [reportID]);
+  // useEffect(() => {
+  //   if (reportID) {
+  //     fetchReportDetails(reportID);
+  //   }
+  // }, [reportID]);
 
-  const fetchReportDetails = async (reportId:number) => {
-    try {
-      const response = await axios.get(`https://flask-railway-sample-production.up.railway.app/reports/${reportId}`, {
-        headers: {
-          'X-API-KEY': API_KEY,
-        },
-      });
+  // const fetchReportDetails = async (reportId:number) => {
+  //   try {
+  //     const response = await axios.get(`https://flask-railway-sample-production.up.railway.app/reports/${reportId}`, {
+  //       headers: {
+  //         'X-API-KEY': API_KEY,
+  //       },
+  //     });
 
-      if (response.data) {
-        setAnnotatedImage(response.data.annotated_image);
-        setCondition(response.data.condition);
-        setMaterial(response.data.material);
-        setMaterialAge(response.data.material_age);
-        setRecommendations(response.data.recommendations);
-        setDamageTypes(response.data.damage_types || []);
-        setDateCreated(response.data.date_created);
-      }
-    } catch (error) {
-      console.error('Error fetching report details: ', error);
-      Alert.alert('Error', 'Failed to fetch report details');
-    }
-  };
+  //     if (response.data) {
+  //       setAnnotatedImage(response.data.annotated_image);
+  //       setCondition(response.data.condition);
+  //       setMaterial(response.data.material);
+  //       setMaterialAge(response.data.material_age);
+  //       setRecommendations(response.data.recommendations);
+  //       setDamageTypes(response.data.damage_types || []);
+  //       setDateCreated(response.data.date_created);
+  //       setNotes(response.data.note);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching report details: ', error);
+  //     Alert.alert('Error', 'Failed to fetch report details');
+  //   }
+  // };
 
 
   const uploadImageToCloudinary = async (uri: string) => {
     try {
       setIsUploading(true);
       console.log(`user image uri: ${uri}`)
-
+  
       const fileInfo = await FileSystem.getInfoAsync(uri);
       if (!fileInfo.exists) {
         throw new Error(`File does not exist at path: ${uri}`);
       }
-
+  
       const fileBase64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-
+  
       const formData = new FormData();
       formData.append('file', `data:image/jpeg;base64,${fileBase64}`);
       formData.append('upload_preset', 'Inspectify_images');
       formData.append('cloud_name', 'dyk1pt3m0');
-
+  
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/dyk1pt3m0/image/upload`,
         formData,
@@ -137,14 +139,28 @@ const PhotoDetails = () => {
           },
         }
       );
-
+  
       const imageUrl = response.data.secure_url;
       await createReport(imageUrl);
       setIsUploading(false);
     } catch (error) {
       console.error('Error uploading image: ', error);
       setIsUploading(false);
-      Alert.alert('Error', 'Failed to upload image');
+      setReportCreationFailed(true);
+      Alert.alert(
+        'Error', 
+        'Failed to upload image',
+        [
+          { 
+            text: "Go Back", 
+            onPress: () => navigation.popToTop()
+          },
+          {
+            text: "Retry",
+            onPress: () => uploadImageToCloudinary(photo)
+          }
+        ]
+      );
     }
   };
 
@@ -152,51 +168,84 @@ const PhotoDetails = () => {
     try {
       // Convert homeId to a number
       const homeIdNumber = parseInt(homeId, 10);
-  
+    
       // Log the data being sent
       console.log("Sending data:", {
         home_id: homeIdNumber,
         report_name: reportName,
         url: imageUrl,
       });
-  
+    
       const response = await axios.post('https://flask-railway-sample-production.up.railway.app/createReport', {
         home_id: homeIdNumber,
         report_name: reportName,
         url: imageUrl,
       }, {
         headers: {
-          'Content-Type': 'application/json', // Ensure the correct content type
+          'Content-Type': 'application/json',
           'X-API-KEY': API_KEY,
         },
       });
-  
+    
       console.log("Response:", response.data);
-  
+    
       if (response.status === 200) {
         setReportID(Number(response.data.report_id));
+        setAnnotatedImage(response.data.annotated_image);
+        setCondition(response.data.condition);
+        setMaterial(response.data.material);
+        setMaterialAge(response.data.material_age);
+        setRecommendations(response.data.recommendations);
+        setDamageTypes(response.data.damage_types || []);
+        setDateCreated(response.data.date_created);
+        setNotes(response.data.note);
+        setReportCreationFailed(false); // Reset failure state on success
         Alert.alert('Success', 'Report created successfully');
       } else {
+        setReportCreationFailed(true); // Set failure state
         Alert.alert(
           'Error', 
           'Failed to create report',
           [
             { 
-              text: "OK", 
-              onPress: () => navigation.popToTop() // This will navigate to top when OK is pressed
+              text: "Go Back", 
+              onPress: () => navigation.popToTop()
+            },
+            {
+              text: "Retry",
+              onPress: () => {
+                // Don't reupload image if it was successful
+                if (imageUrl) {
+                  createReport(imageUrl);
+                } else {
+                  uploadImageToCloudinary(photo);
+                }
+              }
             }
           ]
         );
       }
     } catch (error) {
       console.error('Error creating report: ', error);
+      setReportCreationFailed(true); // Set failure state
       Alert.alert(
         'Error', 
         'An error occurred while creating the report',
         [
           { 
-            text: "OK", 
-            onPress: () => navigation.popToTop() // This will navigate to top when OK is pressed
+            text: "Go Back", 
+            onPress: () => navigation.popToTop()
+          },
+          {
+            text: "Retry",
+            onPress: () => {
+              // Don't reupload image if it was successful
+              if (imageUrl) {
+                createReport(imageUrl);
+              } else {
+                uploadImageToCloudinary(photo);
+              }
+            }
           }
         ]
       );
