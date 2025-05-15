@@ -31,17 +31,127 @@ const Results = () => {
     if (numericScore <= 10) return '#FFC107';
     return '#F44336';
   };
+  const answersArray = params.answers
+    ? JSON.parse(Array.isArray(params.answers) ? params.answers[0] : params.answers)
+    : [];
 
   const waveColor = getColorByPercentage();
 
-  const facilities = [
-    { icon: 'local-hospital', color: '#F44336', label: 'Cebu City Medical Center' },
-    { icon: 'local-police', color: '#2196F3', label: 'Police Station 1 - Near Fuente Osmeña' },
-    { icon: 'home-work', color: '#4CAF50', label: 'Barangay Hall - Capitol Site' },
-    { icon: 'local-hospital', color: '#F44336', label: 'North General Hospital' },
-    { icon: 'home-work', color: '#4CAF50', label: 'Talamban National High School' },
-    { icon: 'emoji-people', color: '#FFC107', label: 'Evacuation Center - Cebu Sports Complex' },
-  ];
+  // const facilities = [
+  //   { icon: 'local-hospital', color: '#F44336', label: 'Cebu City Medical Center' },
+  //   { icon: 'local-police', color: '#2196F3', label: 'Police Station 1 - Near Fuente Osmeña' },
+  //   { icon: 'home-work', color: '#4CAF50', label: 'Barangay Hall - Capitol Site' },
+  //   { icon: 'local-hospital', color: '#F44336', label: 'North General Hospital' },
+  //   { icon: 'home-work', color: '#4CAF50', label: 'Talamban National High School' },
+  //   { icon: 'emoji-people', color: '#FFC107', label: 'Evacuation Center - Cebu Sports Complex' },
+  // ];
+
+  const [recommendation, setRecommendation] = useState('');
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const API_KEY = 'BT_1smAfCA4roEldR7S9LObSgdbZ7uGAF2HJvs5VQyY'; // Flask
+  const GOOGLE_API_KEY = 'AlzaSykSYFuBf5L9fCC0YEoewTViPsGtHSGvJOL'; // Replace with your actual Google Maps API Key
+
+  useEffect(() => {
+    const fetchRecommendation = async () => {
+      try {
+        const response = await fetch(
+          'https://flask-railway-sample-production.up.railway.app/flood-recommendation',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-KEY': API_KEY,
+            },
+            body: JSON.stringify({
+              score: numericScore,
+              answers: answersArray,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unknown error from backend');
+
+        setRecommendation(data.gemini_recommendation);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError('Error fetching recommendation.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  const fetchNearbyFacilities = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Location permission not granted');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      const types = ['hospital', 'police', 'school', 'city_hall'];
+
+      // Fetch results for each type
+      const results = await Promise.all(types.map(type =>
+        axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
+          params: {
+            location: `${latitude},${longitude}`,
+            radius: 5000,
+            type,
+            key: GOOGLE_API_KEY,
+          },
+        })
+      ));
+
+      // Limit 5 results per category and keep track of the results per type
+      const allPlaces = results.flatMap(res => res.data.results);
+      const groupedResults = {};
+
+      types.forEach(type => {
+        groupedResults[type] = allPlaces.filter(place =>
+          place.types.includes(type)
+        ).slice(0, 5); // Limit to 5 per type
+      });
+
+      // Flatten the results and prepare the mapped data
+      const selected = [];
+      for (const type of types) {
+        const places = groupedResults[type];
+        places.forEach(place => {
+          selected.push({
+            icon: mapPlaceTypeToIcon(place.types || []),
+            color: '#4CAF50',
+            label: place.name,
+          });
+        });
+      }
+
+      // Set the state with the selected facilities
+      setFacilities(selected);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch nearby critical facilities.');
+    }
+  };
+
+    fetchRecommendation();
+    fetchNearbyFacilities();
+  }, []);
+
+  const mapPlaceTypeToIcon = (types: string[]): keyof typeof MaterialIcons.glyphMap => {
+    if (types.includes('hospital')) return 'local-hospital';
+    if (types.includes('police')) return 'local-police';
+    if (types.includes('school')) return 'school';
+    if (types.includes('city_hall') || types.includes('local_government_office')) return 'home-work';
+    return 'location-on';
+  };
+
 
   return (
     <View style={styles.container}>
