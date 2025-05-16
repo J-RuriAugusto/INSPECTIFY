@@ -33,6 +33,7 @@ const Dashboard = () => {
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
     'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
   });
 
   useEffect(() => {
@@ -211,11 +212,12 @@ const Dashboard = () => {
   }
 
   const savedShops = [
-    { id: '1', image: require('../../../assets/images/shop1.png') },
-    { id: '2', image: require('../../../assets/images/shop2.png') },
-    { id: '3', image: require('../../../assets/images/shop2.png') },
-    { id: '4', image: require('../../../assets/images/shop2.png') },
+    { id: '1', name: 'Shop A', location: 'Main St, City A', icon: require('../../../assets/images/shop_icon.png') },
+    { id: '2', name: 'Shop B', location: '2nd Ave, City B', icon: require('../../../assets/images/shop_icon.png') },
+    { id: '3', name: 'Shop C', location: 'Market Rd, City C', icon: require('../../../assets/images/shop_icon.png') },
+    { id: '4', name: 'Shop D', location: '4th Blvd, City D', icon: require('../../../assets/images/shop_icon.png') },
   ];
+
 
   const handleShopPress = (id: string) => {
     Alert.alert(`Shop ${id} Pressed!`);
@@ -268,11 +270,14 @@ const Dashboard = () => {
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleShopPress(item.id)}>
-              <Image source={item.image} style={styles.shopImage} />
+            <TouchableOpacity onPress={() => handleShopPress(item.id)} style={styles.shopCard}>
+              <Image source={item.icon} style={styles.shopIcon} />
+              <Text style={styles.shopName}>{item.name}</Text>
+              <Text style={styles.shopLocation}>{item.location}</Text>
             </TouchableOpacity>
           )}
         />
+
 
         {/* Reports Section (Vertical Scroll) */}
         <Text style={styles.title4}>{t('REPORTS')}</Text>
@@ -313,7 +318,8 @@ const Dashboard = () => {
             backgroundColor: '#FFFFFF',
             paddingTop: 60, // Adjusted for the header height
             paddingHorizontal: 20,   
-            width: '100%'   
+            width: '100%',
+            
           },
           header: {
             position: 'absolute', // Fix the header at the top
@@ -355,6 +361,7 @@ const Dashboard = () => {
             fontFamily: 'Epilogue-Bold',
             alignSelf: 'flex-start',  
             marginBottom: 10,  
+            marginTop: 10,
           },
           searchBar: {
             height: 40,
@@ -366,13 +373,7 @@ const Dashboard = () => {
             fontSize: 16,
             backgroundColor: '#FFFFFF',
           },
-          shopImage: {
-            width: 100,
-            height: 100,
-            borderRadius: 10,
-            marginHorizontal: 10,
-            marginBottom: 60,
-          },
+
           reportsContainer: {
             paddingBottom: 256, // Add some padding at the bottom to avoid cutoff
             width: '100%'
@@ -390,7 +391,6 @@ const Dashboard = () => {
           },
           reportItem: {
             padding: 15,
-            backgroundColor: '#FFFFFF',
             borderRadius: 15,
             marginBottom: 10,
             width: '100%',  // Makes the container match the search bar width
@@ -400,7 +400,8 @@ const Dashboard = () => {
             // alignSelf: 'stretch',
             flexDirection: 'row',  // Keep the icon and text in a row layout
             alignItems: 'center',   // Center the icon and text vertically
-            justifyContent: 'flex-start'
+            justifyContent: 'flex-start',
+            backgroundColor: '#FFFFFF',
           },
           reportContent: {
             flexDirection: 'row',  // Aligns icon and title horizontally
@@ -418,7 +419,37 @@ const Dashboard = () => {
               color: '#2B3C62',
               fontFamily: 'Epilogue-Bold',
               textAlign: 'left'
-          }
+          },
+          shopCard: {
+            width: 110,
+            height: 120,
+            backgroundColor: '#0B417D', // Blue color
+            borderRadius: 12,
+            marginHorizontal: 5,
+            marginVertical: 5,
+            padding: 10,
+            alignItems: 'left',
+          },
+          shopIcon: {
+            width: 25,
+            height: 25,
+            marginBottom: 8,
+          },
+          shopName: {
+            fontSize: 14,
+            fontWeight: 'bold',
+            color: '#FFFFFF',
+            textAlign: 'left',
+            marginTop: 30,
+            fontFamily: 'Epilogue-Medium'
+          },
+          shopLocation: {
+            fontSize: 12,
+            color: '#84BEFF',
+            textAlign: 'left',
+            marginBottom: 10,
+          },
+
         });
                 
 export default Dashboard;
