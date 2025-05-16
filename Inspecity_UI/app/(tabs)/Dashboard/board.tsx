@@ -35,7 +35,6 @@ const Dashboard = () => {
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
     'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
   });
 
   useEffect(() => {
