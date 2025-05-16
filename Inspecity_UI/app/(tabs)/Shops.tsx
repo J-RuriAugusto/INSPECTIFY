@@ -53,9 +53,11 @@ const NearbyShops = () => {
   // Load bookmarked stores from AsyncStorage
   const loadBookmarkedStores = async () => {
     try {
-      const savedBookmarks = await AsyncStorage.getItem('bookmarkedStores');
-      if (savedBookmarks) {
-        setBookmarkedStores(JSON.parse(savedBookmarks));
+      const saved = await AsyncStorage.getItem('savedShops');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const ids = parsed.map((s: Store) => s.id);
+        setBookmarkedStores(ids);
       }
     } catch (error) {
       console.error('Error loading bookmarked stores:', error);
@@ -63,28 +65,41 @@ const NearbyShops = () => {
   };
 
   // Save bookmarked stores to AsyncStorage
-  const saveBookmarkedStores = async (bookmarks: string[]) => {
-    try {
-      await AsyncStorage.setItem('bookmarkedStores', JSON.stringify(bookmarks));
-    } catch (error) {
-      console.error('Error saving bookmarked stores:', error);
-    }
-  };
+  // const saveBookmarkedStores = async (bookmarks: string[]) => {
+  //   try {
+  //     await AsyncStorage.setItem('bookmarkedStores', JSON.stringify(bookmarks));
+  //   } catch (error) {
+  //     console.error('Error saving bookmarked stores:', error);
+  //   }
+  // };
 
   // Toggle bookmark for a store
-  const toggleBookmark = (storeId: string) => {
-    let updatedBookmarks: string[];
-    
-    if (bookmarkedStores.includes(storeId)) {
-      // Remove bookmark
-      updatedBookmarks = bookmarkedStores.filter(id => id !== storeId);
-    } else {
-      // Add bookmark
-      updatedBookmarks = [...bookmarkedStores, storeId];
+  const toggleBookmark = async (storeId: string) => {
+    try {
+      const store = stores.find((s) => s.id === storeId);
+      if (!store) return;
+
+      const existing = await AsyncStorage.getItem('savedShops');
+      const parsed = existing ? JSON.parse(existing) : [];
+
+      let updated;
+      const isAlreadyBookmarked = parsed.some((s: Store) => s.id === storeId);
+
+      if (isAlreadyBookmarked) {
+        updated = parsed.filter((s: Store) => s.id !== storeId);
+      } else {
+        const { id, name, image } = store; // Only save necessary fields
+        updated = [...parsed.filter((s: Store) => s.id !== storeId), { id, name, image }];
+      }
+
+      await AsyncStorage.setItem('savedShops', JSON.stringify(updated));
+
+      // Optional: update bookmarkedStores for UI toggle
+      const updatedIds = updated.map((s: Store) => s.id);
+      setBookmarkedStores(updatedIds);
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
     }
-    
-    setBookmarkedStores(updatedBookmarks);
-    saveBookmarkedStores(updatedBookmarks);
   };
 
   // Check if a store is bookmarked

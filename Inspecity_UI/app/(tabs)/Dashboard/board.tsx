@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler, RefreshControl } from 'react-native';
-import { Dimensions } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+// import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text } from '@/components/Themed';
 import useUserID from "../../useUserID";
@@ -10,6 +11,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import HomeDetails from '../../../constants/HomeDetails'
 import { Link } from 'expo-router';
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -211,16 +213,31 @@ const Dashboard = () => {
     return null; 
   }
 
-  const savedShops = [
-    { id: '1', name: 'Shop A', location: 'Main St, City A', icon: require('../../../assets/images/shop_icon.png') },
-    { id: '2', name: 'Shop B', location: '2nd Ave, City B', icon: require('../../../assets/images/shop_icon.png') },
-    { id: '3', name: 'Shop C', location: 'Market Rd, City C', icon: require('../../../assets/images/shop_icon.png') },
-    { id: '4', name: 'Shop D', location: '4th Blvd, City D', icon: require('../../../assets/images/shop_icon.png') },
-  ];
+  // Inside your Dashboard component
+  const [savedShops, setSavedShops] = useState<{ id: string; name: string; image: string }[]>([]);
 
+  // Load saved bookmarks from AsyncStorage on focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadBookmarkedShops = async () => {
+        try {
+          const saved = await AsyncStorage.getItem('savedShops');
+          const parsed = saved ? JSON.parse(saved) : [];
+          setSavedShops(parsed);
+        } catch (error) {
+          console.error('Failed to load saved shops:', error);
+        }
+      };
+      loadBookmarkedShops();
+    }, [])
+  );
 
+  // When a shop is tapped, navigate to the map and pass the shop ID
   const handleShopPress = (id: string) => {
-    Alert.alert(`Shop ${id} Pressed!`);
+    router.push({
+      pathname: '/(tabs)/Shops', // make sure your Shops.tsx is routed here
+      params: { shopId: id },
+    });
   };
 
   const handleReportPress = (id: string) => {
@@ -234,222 +251,286 @@ const Dashboard = () => {
       }
     >
       <View style={styles.container}>
-        {/* Header with House and Settings Icons */}
-        <View style={styles.header}>
-          <Link href="/(tabs)/Dashboard/MyProperties" asChild>
-            <TouchableOpacity>
-              <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
-            </TouchableOpacity>
-          </Link>
+      {/* Header with House and Settings Icons */}
+      <View style={styles.header}>
+        <Link href="/(tabs)/Dashboard/MyProperties" asChild>
+          <TouchableOpacity>
+            <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
+          </TouchableOpacity>
+        </Link>
 
-          <Link href="./settings" asChild>
-          <TouchableOpacity>            
-            <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
-            </TouchableOpacity>
-          </Link>
-        </View>
+        <Link href="./settings" asChild>
+        <TouchableOpacity>            
+          <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
+          </TouchableOpacity>
+        </Link>
+      </View>
 
-        {/* Main Content */}
-        <Text style={styles.title1}>{houseName}</Text>
-        <Text style={styles.title2}>{location}</Text>
+      {/* Main Content */}
+      <Text style={styles.title1}>{houseName}</Text>
+      <Text style={styles.title2}>{location}</Text>
 
-        {/* Search Bar */}
-        <TextInput
-          style={styles.searchBar}
-          placeholder={t('SEARCH_PLACEHOLDER')}
-          placeholderTextColor="#AFAFAF"
-          value={search}
-          onChangeText={setSearch}
-        />
+      {/* Search Bar */}
+      <TextInput
+        style={styles.searchBar}
+        placeholder={t('SEARCH_PLACEHOLDER')}
+        placeholderTextColor="#AFAFAF"
+        value={search}
+        onChangeText={setSearch}
+      />
 
-        {/* Saved Shops (Horizontal Scroll) */}
-        <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
+      {/* Saved Shops (Horizontal Scroll) */}
+      <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
+      {savedShops.length > 0 ? (
         <FlatList
           data={savedShops}
           horizontal
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleShopPress(item.id)} style={styles.shopCard}>
-              <Image source={item.icon} style={styles.shopIcon} />
-              <Text style={styles.shopName}>{item.name}</Text>
-              <Text style={styles.shopLocation}>{item.location}</Text>
+            <TouchableOpacity
+              onPress={() => handleShopPress(item.id)}
+              style={{
+                backgroundColor: '#0B417D',
+                padding: wp(3),
+                borderRadius: wp(3),
+                marginHorizontal: wp(1.5),
+                marginTop: hp(2),
+                marginBottom: hp(3),
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: wp(70),
+                height: hp(15),
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: hp(0.25) },
+                shadowOpacity: 0.1,
+                shadowRadius: wp(1),
+                elevation: 3,
+              }}
+            >
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  width: wp(20),
+                  height: wp(20),
+                  borderRadius: wp(2),
+                  marginRight: wp(2.5),
+                }}
+              />
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: hp(0.25),
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{ fontSize: wp(3.5), fontWeight: 'bold', color: '#fff', flex: 1 }}
+                  >
+                    {item.name}
+                  </Text>
+                  <View
+                    style={{
+                      width: wp(7),
+                      height: wp(7),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
+                  </View>
+                </View>
+                <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on map</Text>
+              </View>
             </TouchableOpacity>
           )}
         />
-
-
-        {/* Reports Section (Vertical Scroll) */}
-        <Text style={styles.title4}>{t('REPORTS')}</Text>
-                <View style={{ flex: 1, backgroundColor: 'FFFFFF' }}>
-                  <ScrollView contentContainerStyle={styles.reportsContainer}>
-                    {reportsTitleID.length === 0 ? (
-                      <View style={styles.noReportsContainer}>
-                        <Text style={styles.noReportsText}>{t('NO_REPORTS')}</Text>
-                      </View>
-                    ) : (
-                      reportsTitleID.map((report) => (
-                        <TouchableOpacity 
-                          key={report.report_id} 
-                          onPress={() => handleReportPress(report.report_id)} 
-                          style={styles.reportItem}
-                        >
-                          <View style={styles.reportContent}>
-                            <Image 
-                              source={require('../../../assets/images/report_icon.png')} 
-                              style={styles.reportIcon}
-                            />
-                            <Text style={styles.reportText}>{report.report_name || t('UNTITLED')}</Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              </View>
-            </ScrollView>
-          );
-        };
-
-
-        const styles = StyleSheet.create({
-          container: {
-            flex: 1,             
-            backgroundColor: '#FFFFFF',
-            paddingTop: 60, // Adjusted for the header height
-            paddingHorizontal: 20,   
-            width: '100%',
-            
-          },
-          header: {
-            position: 'absolute', // Fix the header at the top
-            paddingTop: 20, // Space for the top
-            paddingHorizontal: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: Dimensions.get('window').width,
-            backgroundColor: '#FFFFFF', // Matches the screen background
-          },
-          headerIcon: {
-            width: 30,
-            height: 30,
-          },
-          title1: {
-            fontSize: 25,
-            color: '#05173F',
-            fontFamily: 'Epilogue-Black',
-            alignSelf: 'center'
-          },
-          title2: {
-            fontSize: 17,
-            color: '#AFAFAF',
-            fontFamily: 'Archivo-Regular',
-            marginBottom: 10,
-            alignSelf: 'center'
-          },
-          title3: {
-            fontSize: 18,
-            color: '#071C34',
-            fontFamily: 'Epilogue-Bold',
-            alignSelf: 'flex-start',
-            marginTop: 10,
-            marginBottom: 10,  
-          },
-          title4: {
-            fontSize: 18,
-            color: '#071C34',
-            fontFamily: 'Epilogue-Bold',
-            alignSelf: 'flex-start',  
-            marginBottom: 10,  
-            marginTop: 10,
-          },
-          searchBar: {
-            height: 40,
-            width: '100%',
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 25,
-            paddingHorizontal: 20,
-            fontSize: 16,
-            backgroundColor: '#FFFFFF',
-          },
-
-          reportsContainer: {
-            paddingBottom: 256, // Add some padding at the bottom to avoid cutoff
-            width: '100%'
-          },
-          noReportsContainer: {
-            flex: 1,
-            justifyContent: 'center',
+      ) : (
+        <View
+          style={{
             alignItems: 'center',
-            paddingVertical: 20,
-          },
-          noReportsText: {
-            fontSize: 18,
-            color: '#AFAFAF',
-            fontFamily: 'Archivo-Regular',
-          },
-          reportItem: {
-            padding: 15,
-            borderRadius: 15,
-            marginBottom: 10,
-            width: '100%',  // Makes the container match the search bar width
-            borderWidth: 1,
-            borderColor: '#ddd',
-            paddingHorizontal: 20, // Adjusted for consistency
-            // alignSelf: 'stretch',
-            flexDirection: 'row',  // Keep the icon and text in a row layout
-            alignItems: 'center',   // Center the icon and text vertically
-            justifyContent: 'flex-start',
-            backgroundColor: '#FFFFFF',
-          },
-          reportContent: {
-            flexDirection: 'row',  // Aligns icon and title horizontally
-            alignItems: 'center',  // Centers them vertically
-            justifyContent: 'flex-start',
-            gap: 8
-          },
-          reportIcon: {
-              width: 20,  // Smaller icon for minimal spacing
-              height: 20,
-              marginRight: 8,  // Minimal space between the icon and the title
-          },
-          reportText: {
-              fontSize: 18,
-              color: '#2B3C62',
-              fontFamily: 'Epilogue-Bold',
-              textAlign: 'left'
-          },
-          shopCard: {
-            width: 110,
-            height: 120,
-            backgroundColor: '#0B417D', // Blue color
-            borderRadius: 12,
-            marginHorizontal: 5,
-            marginVertical: 5,
-            padding: 10,
-            alignItems: 'left',
-          },
-          shopIcon: {
-            width: 25,
-            height: 25,
-            marginBottom: 8,
-          },
-          shopName: {
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: '#FFFFFF',
-            textAlign: 'left',
-            marginTop: 30,
-            fontFamily: 'Epilogue-Medium'
-          },
-          shopLocation: {
-            fontSize: 12,
-            color: '#84BEFF',
-            textAlign: 'left',
-            marginBottom: 10,
-          },
+            justifyContent: 'center',
+            paddingVertical: hp(2),
+            paddingHorizontal: wp(5),
+          }}
+        >
+          <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
+          <Text
+            style={{
+              fontSize: wp('4.1%'),
+              fontWeight: '600',
+              fontFamily: 'Archivo-Bold',
+              color: '#777',
+              marginTop: hp(1),
+              textAlign: 'center',
+            }}
+          >
+            You haven’t bookmarked any shops yet.
+          </Text>
+          <Text
+            style={{
+              fontSize: wp('3.8%'),
+              fontFamily: 'Archivo-Regular',
+              color: '#AFAFAF',
+              // marginTop: hp(0.5),
+              textAlign: 'center',
+            }}
+          >
+            Go to the Shops and tap the heart icon on a store to save it here.
+          </Text>
+        </View>
+      )}
 
-        });
+      {/* Reports Section (Vertical Scroll) */}
+      <Text style={styles.title4}>{t('REPORTS')}</Text>
+        <View style={{ flex: 1, backgroundColor: 'FFFFFF' }}>
+          <ScrollView contentContainerStyle={styles.reportsContainer}>
+            {reportsTitleID.length === 0 ? (
+              <View style={styles.noReportsContainer}>
+                <Text style={styles.noReportsText}>{t('NO_REPORTS')}</Text>
+              </View>
+            ) : (
+              reportsTitleID.map((report) => (
+                <TouchableOpacity 
+                  key={report.report_id} 
+                  onPress={() => handleReportPress(report.report_id)} 
+                  style={styles.reportItem}
+                >
+                  <View style={styles.reportContent}>
+                    <Image 
+                      source={require('../../../assets/images/report_icon.png')} 
+                      style={styles.reportIcon}
+                    />
+                    <Text style={styles.reportText}>{report.report_name || t('UNTITLED')}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingTop: hp('8%'),
+    paddingHorizontal: wp('6%'),
+    // paddingBottom: hp('1.8%'),
+    width: '100%'
+  },
+  header: {
+    position: 'absolute',
+    paddingTop: hp('3%'),
+    paddingHorizontal: wp('5%'),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: wp('100%'),
+    backgroundColor: '#FFFFFF',
+  },
+  headerIcon: {
+    width: wp('8%'),
+    height: wp('8.5%'),
+  },
+  title1: {
+    fontSize: wp('6.5%'),
+    color: '#05173F',
+    fontFamily: 'Epilogue-Black',
+    alignSelf: 'center'
+  },
+  title2: {
+    fontSize: wp('4.5%'),
+    color: '#AFAFAF',
+    fontFamily: 'Archivo-Regular',
+    marginBottom: hp('1%'),
+    alignSelf: 'center'
+  },
+  title3: {
+    fontSize: wp('4.8%'),
+    color: '#071C34',
+    fontFamily: 'Epilogue-Bold',
+    alignSelf: 'flex-start',
+    marginTop: hp('1.5%'),
+    marginBottom: hp('1.5%'),
+  },
+  title4: {
+    fontSize: wp('4.8%'),
+    color: '#071C34',
+    fontFamily: 'Epilogue-Bold',
+    alignSelf: 'flex-start',
+    marginBottom: hp('1.5%'),
+  },
+  searchBar: {
+    height: hp('5%'),
+    width: '100%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: wp('6%'),
+    paddingHorizontal: wp('5%'),
+    fontSize: wp('4%'),
+    color: '#C0C0C0',
+    backgroundColor: '#FFFFFF',
+  },
+  shopImage: {
+    width: wp('30%'),
+    height: wp('33%'),
+    borderRadius: wp('3%'),
+    marginHorizontal: wp('2.0%'),
+    marginBottom: hp('10%'),
+  },
+  noReportsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    paddingBottom: hp('12%'),
+  },
+  noReportsText: {
+    fontSize: wp('4.5%'),
+    textAlign: 'center',
+    color: '#AFAFAF',
+    fontFamily: 'Archivo-Regular',
+  },
+  reportsContainer: {
+    width: '100%',
+    paddingBottom: hp('33%'),
+  },
+  reportItem: {
+    padding: wp('4%'),
+    backgroundColor: '#FFFFFF',
+    borderRadius: wp('4%'),
+    marginBottom: hp('1.2%'),
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingHorizontal: wp('5%'),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start'
+  },
+  reportContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: wp('2%'),
+  },
+  reportIcon: {
+    width: wp('5.5%'),
+    height: wp('5.5%'),
+    marginRight: wp('2%'),
+  },
+  reportText: {
+    fontSize: wp('4.5%'),
+    color: '#2B3C62',
+    fontFamily: 'Epilogue-Bold',
+    textAlign: 'left'
+  }
+});
                 
 export default Dashboard;
