@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: wp('90%'),
     marginBottom: hp('7.5%'),
+    marginTop: -hp('5.5%'),
   },
   progressStep: {
     width: wp('13%'),

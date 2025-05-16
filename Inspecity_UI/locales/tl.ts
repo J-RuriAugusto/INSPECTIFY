@@ -11,6 +11,10 @@ export default {
   ERROR_FETCHING_HOUSE: "Nagka-Error sa pagkuha ng mga detalye ng bahay.",
   ERROR_FETCHING_REPORTS: "Nagka-Error sa pagkuha ng mga pamagat ng ulat.",
   UNTITLED: 'Hindi Napangalanan',
+  NO_MATCHING_RESULTS: "Walang natagpuang kaparehong resulta",
+  CHECK_SPELLING_OR_TRY_AGAIN: "Maaaring may maling baybay o ibang pangalan ang ginamit. Paki-suri ang spelling o subukan muli gamit ang ibang salita.",
+  ADD_A_REPORT_BY_SCANNING: "Magdagdag ng ulat sa pamamagitan ng pag-scan ng lugar o pag-upload ng mga larawan upang makapagsimula.",
+
 
   NAME_YOUR_REPORT: "PANGALANAN ANG IYONG REPORT",
   ENTER_REPORT_NAME: "I-enter ang pangalan ng report",

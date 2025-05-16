@@ -12,6 +12,7 @@ import { Asset } from 'expo-asset';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
+
 const ReportDetails = () => {
   const { t } = useTranslation();
   const params = useLocalSearchParams();
@@ -34,6 +35,8 @@ const ReportDetails = () => {
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [inputHeight, setInputHeight] = useState(hp('10%')); // starting height
+
 
   const deleteReport = async () => {
     try {
@@ -478,13 +481,17 @@ const ReportDetails = () => {
                 </TouchableOpacity>
               </View>
                 <TextInput
-                  style={styles.notesInput}
+                  style={[styles.notesInput, { height: inputHeight }]}
                   placeholder={notes ? notes : t('CLICK_EDIT')}
                   placeholderTextColor="#A0A0A0"
                   value={notes}
-                  editable={false}
+                  editable={false} // You can toggle this to true when in edit mode
                   multiline
+                  onContentSizeChange={(e) =>
+                    setInputHeight(e.nativeEvent.contentSize.height)
+                  }
                 />
+
             </View>
           </ScrollView>
           
@@ -592,9 +599,30 @@ const styles = StyleSheet.create({
 
   // Header
   header: { position: 'absolute', top: hp('3%'), right: wp('3%'), zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('52%') },
-  backIcon: { width: wp('8%'), height: hp('4%'), marginRight: wp('1.5%') },
-  backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
+  // backButton: { flexDirection: 'row', alignItems: 'center', left: wp('-53%') },
+  // backIcon: { width: wp('8%'), height: hp('4%'), },
+  // backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
+    backButton: {
+      position: 'absolute',
+      top: hp('1%'),         // adjust as needed for your layout
+      left: wp('-73%'),        // slight margin from the left edge
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+
+    backIcon: {
+      width: wp('8%'),
+      height: hp('4%'),
+      marginRight: wp('2%'),
+    },
+
+    backText: {
+      fontSize: wp('4.5%'),
+      fontFamily: 'Epilogue-Bold',
+      color: '#FFF',
+    },
+
+
   shareButton: { padding: wp('2%') },
   shareIcon: { width: wp('8%'), height: wp('8%') },
 
@@ -614,7 +642,20 @@ const styles = StyleSheet.create({
   detailText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%') },
 
   // Condition & Tags
-  conditionWrapper: { width: wp('40%'), alignSelf: 'center', backgroundColor: '#FFF', borderRadius: wp('4%'), padding: wp('3%'), marginBottom: hp('3%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%') },
+  // conditionWrapper: { width: wp('40%'), alignSelf: 'center', backgroundColor: '#FFF', borderRadius: wp('4%'), padding: wp('3%'), marginBottom: hp('3%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%') },
+  conditionWrapper: {
+  alignSelf: 'center',            // aligns it to the left (or center if you prefer)
+  backgroundColor: '#FFF',
+  borderRadius: wp('4%'),
+  paddingVertical: hp('1.5%'),
+  paddingHorizontal: wp('3%'),
+  marginBottom: hp('3%'),
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+
   conditionText: { fontFamily: 'Epilogue-Bold', fontSize: wp('4%'), textAlign: 'center', color: '#071C34' },
   conditionBadge: { backgroundColor: '#FFA500', fontFamily: 'Epilogue-Regular', textAlign: 'center', fontSize: wp('3.5%'), borderRadius: wp('5%'), marginVertical: hp('0.5%') },
   ageText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Bold', color: '#071C34' },
@@ -630,15 +671,45 @@ const styles = StyleSheet.create({
   saveButtonText: { color: '#05173F', fontSize: wp('5%'), fontFamily: 'Epilogue-Bold' },
 
   // Inputs
-  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('6%')},
-  editNotesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', textAlignVertical: 'top' },
+notesInput: {
+  backgroundColor: '#FFF',
+  borderRadius: wp('5%'),
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: wp('4%'),
+  elevation: wp('2%'),
+  fontSize: wp('4%'),
+  color: '#32373E',
+  fontFamily: 'Epilogue-Regular',
+  marginTop: hp('1%'),
+  marginBottom: hp('6%'),
+  textAlign: 'left',
+  padding: wp('4%'),
+  minHeight: hp('10%'), // optional minimum
+},
+
+editNotesInput: {
+  backgroundColor: '#FFF',
+  borderRadius: wp('5%'),
+  flex: 1,
+  fontSize: wp('4%'),
+  color: '#32373E',
+  fontFamily: 'Epilogue-Regular',
+  textAlign: 'left',            // ensures horizontal alignment
+  textAlignVertical: 'top',     // ensures vertical alignment
+  paddingHorizontal: wp('4%'),  // adds left & right padding
+  paddingTop: wp('4%'),         // top padding
+},
+
+
+
 
   // Row Layouts
   rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp('0.1%') },
   concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000' },
   // Modal Edit
-  modalEditContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative' },
-  modalEditContent: { backgroundColor: '#FFF', padding: wp('5%'), borderRadius: wp('5%'), alignItems: 'center', height: hp('60%'), width: wp('90%'), alignSelf: 'center' },
+  modalEditContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative',textAlign:'left', },
+  modalEditContent: { backgroundColor: '#FFF', padding: wp('5%'), borderRadius: wp('5%'), alignItems: 'center', height: hp('60%'), width: wp('90%'), alignSelf: 'center', textAlign:'left', },
   modalEditTitle: { fontSize: wp('5%'), fontWeight: 'bold' },
   closeEditButton: { position: 'absolute', top: hp('13.5%'), right: wp('3%'), width: wp('13%'), height: wp('13%'), alignItems: 'center', justifyContent: 'center' },
   closeEditButtonImage: { width: wp('9%'), height: wp('9%'), resizeMode: 'contain' },

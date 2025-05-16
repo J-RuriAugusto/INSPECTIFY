@@ -14,6 +14,8 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { Swipeable } from 'react-native-gesture-handler';
+
 
 interface Report {
   report_id: string;
@@ -30,6 +32,47 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const API_KEY = '***REMOVED***';
   const router = useRouter();
+  const filteredReports = reportsTitleID.filter((report) =>
+  report.report_name.toLowerCase().includes(search.toLowerCase())
+);
+
+  const onRenameReport = (report) => {
+    Alert.prompt(
+      t('RENAME_REPORT'),
+      t('ENTER_NEW_NAME'),
+      [
+        { text: t('CANCEL'), style: 'cancel' },
+        {
+          text: t('SAVE'),
+          onPress: (newName) => {
+            if (newName.trim()) {
+              handleRename(report.report_id, newName.trim());
+            }
+          },
+        },
+      ],
+      'plain-text',
+      report.report_name
+    );
+  };
+
+  // Swipe action component
+  const renderRightActions = (onEdit) => (
+    <TouchableOpacity
+      onPress={onEdit}
+      style={{
+        backgroundColor: '#2563eb', // Tailwind blue-600
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: wp('18%'),
+        borderRadius: 16,
+        height: wp('14%')
+      }}
+    >
+      <Text style={{ color: 'white', fontSize: 13, textAlign: 'center', fontFamily:'Epilogue-Bold' }}>{t('EDIT')}</Text>
+    </TouchableOpacity>
+  );
+
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -384,35 +427,65 @@ const Dashboard = () => {
       )}
 
       {/* Reports Section (Vertical Scroll) */}
-      <Text style={styles.title4}>{t('REPORTS')}</Text>
-        <View style={{ flex: 1, backgroundColor: 'FFFFFF' }}>
-          <ScrollView contentContainerStyle={styles.reportsContainer}>
-            {reportsTitleID.length === 0 ? (
-              <View style={styles.noReportsContainer}>
-                <Text style={styles.noReportsText}>{t('NO_REPORTS')}</Text>
-              </View>
-            ) : (
-              reportsTitleID.map((report) => (
-                <TouchableOpacity 
-                  key={report.report_id} 
-                  onPress={() => handleReportPress(report.report_id)} 
-                  style={styles.reportItem}
-                >
-                  <View style={styles.reportContent}>
-                    <Image 
-                      source={require('../../../assets/images/report_icon.png')} 
-                      style={styles.reportIcon}
-                    />
-                    <Text style={styles.reportText}>{report.report_name || t('UNTITLED')}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))
-            )}
-          </ScrollView>
-        </View>
+      {/* Reports Section (Vertical Scroll) */}
+<Text style={styles.title4}>{t('REPORTS')}</Text>
+<View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+  <ScrollView contentContainerStyle={styles.reportsContainer}>
+    {filteredReports.length === 0 ? (
+      <View style={styles.noReportsContainer}>
+        <Image
+          source={
+            reportsTitleID.length === 0
+              ? require('../../../assets/images/add_report.png')
+              : require('../../../assets/images/no_result.png')
+          }
+          style={styles.noReportsImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noReportsText}>
+          {reportsTitleID.length === 0
+            ? t('NO_REPORTS')
+            : t('NO_MATCHING_RESULTS')}
+        </Text>
+        <Text style={styles.noReportsSubtext}>
+          {reportsTitleID.length === 0
+            ? t('ADD_A_REPORT_BY_SCANNING')
+            : t('CHECK_SPELLING_OR_TRY_AGAIN')}
+        </Text>
       </View>
+    ) : (
+      filteredReports.map((report) => (
+  <View key={report.report_id} style={{ width: '100%', alignItems: 'center', }}>
+
+    <Swipeable
+  renderRightActions={() =>
+    renderRightActions(() => onRenameReport(report))
+  }
+  containerStyle={{ width: '100%', }}
+>
+  <TouchableOpacity
+    onPress={() => handleReportPress(report.report_id)}
+    style={[styles.reportItem, { width: '97%', marginLeft: 5, }]}
+  >
+
+        <View style={styles.reportContent}>
+          <Image
+            source={require('../../../assets/images/report_icon.png')}
+            style={styles.reportIcon}
+          />
+          <Text style={styles.reportText}>
+            {report.report_name || t('UNTITLED')}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
+      </View>
+    )))}
     </ScrollView>
-  );
+    </View>
+    </View>
+    </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -466,12 +539,13 @@ const styles = StyleSheet.create({
     marginBottom: hp('1.5%'),
   },
   searchBar: {
-    height: hp('5%'),
+    height: hp('5.5%'),
     width: '100%',
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: wp('6%'),
-    paddingHorizontal: wp('5%'),
+    paddingHorizontal: wp('3%'),
+    paddingVertical: wp('3%'),
     fontSize: wp('4%'),
     color: '#C0C0C0',
     backgroundColor: '#FFFFFF',
@@ -490,28 +564,30 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingBottom: hp('12%'),
   },
-  noReportsText: {
-    fontSize: wp('4.5%'),
-    textAlign: 'center',
-    color: '#AFAFAF',
-    fontFamily: 'Archivo-Regular',
-  },
+
   reportsContainer: {
     width: '100%',
     paddingBottom: hp('37%'),
+    alignItems: 'center',
   },
   reportItem: {
     padding: wp('4%'),
     backgroundColor: '#FFFFFF',
     borderRadius: wp('4%'),
     marginBottom: hp('1.2%'),
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    width: '98%',
+    alignContent:'center',
+    // borderWidth: 1,
+    // borderColor: '#ddd',
     paddingHorizontal: wp('5%'),
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    shadowColor: '#000',
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 5,
+
   },
   reportContent: {
     flexDirection: 'row',
@@ -529,7 +605,31 @@ const styles = StyleSheet.create({
     color: '#2B3C62',
     fontFamily: 'Epilogue-Bold',
     textAlign: 'left'
-  }
+  },
+  noReportsImage: {
+    width: wp('12%'),
+    height: wp('12%'),
+    marginBottom: 10,
+    opacity: 0.5,
+  },
+
+  noReportsText: {
+              fontSize: wp('4%'),
+              fontWeight: '600',
+              fontFamily: 'Archivo-Bold',
+              color: '#777',
+              marginTop: hp(1),
+              textAlign: 'center',
+  },
+
+  noReportsSubtext: {
+              fontSize: wp('3.8%'),
+              fontFamily: 'Archivo-Regular',
+              color: '#AFAFAF',
+              // marginTop: hp(0.5),
+              textAlign: 'center',
+  },
+
 });
                 
 export default Dashboard;

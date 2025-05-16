@@ -5,6 +5,11 @@ export default {
     SAVED_SHOPS: "Saved Shops",
     REPORTS: "Reports",
     NO_REPORTS: "No reports yet",
+    NO_MATCHING_RESULTS: "No matching results found",
+    CHECK_SPELLING_OR_TRY_AGAIN: "You might’ve misspelled something or used a different name. Please check your spelling or try another keyword.",
+    ADD_A_REPORT_BY_SCANNING: "Add a report by scanning an area or uploading photos to get started.",
+
+
     NO_INTERNET_TITLE: "No Internet Connection",
     NO_INTERNET_MESSAGE: "Please check your internet connection and try again.",
     OK: "OK",

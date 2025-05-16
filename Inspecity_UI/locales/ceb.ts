@@ -11,6 +11,10 @@ export default {
     ERROR_FETCHING_HOUSE: "Nagka-error sa pagkuha sa detalye sa balay.",
     ERROR_FETCHING_REPORTS: "Nagka-error sa pagkuha sa mga titulo sa report",
     UNTITLED: 'Wala Panganli',
+    NO_MATCHING_RESULTS: "Walay nagtupong nga resulta",
+    CHECK_SPELLING_OR_TRY_AGAIN: "Tingali nasayop ka og spelling o lain ang ngalan nga imong gigamit. Palihug susiha ang spelling o sulayi og usab gamit ang laing pulong.",
+    ADD_A_REPORT_BY_SCANNING: "Pagdugang og report pinaagi sa pag-scan sa lugar o pag-upload og mga hulagway aron magsugod.",
+
 
     NAME_YOUR_REPORT: "PANGANLI IMONG REPORT",
     ENTER_REPORT_NAME: "I-enter ang pangan sa report",

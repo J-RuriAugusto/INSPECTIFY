@@ -121,7 +121,7 @@ const ReportName = () => {
         </TouchableOpacity>
       </View>
       <Text style={styles.title1}>{t('NAME_YOUR_REPORT')}</Text>
-      <Text style={styles.title2}>{t('ENTER_REPORT_NAME')}</Text>
+      {/* <Text style={styles.title2}>{t('ENTER_REPORT_NAME')}</Text> */}
 
       <View style={styles.inputContainer}>
         <TextInput
@@ -205,6 +205,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Black',
     fontSize: wp('8%'), // 30px ≈ 8% width
     color: '#FFFFFF',
+    textAlign:'center',
+    marginBottom: 10,
   },
   title2: {
     fontFamily: 'Epilogue-Medium',
