@@ -208,9 +208,9 @@ const Dashboard = () => {
   }, [userId]);
   
   
-  if (!fontsLoaded) {
-    return null; 
-  }
+  // if (!fontsLoaded) {
+  //   return null; 
+  // }
 
   // Inside your Dashboard component
   const [savedShops, setSavedShops] = useState<{ id: string; name: string; image: string }[]>([]);
@@ -342,7 +342,7 @@ const Dashboard = () => {
                     <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
                   </View>
                 </View>
-                <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on map</Text>
+                <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on Shops</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -359,7 +359,7 @@ const Dashboard = () => {
           <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
           <Text
             style={{
-              fontSize: wp('4.1%'),
+              fontSize: wp('4%'),
               fontWeight: '600',
               fontFamily: 'Archivo-Bold',
               color: '#777',
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   reportsContainer: {
     width: '100%',
-    paddingBottom: hp('33%'),
+    paddingBottom: hp('37%'),
   },
   reportItem: {
     padding: wp('4%'),

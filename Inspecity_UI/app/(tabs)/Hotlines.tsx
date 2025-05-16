@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const GOOGLE_API_KEY = "AlzaSyYLRdCo6-T9fl1vaZ7lMRLRIT0_3HbZpwn"; // Replace with your actual API key
+const GOOGLE_API_KEY = "AlzaSyN__gQOFDIWORsriawVKFnZrLRlco4bpPz"; // Replace with your actual API key
 
 // Common emergency numbers (always available)
 const COMMON_HOTLINES = [
