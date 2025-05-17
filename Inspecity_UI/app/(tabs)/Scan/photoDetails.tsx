@@ -13,6 +13,17 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSettings } from '../Dashboard/settingsContext';
 
+interface DamageDetection {
+  box_2d: [number, number, number, number]; // [x1, y1, x2, y2]
+  damage_type: string;
+}
+
+interface Recommendations {
+  english: string;
+  tagalog: string;
+  cebuano: string;
+}
+
 const PhotoDetails = () => {
   const { t } = useTranslation();
   const { settings } = useSettings();
@@ -37,22 +48,99 @@ const PhotoDetails = () => {
   const [annotatedImage, setAnnotatedImage] = useState('');
   const [material, setMaterial] = useState('');
   const [materialAge, setMaterialAge] = useState('');
-  const [recommendations, setRecommendations] = useState('');
+  const [recommendations, setRecommendations] = useState<Recommendations>({
+    english: '',
+    tagalog: '',
+    cebuano: ''
+  });
+  const [plainImageUrl, setImageUrl] = useState('');
   const [damageTypes, setDamageTypes] = useState<string[]>([]); // State for detected issues
   const [isImageModalVisible, setImageModalVisible] = useState(false); // State for full-screen image modal
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [formattedResponse, setFormattedResponse] = useState<any[] | null>(null);
   const [inputHeight, setInputHeight] = useState(hp('10%')); // starting height
   const [reportCreationFailed, setReportCreationFailed] = useState(false);
   const [hasExplicitlySaved, setHasExplicitlySaved] = useState(false);
   const hasExplicitlySavedRef = useRef(false);
 
-  const saveReport = () => {
+  const getCurrentRecommendation = () => {
+    if (!recommendations) return '';
+    
+    // Default to English if language not set or not found
+    const lang = settings.language;
+    if(lang === "Cebuano"){
+      return recommendations.cebuano
+    }
+    if(lang === "Tagalog"){
+      return recommendations.tagalog
+    }
+    return recommendations.english;
+  };
+  
+  const saveReport = async () => {
     setHasExplicitlySaved(true);
     hasExplicitlySavedRef.current = true;
     let message = t('SUCCESSFULLY_SAVED_REPORT')
     if(settings.autoSave){
       message = t('ALREADY_SAVED_REPORT');
+    }
+    else{
+      try {
+        // Convert homeId to a number
+        const homeIdNumber = parseInt(homeId, 10);
+      
+        // Log the data being sent
+        console.log("Sending data:", {
+          home_id: homeIdNumber,
+          report_name: reportName,
+          url: plainImageUrl,
+          annotated_image: annotatedImage,
+          condition: condition,
+          material: material,
+          material_age: materialAge,
+          recommendations: recommendations,
+          note: notes,
+        });
+        console.log("formatted_response:", JSON.stringify(formattedResponse, null, 2));
+      
+        const response = await axios.post('https://flask-railway-sample-production.up.railway.app/saveReport', {
+          home_id: homeIdNumber,
+          report_name: reportName,
+          url: plainImageUrl,
+          annotated_image: annotatedImage,
+          condition: condition,
+          material: material,
+          material_age: materialAge,
+          recommendations: recommendations,
+          formatted_response: formattedResponse || [], 
+          note: notes,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': API_KEY,
+          },
+        });
+      
+        console.log("Response:", response.data);
+      
+        if (response.status === 200) {
+          setReportCreationFailed(false);
+        } else {
+          setReportCreationFailed(true); // Set failure state
+          Alert.alert(
+            'Error', 
+            'Failed to save report',
+          );
+        }
+      } catch (error) {
+        console.error('Error saving report: ', error);
+        setReportCreationFailed(true); // Set failure state
+        Alert.alert(
+          'Error', 
+          'An error occurred while saving the report'
+        );
+      }
     }
     Alert.alert(
       t("REPORT_STATUS"),
@@ -60,10 +148,14 @@ const PhotoDetails = () => {
       [{ text: "OK", onPress: () => setReportModalVisible(false) }]
     );
     setReportModalVisible(false);
-    navigation.popToTop();
   };
 
   const deleteReport = async () => {
+    if(!settings.autoSave){
+      setReportModalVisible(false);
+      navigation.popToTop();
+      return;
+    }
     try {
       setHasExplicitlySaved(true);
       hasExplicitlySavedRef.current = true;
@@ -118,17 +210,15 @@ const PhotoDetails = () => {
             text: t('DELETE'),
             style: "destructive",
             onPress: () => {
-              // Delete the report and then navigate back
-              deleteReport().then(() => {
-                navigation.dispatch(e.data.action);
-              });
+              navigation.dispatch(e.data.action);
             }
           },
           {
             text: t('SAVE'),
             onPress: () => {
-              // Continue without doing anything since it's already saved
-              navigation.dispatch(e.data.action);
+              saveReport().then(() => {
+                navigation.dispatch(e.data.action);
+              });
             }
           }
         ]
@@ -159,9 +249,7 @@ const PhotoDetails = () => {
           text: t('DELETE'),
           style: "destructive",
           onPress: () => {
-            deleteReport().then(() => {
-              navigation.goBack(); 
-            });
+            navigation.goBack(); 
           }
         },
         {
@@ -237,6 +325,7 @@ const PhotoDetails = () => {
       );
   
       const imageUrl = response.data.secure_url;
+      setImageUrl(imageUrl)
       await createReport(imageUrl);
       setIsUploading(false);
     } catch (error) {
@@ -266,16 +355,18 @@ const PhotoDetails = () => {
       const homeIdNumber = parseInt(homeId, 10);
     
       // Log the data being sent
-      console.log("Sending data:", {
+      console.log("Sending datas:", {
         home_id: homeIdNumber,
         report_name: reportName,
         url: imageUrl,
+        autosave: settings.autoSave,
       });
     
       const response = await axios.post('https://flask-railway-sample-production.up.railway.app/createReport', {
         home_id: homeIdNumber,
         report_name: reportName,
         url: imageUrl,
+        autosave: settings.autoSave,
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -291,11 +382,19 @@ const PhotoDetails = () => {
         setCondition(response.data.condition);
         setMaterial(response.data.material);
         setMaterialAge(response.data.material_age);
-        setRecommendations(response.data.recommendations);
+        setRecommendations(response.data.recommendations || {
+          english: '',
+          tagalog: '',
+          cebuano: ''
+        })
         setDamageTypes(response.data.damage_types || []);
         setDateCreated(response.data.date_created);
         setNotes(response.data.note);
-        setReportCreationFailed(false); // Reset failure state on success
+        if (!settings.autoSave){
+          setFormattedResponse(response.data.formatted_response);
+        }
+        setReportCreationFailed(false);
+
         Alert.alert(t('SUCCESS'), t('REPORT_CREATED_SUCCESSFULLY'));
       } else {
         setReportCreationFailed(true); // Set failure state
@@ -350,7 +449,8 @@ const PhotoDetails = () => {
 
   const updateNote = async () => {
     if (!reportID) {
-      Alert.alert(t('ERROR'), t('MISSING_REPORT_ID'));
+      Alert.alert(t('SUCCESS'), t('UPDATED_NOTE_SUCCESSFULLY'));
+      setEditNoteModalVisible(false);
       return;
     }
   
@@ -406,13 +506,13 @@ const PhotoDetails = () => {
           : `<p>${t('NO_ISSUES')}</p>`;
         
         // Split recommendations into an array if it's a string
-        const processedRecommendations = recommendations 
-        ? String(recommendations).split('\n').filter(rec => rec.trim() !== '')
+        const processedRecommendations = getCurrentRecommendation().length > 0
+        ? getCurrentRecommendation().split('\n').filter(rec => rec.trim() !== '')
         : [];
         
         const recommendationsHTML = processedRecommendations.length > 0
-          ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
-          : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
+        ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
+        : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
         // Format dates properly
         const currentDate = new Date();
         const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -724,7 +824,7 @@ const PhotoDetails = () => {
               </View>
   
               <Text style={styles.sectionTitle}>{t('RECOMMENDATIONS')}</Text>
-              <Text style={styles.detailText}>• {recommendations}</Text>
+              <Text style={styles.detailText}>• {getCurrentRecommendation()}</Text>
               <TouchableOpacity 
                 style={styles.shopButton} 
                 onPress={handleFindNearbyShops}

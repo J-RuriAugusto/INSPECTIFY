@@ -11,10 +11,17 @@ import ImageView from 'react-native-image-viewing';
 import { Asset } from 'expo-asset';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useSettings } from '../Dashboard/settingsContext';
 
+interface Recommendations {
+  english: string;
+  tagalog: string;
+  cebuano: string;
+}
 
 const ReportDetails = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const params = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const router = useRouter();
@@ -30,13 +37,31 @@ const ReportDetails = () => {
   const [annotatedImage, setAnnotatedImage] = useState('');
   const [material, setMaterial] = useState('');
   const [materialAge, setMaterialAge] = useState('');
-  const [recommendations, setRecommendations] = useState('');
+  const [recommendations, setRecommendations] = useState<Recommendations>({
+    english: '',
+    tagalog: '',
+    cebuano: ''
+  });
   const [damageTypes, setDamageTypes] = useState<string[]>([]);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [inputHeight, setInputHeight] = useState(hp('10%')); // starting height
 
+
+  const getCurrentRecommendation = () => {
+    if (!recommendations) return '';
+    
+    // Default to English if language not set or not found
+    const lang = settings.language;
+    if(lang === "Cebuano"){
+      return recommendations.cebuano
+    }
+    if(lang === "Tagalog"){
+      return recommendations.tagalog
+    }
+    return recommendations.english;
+  };
 
   const deleteReport = async () => {
     try {
@@ -187,13 +212,13 @@ const ReportDetails = () => {
           : `<p>${t('NO_ISSUES')}</p>`;
         
         // Split recommendations into an array if it's a string
-        const processedRecommendations = recommendations 
-        ? String(recommendations).split('\n').filter(rec => rec.trim() !== '')
+        const processedRecommendations = getCurrentRecommendation().length > 0
+        ? getCurrentRecommendation().split('\n').filter(rec => rec.trim() !== '')
         : [];
         
         const recommendationsHTML = processedRecommendations.length > 0
-          ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
-          : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
+        ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
+        : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
         // Format dates properly
         const currentDate = new Date();
         const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -486,7 +511,7 @@ const ReportDetails = () => {
               </View>
   
               <Text style={styles.sectionTitle}>{t('RECOMMENDATIONS')}</Text>
-              <Text style={styles.detailText}>• {recommendations}</Text>
+              <Text style={styles.detailText}>• {getCurrentRecommendation()}</Text>
               <TouchableOpacity 
                 style={styles.shopButton} 
                 onPress={() => router.push('/(tabs)/Shops')}

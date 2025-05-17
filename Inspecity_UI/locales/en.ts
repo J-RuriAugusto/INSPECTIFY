@@ -97,4 +97,13 @@ export default {
     DETECTED_ISSUES_2: "Detected Issues:",
     FETCHING_DETAILS: "Fetching Details...",
 
+    ALREADY_SAVED_REPORT: "Your report is already saved.\nYou can turn off auto-save in settings.",
+    SUCCESSFULLY_SAVED_REPORT: "Report successfully saved.",
+    LEAVE_WITHOUT_SAVE: "Leave without saving",
+    THIS_WILL_BE_DELETED: "This report will be deleted.",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    DELETE: "Delete",
+
+
 };

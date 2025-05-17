@@ -93,4 +93,11 @@ export default {
     DETECTED_ISSUES_2: "Nakit-ang mga Isyu:",
     FETCHING_DETAILS: "Gikuha ang mga Detalye...",
 
+    ALREADY_SAVED_REPORT: "Naka-save na ang imong report.\nPwede nimo i-off ang auto-save sa settings.",
+    SUCCESSFULLY_SAVED_REPORT: "Malampusong na-save ang report.",
+    LEAVE_WITHOUT_SAVE: "Mobiya nga wala mag-save",
+    THIS_WILL_BE_DELETED: "Kini nga report kay papason.",
+    SAVE: "I-save",
+    CANCEL: "I-kansela",
+    DELETE: "I-papas",
 };

@@ -94,6 +94,14 @@ export default {
   PDF_ERROR: "Nabigong gumawa ng PDF na ulat.",
   LOADING_DATE: "Ikinakarga ang petsa...",
   DETECTED_ISSUES_2: "Natukoy na mga Isyu:",
-  FETCHING_DETAILS: "Kinukuha ang mga Detalye..."
+  FETCHING_DETAILS: "Kinukuha ang mga Detalye...",
 
+
+  ALREADY_SAVED_REPORT: "Naka-save na ang iyong ulat.\nMaaari mong i-off ang auto-save sa settings.",
+  SUCCESSFULLY_SAVED_REPORT: "Matagumpay na na-save ang ulat.",
+  LEAVE_WITHOUT_SAVE: "Umalis nang hindi nagse-save",
+  THIS_WILL_BE_DELETED: "Ang ulat na ito ay mabubura.",
+  SAVE: "I-save",
+  CANCEL: "Kanselahin",
+  DELETE: "Burahin",
 };
