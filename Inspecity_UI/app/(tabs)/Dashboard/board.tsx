@@ -36,7 +36,17 @@ const Dashboard = () => {
   report.report_name.toLowerCase().includes(search.toLowerCase())
 );
 
-  const onRenameReport = (report) => {
+  const handleRename = (reportId: string, newName: string) => {
+    // Example: update the report name locally
+    setReportsTitleID(prev =>
+      prev.map(r =>
+        r.report_id === reportId ? { ...r, report_name: newName } : r
+      )
+    );
+    // TODO: Optionally, add API call to persist the change
+  };
+
+  const onRenameReport = (report: Report) => {
     Alert.prompt(
       t('RENAME_REPORT'),
       t('ENTER_NEW_NAME'),
@@ -45,19 +55,19 @@ const Dashboard = () => {
         {
           text: t('SAVE'),
           onPress: (newName) => {
-            if (newName.trim()) {
+            if (newName && newName.trim()) {
               handleRename(report.report_id, newName.trim());
             }
           },
         },
       ],
       'plain-text',
-      report.report_name
+      report.report_name || ''
     );
   };
 
   // Swipe action component
-  const renderRightActions = (onEdit) => (
+  const renderRightActions = (onEdit: () => void) => (
     <TouchableOpacity
       onPress={onEdit}
       style={{
@@ -73,12 +83,11 @@ const Dashboard = () => {
     </TouchableOpacity>
   );
 
-
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+  // });
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -402,7 +411,7 @@ const Dashboard = () => {
           <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
           <Text
             style={{
-              fontSize: wp('4%'),
+              fontSize: wp('3.9%'),
               fontWeight: '600',
               fontFamily: 'Archivo-Bold',
               color: '#777',
@@ -410,23 +419,22 @@ const Dashboard = () => {
               textAlign: 'center',
             }}
           >
-            You haven’t bookmarked any shops yet.
+            {t('YOU_HAVENT_BOOKMARKED_ANY_SHOPS_YET')}
           </Text>
           <Text
             style={{
-              fontSize: wp('3.8%'),
+              fontSize: wp('3.5%'),
               fontFamily: 'Archivo-Regular',
               color: '#AFAFAF',
               // marginTop: hp(0.5),
               textAlign: 'center',
             }}
           >
-            Go to the Shops and tap the heart icon on a store to save it here.
+            {t('GO_TO_THE_SHOPS_AND_TAP_THE_HEART_ICON_ON_A_STORE_TO_SAVE_IT_HERE')}
           </Text>
         </View>
       )}
 
-      {/* Reports Section (Vertical Scroll) */}
       {/* Reports Section (Vertical Scroll) */}
 <Text style={styles.title4}>{t('REPORTS')}</Text>
 <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -507,7 +515,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   headerIcon: {
-    width: wp('8%'),
+    width: wp('8.5%'),
     height: wp('8.5%'),
   },
   title1: {
@@ -567,7 +575,7 @@ const styles = StyleSheet.create({
 
   reportsContainer: {
     width: '100%',
-    paddingBottom: hp('37%'),
+    paddingBottom: hp('35%'),
     alignItems: 'center',
   },
   reportItem: {

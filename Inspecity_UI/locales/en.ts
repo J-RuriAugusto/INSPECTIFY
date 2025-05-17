@@ -3,6 +3,8 @@ export default {
     LOCATION_PLACEHOLDER: "LOCATION",
     SEARCH_PLACEHOLDER: "Search here...",
     SAVED_SHOPS: "Saved Shops",
+    YOU_HAVENT_BOOKMARKED_ANY_SHOPS_YET: "You haven't bookmarked any shops yet.",
+    GO_TO_THE_SHOPS_AND_TAP_THE_HEART_ICON_ON_A_STORE_TO_SAVE_IT_HERE: "Go to the Shops and tap the heart icon on a store to save it here.",
     REPORTS: "Reports",
     NO_REPORTS: "No reports yet",
     NO_MATCHING_RESULTS: "No matching results found",
@@ -28,6 +30,7 @@ export default {
     CLOSE: "Close",
 
     NO_PHOTO: "No photo available",
+    NO_PHOTO_PROVIDED: "No photo provided!",
     ANALYZING_STRUCTURES: "Analyzing the structures",
     FOR_CRACKS: "for cracks and damages...",
     HOME_TIPS: [
@@ -59,7 +62,11 @@ export default {
     MANAGE_REPORT: "Manage Report",
     DELETE_REPORT: "Delete Report",
     SAVE_REPORT: "Save Report",
+    REPORT_STATUS: "Report Status",
+    YOUR_REPORT_IS_ALREADY_SAVED: "Your report is already saved.",
+    YOU_CAN_TURN_OFF_AUTOSAVE_IN_SETTINGS: "You can turn off auto-save in settings.",
     SUCCESS: "Success",
+    REPORT_CREATED_SUCCESSFULLY: "Report created successfully",
     DELETED_REPORT_SUCCESSFULLY: "Report deleted successfully",
     ERROR: "Error",
     DELETE_REPORT_ERROR: "An error occurred while deleting the report",

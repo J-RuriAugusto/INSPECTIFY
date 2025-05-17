@@ -221,6 +221,9 @@ const ReportDetails = () => {
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>${t('REPORT_HAZARD_TITLE')}</title>
               <style>
+              @page {
+                margin: 1in;
+              }
                 body { 
                   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
                   padding: 20px;
@@ -340,17 +343,34 @@ const ReportDetails = () => {
           </html>
         `;
     
-        const { uri } = await Print.printToFileAsync({ 
-          html: htmlContent,
-          width: 612,   // US Letter width in points (8.5in)
-          height: 792,  // US Letter height in points (11in)
-          base64: false
+        // Format date for filename
+        const isoString = currentDate.toISOString(); // e.g., "2025-05-17T12:34:56.789Z"
+
+        const [date, time] = isoString.split('T');
+        const formattedTime = time.split('.')[0].replace(/:/g, '-'); // "12-34-56"
+
+        const formattedDateTime = `${date} | ${formattedTime}`; // "2025-05-17_12-34-56"
+        const fileName = `Report Details ${formattedDateTime}.pdf`;
+
+        const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+        // Generate PDF from HTML
+        const { uri: tempUri } = await Print.printToFileAsync({
+          html: htmlContent, // Replace with your actual HTML content
+          base64: false,
         });
-        
-        await Sharing.shareAsync(uri, {
+
+        // Rename/move the PDF to desired file name
+        await FileSystem.moveAsync({
+          from: tempUri,
+          to: fileUri,
+        });
+
+        // Share the renamed PDF
+        await Sharing.shareAsync(fileUri, {
           mimeType: 'application/pdf',
-          dialogTitle: 'Share Inspection Report',
-          UTI: 'com.adobe.pdf'
+          dialogTitle: 'Share Report',
+          UTI: 'com.adobe.pdf', // iOS support
         });
       } catch (error) {
         console.error("Error generating PDF:", error);
@@ -491,7 +511,6 @@ const ReportDetails = () => {
                     setInputHeight(e.nativeEvent.contentSize.height)
                   }
                 />
-
             </View>
           </ScrollView>
           
@@ -599,9 +618,6 @@ const styles = StyleSheet.create({
 
   // Header
   header: { position: 'absolute', top: hp('3%'), right: wp('3%'), zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  // backButton: { flexDirection: 'row', alignItems: 'center', left: wp('-53%') },
-  // backIcon: { width: wp('8%'), height: hp('4%'), },
-  // backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
     backButton: {
       position: 'absolute',
       top: hp('1%'),         // adjust as needed for your layout
@@ -682,7 +698,7 @@ notesInput: {
   color: '#32373E',
   fontFamily: 'Epilogue-Regular',
   marginTop: hp('1%'),
-  marginBottom: hp('6%'),
+  marginBottom: hp('13%'),
   textAlign: 'left',
   padding: wp('4%'),
   minHeight: hp('10%'), // optional minimum
@@ -701,12 +717,10 @@ editNotesInput: {
   paddingTop: wp('4%'),         // top padding
 },
 
-
-
-
   // Row Layouts
   rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp('0.1%') },
-  concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000' },
+  concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%')},
+  
   // Modal Edit
   modalEditContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative',textAlign:'left', },
   modalEditContent: { backgroundColor: '#FFF', padding: wp('5%'), borderRadius: wp('5%'), alignItems: 'center', height: hp('60%'), width: wp('90%'), alignSelf: 'center', textAlign:'left', },
