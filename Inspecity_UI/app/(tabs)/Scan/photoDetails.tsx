@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
@@ -11,10 +11,11 @@ import Scanning from './scanning';
 import ImageView from 'react-native-image-viewing';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import { useSettings } from '../Dashboard/settingsContext';
 
 const PhotoDetails = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const params = useLocalSearchParams();
   const navigation = useNavigation<any>();
   const router = useRouter();
@@ -42,19 +43,30 @@ const PhotoDetails = () => {
   const [dateCreated, setDateCreated] = useState('');
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportCreationFailed, setReportCreationFailed] = useState(false);
+  const [hasExplicitlySaved, setHasExplicitlySaved] = useState(false);
+  const hasExplicitlySavedRef = useRef(false);
 
   const saveReport = () => {
+    setHasExplicitlySaved(true);
+    hasExplicitlySavedRef.current = true;
+    let message = "Report successfully saved."
+    if(settings.autoSave){
+      message = "Your report is already saved.\nYou can turn off auto-save in settings.";
+    }
     Alert.alert(
       "Report Status",
-      "Your report is already saved.\nYou can turn off auto-save in settings.",
-      [{ text: "OK", onPress: () => setReportModalVisible(false) }]
+      message,
+      [{ text: "OK", onPress: () => {
+        setReportModalVisible(false);
+        navigation.popToTop();
+      }}]
     );
-    setReportModalVisible(false);
-    navigation.popToTop();
   };
 
   const deleteReport = async () => {
     try {
+      setHasExplicitlySaved(true);
+      hasExplicitlySavedRef.current = true;
       const response = await axios.delete(
         `https://flask-railway-sample-production.up.railway.app/reports/${reportID}`,
         {
@@ -81,6 +93,91 @@ const PhotoDetails = () => {
       uploadImageToCloudinary(photo);
     }
   }, [photo]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+      // If we don't have unsaved changes or the report is already saved, we don't need to do anything
+      if (settings.autoSave || hasExplicitlySaved || hasExplicitlySavedRef.current) {
+        return;
+      }
+  
+      // Prevent default behavior of leaving the screen
+      e.preventDefault();
+  
+      // Prompt the user before leaving
+      Alert.alert(
+        `Leave without saving "${reportName}" report?`,
+        'This report will be deleted.',
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {}
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              // Delete the report and then navigate back
+              deleteReport().then(() => {
+                navigation.dispatch(e.data.action);
+              });
+            }
+          },
+          {
+            text: "Save",
+            onPress: () => {
+              // Continue without doing anything since it's already saved
+              navigation.dispatch(e.data.action);
+            }
+          }
+        ]
+      );
+    });
+  
+    return unsubscribe;
+  }, [navigation, reportID]);
+  
+  // Modify your back button press handler to use navigation.goBack() instead of navigation.popToTop()
+  const handleBackPress = () => {
+    if (settings.autoSave || hasExplicitlySaved) {
+      navigation.goBack();
+      return;
+    }
+  
+    // Show the alert only if auto-save is off and user hasn't explicitly saved
+    Alert.alert(
+      'Leave without saving?',
+      'This report will be deleted.',
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {}
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteReport().then(() => {
+              navigation.goBack(); 
+            });
+          }
+        },
+        {
+          text: "Save",
+          onPress: () => {
+            saveReport();
+            navigation.goBack();
+          }
+        }
+      ]
+    );
+  };
+  
+  const handleFindNearbyShops = () => {
+    router.push('/(tabs)/Shops');
+  };
   
   // useEffect(() => {
   //   if (reportID) {
@@ -511,10 +608,10 @@ const PhotoDetails = () => {
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-              <Text style={styles.backText}>Back</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
+            <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
 
             {/* Save/Delete Report Button */}
             <TouchableOpacity onPress={() => setReportModalVisible(true)}>
@@ -528,7 +625,7 @@ const PhotoDetails = () => {
           </View>
 
           <Text style={styles.title}>No photo provided!</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
@@ -544,7 +641,7 @@ const PhotoDetails = () => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
             <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
@@ -611,7 +708,7 @@ const PhotoDetails = () => {
               <Text style={styles.detailText}>• {recommendations}</Text>
               <TouchableOpacity 
                 style={styles.shopButton} 
-                onPress={() => router.push('/(tabs)/Shops')}
+                onPress={handleFindNearbyShops}
               >
                 <Text style={styles.shopButtonText}>Find Nearby Shops</Text>
               </TouchableOpacity>
