@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import * as Location from 'expo-location';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import * as Animatable from 'react-native-animatable';
 
 
 const GettingStarted5 = () => {
@@ -124,17 +125,21 @@ const GettingStarted5 = () => {
   const currentStep = 6; // Current progress step
 
   return (
-    <View style={styles.container}>
-      {/* Hide Status Bar */}
-      <StatusBar hidden={true} />
-
-      {/* Upper Blue Section */}
+<Animatable.View
+      style={styles.container}
+      animation="fadeIn"
+      duration={600}
+      easing="ease-out"
+    >
       <View style={styles.upperSection}>
-        <Image
-          source={require('../assets/images/houseGS5.png')} // Path to your image
-          style={styles.image}
-          resizeMode="contain" // Ensure the image fits well
-        />
+<Animatable.Image
+    animation="slideInRight"
+    duration={800}
+    easing="ease-out"
+    source={require('../assets/images/houseGS5.png')}
+    style={styles.image}
+    resizeMode="contain"
+  />
       </View>
 
       {/* Lower White Section */}
@@ -161,7 +166,7 @@ const GettingStarted5 = () => {
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animatable.View>
   );
 };
 

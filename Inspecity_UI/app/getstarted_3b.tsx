@@ -4,6 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import * as Animatable from 'react-native-animatable';
+
 
 const GettingStarted3b = () => {
   const { homeData } = useLocalSearchParams();
@@ -68,10 +70,21 @@ const GettingStarted3b = () => {
   const currentStep = 4;
 
   return (
-    <View style={styles.container}>
+<Animatable.View
+      style={styles.container}
+      animation="fadeIn"
+      duration={600}
+      easing="ease-out"
+    >
       <View style={styles.upperSection}>
-        <Image source={require('../assets/images/houseGS3.png')} style={styles.image} resizeMode="contain" />
-      </View>
+<Animatable.Image
+    animation="slideInRight"
+    duration={800}
+    easing="ease-out"
+    source={require('../assets/images/houseGS3.png')}
+    style={styles.image}
+    resizeMode="contain"
+  /></View>
 
       <View style={styles.lowerSection}>
       <View style={styles.progressBar}>
@@ -206,7 +219,7 @@ const GettingStarted3b = () => {
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
       </View>
-    </View>
+    </Animatable.View>
   );
 };
 

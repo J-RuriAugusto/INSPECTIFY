@@ -4,6 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import * as Animatable from 'react-native-animatable';
+import { KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 
 
 const GettingStarted3 = () => {
@@ -69,10 +71,28 @@ const GettingStarted3 = () => {
   const currentStep = 3;
 
   return (
-    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+  behavior="height" // best for Android
+  keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
+>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <Animatable.View
+      style={styles.container}
+      animation="fadeIn"
+      duration={600}
+      easing="ease-out"
+    >
       <View style={styles.upperSection}>
-        <Image source={require('../assets/images/houseGS3.png')} style={styles.image} resizeMode="contain" />
-      </View>
+<Animatable.Image
+    animation="slideInRight"
+    duration={800}
+    easing="ease-out"
+    source={require('../assets/images/houseGS3.png')}
+    style={styles.image}
+    resizeMode="contain"
+  />      </View>
 
       <View style={styles.lowerSection}>
         <View style={styles.progressBar}>
@@ -153,7 +173,10 @@ const GettingStarted3 = () => {
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animatable.View>
+         </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
   );
 };
 
@@ -263,6 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: wp('8%'),
     alignItems: 'center',
     marginBottom: hp('2.5%'),
+    marginTop: hp('-6%'),
   },
 
   buttonText: {

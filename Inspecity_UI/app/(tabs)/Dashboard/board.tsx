@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler, RefreshControl } from 'react-native';
+import { Modal, Button,StyleSheet, Image, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, View, BackHandler, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 // import { Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Swipeable } from 'react-native-gesture-handler';
+import axios from 'axios';
 
 
 interface Report {
@@ -32,8 +33,13 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const API_KEY = '***REMOVED***';
   const router = useRouter();
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [newReportName, setNewReportName] = useState('');
+  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+
   const filteredReports = reportsTitleID.filter((report) =>
-  report.report_name.toLowerCase().includes(search.toLowerCase())
+    report.report_name.toLowerCase().includes(search.toLowerCase())
+  
 );
 
   const handleRename = (reportId: string, newName: string) => {
@@ -46,25 +52,25 @@ const Dashboard = () => {
     // TODO: Optionally, add API call to persist the change
   };
 
-  const onRenameReport = (report: Report) => {
-    Alert.prompt(
-      t('RENAME_REPORT'),
-      t('ENTER_NEW_NAME'),
-      [
-        { text: t('CANCEL'), style: 'cancel' },
-        {
-          text: t('SAVE'),
-          onPress: (newName) => {
-            if (newName && newName.trim()) {
-              handleRename(report.report_id, newName.trim());
-            }
-          },
-        },
-      ],
-      'plain-text',
-      report.report_name || ''
-    );
-  };
+  const onRenameReport = (report: Reports) => {
+  setSelectedReportId(report.report_id);
+  setNewReportName(report.report_name);
+  setRenameModalVisible(true);
+};
+
+const handleRenameSubmit = async () => {
+  if (!newReportName.trim() || selectedReportId === null) return;
+
+  try {
+    await axios.put(`${API_BASE_URL}/api/update-report/${selectedReportId}`, {
+      report_name: newReportName,
+    });
+    setRenameModalVisible(false);
+    fetchReports(); // Refresh data
+  } catch (error) {
+    console.error('Failed to rename report:', error);
+  }
+};
 
   // Swipe action component
   const renderRightActions = (onEdit: () => void) => (
@@ -239,6 +245,8 @@ const Dashboard = () => {
     }
   };
 
+  
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true); // Start refresh animation
   
@@ -346,12 +354,12 @@ const Dashboard = () => {
                 padding: wp(3),
                 borderRadius: wp(3),
                 marginHorizontal: wp(1.5),
-                marginTop: hp(2),
+                marginTop: hp(0.5),
                 marginBottom: hp(3),
                 flexDirection: 'row',
                 alignItems: 'center',
-                width: wp(70),
-                height: hp(15),
+                width: wp(40),
+                height: hp(12),
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: hp(0.25) },
                 shadowOpacity: 0.1,
@@ -359,7 +367,7 @@ const Dashboard = () => {
                 elevation: 3,
               }}
             >
-              <Image
+              {/* <Image
                 source={{ uri: item.image }}
                 style={{
                   width: wp(20),
@@ -367,7 +375,7 @@ const Dashboard = () => {
                   borderRadius: wp(2),
                   marginRight: wp(2.5),
                 }}
-              />
+              /> */}
               <View style={{ flex: 1 }}>
                 <View
                   style={{
@@ -378,7 +386,7 @@ const Dashboard = () => {
                   }}
                 >
                   <Text
-                    numberOfLines={1}
+                    numberOfLines={3}
                     style={{ fontSize: wp(3.5), fontWeight: 'bold', color: '#fff', flex: 1 }}
                   >
                     {item.name}
@@ -492,6 +500,59 @@ const Dashboard = () => {
     </ScrollView>
     </View>
     </View>
+<Modal
+  visible={renameModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setRenameModalVisible(false)}
+>
+  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#000000', textAlign:'center' }}>Rename Report</Text>
+      <TextInput
+        value={newReportName}
+        onChangeText={setNewReportName}
+        style={{
+          borderColor: '#ccc',
+          borderWidth: 1,
+          padding: 10,
+          borderRadius: 8,
+          marginBottom: 10,
+        }}
+      />
+<View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+  <TouchableOpacity
+    onPress={() => setRenameModalVisible(false)}
+    style={{
+      marginRight: 10,
+      backgroundColor: '#f44336', // red
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+    }}
+  >
+    <Text style={{ color: 'white', fontWeight: 'bold' }}>Cancel</Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity
+    onPress={handleRenameSubmit}
+    style={{
+      backgroundColor: '#2196f3', // blue
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+    }}
+  >
+    <Text style={{ color: 'white', fontWeight: 'bold' }}>Save</Text>
+  </TouchableOpacity>
+</View>
+
+    </View>
+  </View>
+</Modal>
+
+
+
     </ScrollView>
     );
 };
@@ -637,6 +698,46 @@ const styles = StyleSheet.create({
               // marginTop: hp(0.5),
               textAlign: 'center',
   },
+  modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  width: '80%',
+  backgroundColor: 'white',
+  borderRadius: 10,
+  padding: 20,
+  elevation: 5,
+},
+modalTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 10,
+},
+modalInput: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 5,
+  padding: 10,
+  marginBottom: 20,
+},
+modalButtons: {
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  gap: 10,
+},
+cancelButton: {
+  marginRight: 10,
+  color: 'red',
+  fontWeight: 'bold',
+},
+confirmButton: {
+  color: 'green',
+  fontWeight: 'bold',
+},
+
 
 });
                 

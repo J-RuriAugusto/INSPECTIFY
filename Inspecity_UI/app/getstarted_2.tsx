@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } fro
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { KeyboardAvoidingView, Platform, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 
 const GettingStarted2 = () => {
@@ -64,14 +66,29 @@ const GettingStarted2 = () => {
   const currentStep = 2; // Current progress step
 
   return (
-    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+  behavior="height" // best for Android
+  keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
+>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <Animatable.View
+      style={styles.container}
+      animation="fadeIn"
+      duration={600}
+      easing="ease-out"
+    >
       {/* Upper Blue Section */}
       <View style={styles.upperSection}>
-        <Image
-          source={require('../assets/images/houseGS2.png')} // Path to your image
-          style={styles.image}
-          resizeMode="contain" // Ensure the image fits well
-        />
+<Animatable.Image
+    animation="slideInRight"
+    duration={800}
+    easing="ease-out"
+    source={require('../assets/images/houseGS2.png')}
+    style={styles.image}
+    resizeMode="contain"
+  />
       </View>
 
       {/* Lower White Section */}
@@ -137,7 +154,10 @@ const GettingStarted2 = () => {
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animatable.View>
+     </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
   );
 };
 
@@ -147,7 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   upperSection: {
-    flex: 1,
+    flex: 0.0005,
     backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
@@ -157,7 +177,7 @@ const styles = StyleSheet.create({
     height: hp('50%'),
   },
   lowerSection: {
-    flex: 1.05,
+    flex: 2,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
