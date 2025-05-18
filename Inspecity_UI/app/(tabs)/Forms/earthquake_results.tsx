@@ -12,6 +12,8 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
 import { Animated } from 'react-native';
+import { useTranslation } from '../../../hooks/useTranslation';
+import { useSettings } from '../Dashboard/settingsContext';
 
 const { height } = Dimensions.get('window');
 
@@ -34,6 +36,8 @@ const Results = () => {
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const { settings } = useSettings();
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -109,6 +113,11 @@ const Results = () => {
         if (validAnswers.length === 0) {
           throw new Error('No valid answers provided');
         }
+        console.log({
+          score: numericScore,
+          answers: validAnswers,
+          language: settings.language,
+        })
 
         const response = await fetch(
           'https://flask-railway-sample-production.up.railway.app/earthquake-recommendation',
@@ -121,6 +130,7 @@ const Results = () => {
             body: JSON.stringify({
               score: numericScore,
               answers: validAnswers,
+              language: settings.language,
             }),
           }
         );

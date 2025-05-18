@@ -318,7 +318,7 @@ const handleRenameSubmit = async () => {
           </TouchableOpacity>
         </Link>
 
-        <Link href="./settings" asChild>
+        <Link href="/(tabs)/Dashboard/settings" asChild>
         <TouchableOpacity>            
           <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
           </TouchableOpacity>

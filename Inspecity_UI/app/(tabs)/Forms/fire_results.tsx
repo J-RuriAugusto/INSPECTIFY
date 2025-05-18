@@ -11,6 +11,8 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
+import { useTranslation } from '../../../hooks/useTranslation';
+import { useSettings } from '../Dashboard/settingsContext';
 
 const { height } = Dimensions.get('window');
 
@@ -45,6 +47,8 @@ const Results = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
+  const { settings } = useSettings();
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -120,6 +124,7 @@ const Results = () => {
           body: JSON.stringify({
             score: numericScore,
             answers: answersArray,
+            language: settings.language,
           }),
         }
       );
