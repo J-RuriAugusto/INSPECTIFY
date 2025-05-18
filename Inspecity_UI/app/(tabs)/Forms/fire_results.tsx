@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, ScrollView, Animated } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import { useLocalSearchParams } from 'expo-router';
@@ -48,6 +48,7 @@ const Results = () => {
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
+  
   const handlePositionChange = (position: 'initial' | 'top') => {
     setIsModalOpen(position === 'top');
   };
@@ -68,7 +69,7 @@ const Results = () => {
   const [error, setError] = useState<string | null>(null);
 
   const API_KEY = '***REMOVED***'; // Flask
-  const GOOGLE_API_KEY = 'AlzaSykSYFuBf5L9fCC0YEoewTViPsGtHSGvJOL';
+  const GOOGLE_API_KEY = 'AlzaSykSYFuBf5L9fCC0YEoewTViPsGtHSGvJOL'; // Replace with your actual Google Maps API Key
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,96 +84,6 @@ const Results = () => {
         setError('Failed to fetch data');
       } finally {
         setIsLoading(false);
-      }
-    };
-
-    const fetchRecommendation = async () => {
-      try {
-        const response = await fetch(
-          'https://flask-railway-sample-production.up.railway.app/general_recommendation',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-API-KEY': API_KEY,
-            },
-            body: JSON.stringify({
-              score: numericScore,
-              answers: answersArray,
-            }),
-          }
-        );
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unknown error from backend');
-
-        setRecommendation(data.gemini_recommendation);
-      } catch (err) {
-        console.error('Fetch error:', err);
-        setError('Error fetching recommendation.');
-      }
-    };
-
-    const fetchNearbyFacilities = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setError('Location permission not granted');
-          return;
-        }
-
-        const location = await Location.getCurrentPositionAsync({});
-        const { latitude, longitude } = location.coords;
-
-        const types = ['hospital', 'police', 'school', 'city_hall'];
-
-        // Fetch results for each type
-        const results = await Promise.all(types.map(type =>
-          axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
-            params: {
-              location: `${latitude},${longitude}`,
-              radius: 5000,
-              type,
-              key: GOOGLE_API_KEY,
-            },
-          })
-        ));
-
-        // Limit 5 results per category and keep track of the results per type
-        const allPlaces = results.flatMap(res => res.data.results);
-        const groupedResults: GroupedResults = {};
-
-        types.forEach(type => {
-          groupedResults[type] = allPlaces.filter(place =>
-            place.types.includes(type)
-          ).slice(0, 5); // Limit to 5 per type
-        });
-
-        // Flatten the results and prepare the mapped data
-        const selected: Facility[] = [];
-        for (const type of types) {
-          const places = groupedResults[type];
-          places.forEach(place => {
-            const distance = calculateDistance(
-              latitude,
-              longitude,
-              place.geometry.location.lat,
-              place.geometry.location.lng
-            );
-            selected.push({
-              icon: mapPlaceTypeToIcon(place.types || []),
-              color: '#4CAF50',
-              label: place.name,
-              distance: distance
-            });
-          });
-        }
-        // Sort facilities by distance
-        selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-        setFacilities(selected);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch nearby critical facilities.');
       }
     };
 
@@ -195,6 +106,96 @@ const Results = () => {
 
     Animated.loop(pulse).start();
   }, []);
+
+  const fetchRecommendation = async () => {
+    try {
+      const response = await fetch(
+        'https://flask-railway-sample-production.up.railway.app/fire-recommendation',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': API_KEY,
+          },
+          body: JSON.stringify({
+            score: numericScore,
+            answers: answersArray,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unknown error from backend');
+
+      setRecommendation(data.gemini_recommendation);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError('Error fetching recommendation.');
+    }
+  };
+
+  const fetchNearbyFacilities = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Location permission not granted');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      const types = ['hospital', 'police', 'school', 'city_hall'];
+
+      // Fetch results for each type
+      const results = await Promise.all(types.map(type =>
+        axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
+          params: {
+            location: `${latitude},${longitude}`,
+            radius: 5000,
+            type,
+            key: GOOGLE_API_KEY,
+          },
+        })
+      ));
+
+      // Limit 5 results per category and keep track of the results per type
+      const allPlaces = results.flatMap(res => res.data.results);
+      const groupedResults: GroupedResults = {};
+
+      types.forEach(type => {
+        groupedResults[type] = allPlaces.filter(place =>
+          place.types.includes(type)
+        ).slice(0, 5); // Limit to 5 per type
+      });
+
+      // Flatten the results and prepare the mapped data
+      const selected: Facility[] = [];
+      for (const type of types) {
+        const places = groupedResults[type];
+        places.forEach(place => {
+          const distance = calculateDistance(
+            latitude,
+            longitude,
+            place.geometry.location.lat,
+            place.geometry.location.lng
+          );
+          selected.push({
+            icon: mapPlaceTypeToIcon(place.types || []),
+            color: '#4CAF50',
+            label: place.name,
+            distance: distance
+          });
+        });
+      }
+      // Sort facilities by distance
+      selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      setFacilities(selected);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch nearby critical facilities.');
+    }
+  };
 
   const mapPlaceTypeToIcon = (types: string[]): MaterialIconName => {
     if (types.includes('hospital')) return 'local-hospital';
@@ -224,7 +225,7 @@ const Results = () => {
   };
 
   const generatePreviewHtml = () => {
-    const logoBase64 = `data:image/png;base64,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`;
+    const logoBase64 = `data:image/png;base64,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`;
 
     const currentDate = new Date();
     const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -242,7 +243,7 @@ const Results = () => {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>General Preparedness Assessment</title>
+          <title>Fire Preparedness Assessment</title>
           <style>
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -356,7 +357,7 @@ const Results = () => {
           <div class="header">
             <img src="${logoBase64}" alt="Inspectify Logo" />
             <div class="header-text">
-              <h1>General Preparedness Assessment</h1>
+              <h1>Fire Preparedness Assessment</h1>
               <p>Comprehensive Risk Evaluation</p>
             </div>
           </div>
@@ -364,7 +365,7 @@ const Results = () => {
           <div class="meta">
             <p><strong>Date Generated:</strong> ${formattedCurrentDate}</p>
             <p><strong>Risk Level:</strong> ${label}</p>
-            <p><strong>Score:</strong> ${numericScore} out of 16</p>
+            <p><strong>Score:</strong> ${numericScore} out of 15</p>
           </div>
 
           <div class="section">
@@ -385,7 +386,7 @@ const Results = () => {
           </div>
 
           <div class="footer">
-            <p>This assessment is generated based on your responses to the general preparedness questionnaire.</p>
+            <p>This assessment is generated based on your responses to the fire preparedness questionnaire.</p>
             <p>© ${currentDate.getFullYear()} Inspectify. All rights reserved.</p>
           </div>
         </body>
@@ -408,7 +409,7 @@ const Results = () => {
       });
 
       const downloadDir = FileSystem.documentDirectory;
-      const fileName = `general_results_${new Date().getTime()}.pdf`;
+      const fileName = `fire_results_${new Date().getTime()}.pdf`;
       const destinationUri = `${downloadDir}${fileName}`;
 
       await FileSystem.copyAsync({
@@ -429,7 +430,7 @@ const Results = () => {
     <View style={styles.container}>
       {/* Background Video */}
       <Video
-        source={require('../../../assets/videos/houses4.mp4')}
+        source={require('../../../assets/videos/houses3.mp4')}
         style={StyleSheet.absoluteFill}
         resizeMode={ResizeMode.COVER}
         shouldPlay
@@ -450,14 +451,14 @@ const Results = () => {
         <>
           {/* Top Content */}
           <View style={styles.content}>
-            <Text style={styles.title}>General Preparedness Result</Text>
+            <Text style={styles.title}>Fire Preparedness Result</Text>
             <Text style={[styles.riskLevel, { color }]}>{label}</Text>
             <View style={styles.barContainer}>
               <View
-                style={[styles.bar, { width: `${(numericScore / 16) * 100}%`, backgroundColor: color }]}
+                style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>You answered {numericScore} out of 16</Text>
+            <Text style={styles.score}>You answered {numericScore} out of 15</Text>
                     
             <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
               <MaterialIcons name="visibility" size={24} color="#fff" />
@@ -664,44 +665,6 @@ const styles = StyleSheet.create({
     color: '#666',
     fontStyle: 'italic',
   },
-  collapsedHeader: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginBottom: 10,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: '#eee',
-  },
-  collapsedLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#444',
-  },
-  criticalFacilities: {
-    marginTop: 10,
-  },
-  recommendationText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  downloadButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#19477B',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 10,
-    alignSelf: 'center',
-  },
-  downloadButtonText: {
-    color: '#fff',
-    marginLeft: 8,
-    fontSize: 16,
-    fontWeight: '600',
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -759,6 +722,44 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  collapsedHeader: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#eee',
+  },
+  collapsedLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+  },
+  criticalFacilities: {
+    marginTop: 10,
+  },
+  recommendationText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  downloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#19477B',
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignSelf: 'center',
+  },
+  downloadButtonText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontSize: 16,
+    fontWeight: '600',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -778,8 +779,6 @@ const styles = StyleSheet.create({
   },
   loadingIcon: {
     marginBottom: 10,
-    transform: [{ scale: 1 }],
-    opacity: 1,
   },
   loadingText: {
     fontSize: 16,
@@ -789,4 +788,3 @@ const styles = StyleSheet.create({
 });
 
 export default Results;
-

@@ -39,8 +39,8 @@ export default function AwarenessToolLayout() {
         options={{ title: 'Earthquake Queries' }}
       />
       <Stack.Screen
-        name="typhoon"
-        options={{ title: 'Typhoon Preparedness' }} // Title for Typhoon screen
+        name="fire"
+        options={{ title: 'Fire Preparedness' }} // Title for Typhoon screen
       />
       <Stack.Screen
         name="general"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Image,
@@ -16,32 +16,46 @@ const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
   const initialQuestions = [
+    // Emergency Supplies & Equipment
     'Do you have an emergency kit with basic supplies (e.g., flashlight, first aid, food, water)?',
+    'Do you have a battery-powered radio for updates during power outages?',
+    'Do you store important documents (e.g., IDs, land titles) in a waterproof and fireproof container?',
+    'Do you regularly check and maintain your emergency supplies?',
+    'Do you have a backup power source (e.g., generator, power bank)?',
+    'Do you have a fire extinguisher at home?',
+
+    // Family & Household Preparedness
     'Do you have a family emergency plan in case of disasters?',
+    'Do you have a plan for evacuating elderly or disabled family members?',
+    'If you have pets, do you have a plan for them during disasters?',
+    'Do you have a plan for communicating with family members during disasters?',
+
+    // Knowledge & Skills
     'Do you know the nearest evacuation center in your area?',
     'Do you have a list of emergency contact numbers (e.g., barangay, hospital, fire station)?',
-    'Do you have a battery-powered radio for updates during power outages?  ',
-    'Do you store important documents (e.g., IDs, land titles) in a waterproof and fireproof container?',
-    'Do you have a plan for securing your pets during disasters?',
-    'Do you regularly check and maintain your emergency supplies? ',
-    'Do you know how to turn off utilities (electricity, water, gas) in case of emergencies? ',
-    'Do you have a backup power source (e.g., generator, power bank)? ',
-    'Do you have a plan for evacuating elderly or disabled family members? ',
-    'Do you have a fire extinguisher at home? ',
-    'Do you regularly participate in community disaster drills?  ',
-    'Do you have a plan for communicating with family members during disasters? ',
-    'Do you know the basic first aid procedures (e.g., CPR, wound care)?',
+    'Do you know how to turn off utilities (electricity, water, gas) in case of emergencies?',
+    'Do you know basic first aid procedures (e.g., CPR, wound care)?',
+
+    // Community Engagement
+    'Are you aware of any disaster drills regularly conducted in your barangay or community?',
+
+    // Awareness of Hazard Assessment Tools
+    'Are you familiar with any of the following free hazard assessment tools: NOAH, HazardHunterPH, or How Safe is My House?',
   ];
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(Array(initialQuestions.length).fill(''));
+  const [skippedIndices, setSkippedIndices] = useState<number[]>([]);
+
+  // Calculate score dynamically based on answers to avoid double counting
+  const score = answers.filter((ans) => ans === 'Yes').length;
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
     'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-    'Epilogue-Medium': require('../../../assets/fonts/Archivo-Medium.ttf'),
+    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'), // fixed font file name
   });
 
   const navigation = useNavigation();
@@ -50,31 +64,89 @@ const Questions = () => {
   if (!fontsLoaded) return null;
 
   const handleAnswer = (answer: string) => {
-    if (answer === 'Yes') {
-      setScore((prev) => prev + 1);
+    const currentIndex = questionIndex;
+
+    // Store answer at the original question index
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = answer;
+    setAnswers(updatedAnswers);
+
+    console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    // If this question was skipped before and now answered, remove from skipped
+    if (skippedIndices.includes(currentIndex)) {
+      setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
     }
 
-    const nextIndex = questionIndex + 1;
-
-    if (nextIndex < questionsQueue.length) {
+    // Move to next question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
       setQuestionIndex(nextIndex);
     } else {
-      router.push({
-        pathname: '/Forms/general_results',
-        params: { score: (answer === 'Yes' ? score + 1 : score).toString() },
-      });
+      // If no more unanswered questions, check if skipped questions remain
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All done - navigate to results
+        router.push({
+          pathname: '/Forms/general_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
   };
 
-  const handleSkip = () => {
-    const skippedQuestion = questionsQueue[questionIndex];
-    const updatedQueue = [...questionsQueue.slice(0, questionIndex), ...questionsQueue.slice(questionIndex + 1), skippedQuestion];
+  // Helper to find next unanswered question index after current
+  const findNextUnansweredQuestion = (startIdx: number, answersArr: string[], skippedArr: number[]) => {
+    for (let i = startIdx; i < answersArr.length; i++) {
+      if (answersArr[i] === '') return i;
+    }
+    // Also check skipped questions
+    for (let i = 0; i < answersArr.length; i++) {
+      if (skippedArr.includes(i) && answersArr[i] === 'Skipped') {
+        return i;
+      }
+    }
+    return -1; // none found
+  };
 
-    setQuestionsQueue(updatedQueue);
-    if (questionIndex < updatedQueue.length - 1) {
-      setQuestionIndex(questionIndex); // Stay at same index (next question comes forward)
+  const handleSkip = () => {
+    const currentIndex = questionIndex;
+
+    // Mark question as skipped
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = 'Skipped';
+    setAnswers(updatedAnswers);
+
+    console.log(`Skipped Question ${currentIndex + 1}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    if (!skippedIndices.includes(currentIndex)) {
+      setSkippedIndices([...skippedIndices, currentIndex]);
+    }
+
+    // Move to next unanswered question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
+      setQuestionIndex(nextIndex);
     } else {
-      setQuestionIndex(updatedQueue.length - 1);
+      // If no more questions, but skipped remain, show first skipped
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All answered/skipped, go to results
+        router.push({
+          pathname: '/Forms/general_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
   };
 
@@ -175,8 +247,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Medium',
     fontSize: width * 0.045,
     color: '#FFFFFF',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   progressContainer: {
     top: height * 0.12,
@@ -225,7 +295,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '8%',
     marginTop: '10%',
   },
   optionButton: {
@@ -233,6 +302,7 @@ const styles = StyleSheet.create({
     paddingVertical: '5%',
     paddingHorizontal: '40%',
     borderRadius: 15,
+    marginBottom: 20,
   },
   optionText: {
     fontFamily: 'Epilogue-Bold',

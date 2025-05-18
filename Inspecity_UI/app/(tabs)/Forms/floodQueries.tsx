@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Image,
@@ -16,26 +16,35 @@ const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
   const initialQuestions = [
-    'Is your house located near a river, creek, or estero?',
-    'Has your area experienced flooding in the past 2 years?',
-    'Is your house in a low-lying area or near a floodplain?',
-    'Does water enter your house during heavy rain?',
-    'Is your house near a clogged or poorly maintained drainage system?',
-    'Is your house surrounded by concrete or paved surfaces that prevent water absorption?',
-    'Is your house near a coastal area prone to storm surges?',
-    'Is your house near a dam or reservoir that could overflow?',
-    'Is your house in an area where the local government has issued flood warnings?',
-    'Is your house near a construction site that could block water flow?',
-    'Is your house near a landfill or area with poor waste management?',
-    'Is your house in an area where the water table is high?',
-    'Is your house near a river that often overflows during typhoons?',
-    'Is your house in an area where flooding lasts for several days?',
-    'Is your house near a creek or estero that overflows during heavy rain?',
+    // HAZARD
+    'Is your house located within 100 meters of a river, creek, canal, or estero?',
+    'Has your community experienced flooding within the last 2 years?',
+    'Is your house situated at a lower elevation than the road, causing water to flow into it during rains?',
+    'Does your street flood even during light rain (e.g., ankle-deep water)?',
+    'Is there a dam, large lake, or reservoir within 1 kilometer of your home?',
+
+    // VULNERABILITY
+    'Does any amount of water enter your home during heavy rain, including minor leaks or major flooding?',
+    'Is your house made of light materials (e.g., wood, bamboo, or thin sheets) that can be damaged by floodwater?',
+    'Are important items like documents, appliances, or food stored on the floor or below waist level?',
+    'Is your family unfamiliar with evacuation routes or flood safety plans in your barangay?',
+    'Are there children, elderly, pregnant women, or persons with disabilities in your household?',
+
+    // EXPOSURE
+    'Is there a clogged drainage system or canal within 50 meters of your house?',
+    'Is your area mostly concrete, preventing water from soaking into the ground?',
+    'Is there ongoing construction within 200 meters that could block natural water flow?',
+    'Are there large trees, signs, or weak structures nearby that could fall during a flood?',
+    'When it floods in your area, does it take more than 12 hours for the water to subside?',
   ];
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(Array(initialQuestions.length).fill(''));
+  const [skippedIndices, setSkippedIndices] = useState<number[]>([]);
+
+  // Calculate score dynamically based on answers to avoid double counting
+  const score = answers.filter((ans) => ans === 'Yes').length;
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -50,33 +59,91 @@ const Questions = () => {
   if (!fontsLoaded) return null;
 
   const handleAnswer = (answer: string) => {
-    if (answer === 'Yes') {
-      setScore((prev) => prev + 1);
-    }
+      const currentIndex = questionIndex;
 
-    const nextIndex = questionIndex + 1;
+      // Store answer at the original question index
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentIndex] = answer;
+      setAnswers(updatedAnswers);
 
-    if (nextIndex < questionsQueue.length) {
-      setQuestionIndex(nextIndex);
-    } else {
-      router.push({
-        pathname: '/Forms/flood_results',
-        params: { score: (answer === 'Yes' ? score + 1 : score).toString() },
-      });
-    }
-  };
+      console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
+      console.log('Updated Answers:', updatedAnswers);
 
-  const handleSkip = () => {
-    const skippedQuestion = questionsQueue[questionIndex];
-    const updatedQueue = [...questionsQueue.slice(0, questionIndex), ...questionsQueue.slice(questionIndex + 1), skippedQuestion];
+      // If this question was skipped before and now answered, remove from skipped
+      if (skippedIndices.includes(currentIndex)) {
+        setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
+      }
 
-    setQuestionsQueue(updatedQueue);
-    if (questionIndex < updatedQueue.length - 1) {
-      setQuestionIndex(questionIndex); // Stay at same index (next question comes forward)
-    } else {
-      setQuestionIndex(updatedQueue.length - 1);
-    }
-  };
+      // Move to next question
+      const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+      if (nextIndex !== -1) {
+        setQuestionIndex(nextIndex);
+      } else {
+        // If no more unanswered questions, check if skipped questions remain
+        if (skippedIndices.length > 0) {
+          setQuestionIndex(skippedIndices[0]);
+        } else {
+          // All done - navigate to results
+          router.push({
+            pathname: '/Forms/flood_results',
+            params: {
+              score: score.toString(),
+              answers: JSON.stringify(updatedAnswers),
+            },
+          });
+        }
+      }
+    };
+
+    // Helper to find next unanswered question index after current
+    const findNextUnansweredQuestion = (startIdx: number, answersArr: string[], skippedArr: number[]) => {
+      for (let i = startIdx; i < answersArr.length; i++) {
+        if (answersArr[i] === '') return i;
+      }
+      // Also check skipped questions
+      for (let i = 0; i < answersArr.length; i++) {
+        if (skippedArr.includes(i) && answersArr[i] === 'Skipped') {
+          return i;
+        }
+      }
+      return -1; // none found
+    };
+
+    const handleSkip = () => {
+      const currentIndex = questionIndex;
+
+      // Mark question as skipped
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentIndex] = 'Skipped';
+      setAnswers(updatedAnswers);
+
+      console.log(`Skipped Question ${currentIndex + 1}`);
+      console.log('Updated Answers:', updatedAnswers);
+
+      if (!skippedIndices.includes(currentIndex)) {
+        setSkippedIndices([...skippedIndices, currentIndex]);
+      }
+
+      // Move to next unanswered question
+      const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+      if (nextIndex !== -1) {
+        setQuestionIndex(nextIndex);
+      } else {
+        // If no more questions, but skipped remain, show first skipped
+        if (skippedIndices.length > 0) {
+          setQuestionIndex(skippedIndices[0]);
+        } else {
+          // All answered/skipped, go to results
+          router.push({
+            pathname: '/Forms/flood_results',
+            params: {
+              score: score.toString(),
+              answers: JSON.stringify(updatedAnswers),
+            },
+          });
+        }
+      }
+    };
 
   return (
     <ImageBackground

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Image,
@@ -16,26 +16,36 @@ const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
   const initialQuestions = [
-    'Is your house located in an area frequently hit by typhoons? ',
-    'Does your area experience strong winds during typhoons?  ',
-    'Is your house near a coastal area prone to storm surges?  ',
-    'Is your roof made of lightweight materials (e.g., galvanized iron, nipa)?',
-    'Are there loose objects (e.g., signs, furniture) outside your house that could be blown away?',
-    'Is your house near a hill or mountain prone to landslides during heavy rain?',
-    'Does your area experience power outages during typhoons? ',
-    'Is your house near a river or creek that overflows during heavy rain?  ',
-    'Is your house in an area with poor drainage systems? ',
-    'Does your house have large windows or glass doors that could shatter in strong winds? ',
-    'Is your house near a construction site with temporary structures that could collapse?',
-    'Is your house in an area where typhoons often cause flooding? ',
-    'Is your house near a body of water that could cause storm surges?',
-    'Is your house in an area with weak or old electrical poles and wires?',
-    'Is your house in an area where typhoons often cause landslides?',  
+    // HAZARD
+    'Is your house located near facilities that pose a fire risk (e.g., factories, warehouses, gas stations, chemical plants, or power plants)?',
+    'Is your house located in an area with a high risk of consecutive fires (e.g., congested neighborhoods with wooden buildings or poor fire safety enforcement)?',
+    'Is your house near streets that are difficult for emergency responders to access (e.g., narrow or blocked roads)?',
+    'Is your house near areas where outdoor fires such as bonfires or trash burning are common?',
+
+    // VULNERABILITY
+    'Is your house built with easily combustible materials (e.g., wood, plastic, non-fire-resistant materials)?',
+    'Does your house have electrical wiring that is old or has not been inspected (e.g., exposed or improperly installed wires)?',
+    'Do you have electrical appliances or devices that are often left on for long periods or haven’t undergone safety inspections?',
+    'Does your house have a fireplace, stove, or open flame source that is not regularly maintained?',
+    'Are fire extinguishers or other fire safety equipment in your house old, expired, or not easily accessible?',
+
+    // EXPOSURE
+    'Does your home have easy access to fire suppression resources (e.g., hydrants, fire trucks, or water tanks)?',
+    'Is your house near a high-rise building, tower, or construction site that could pose a fire hazard?',
+    'Is your house in an area where emergency services may struggle to reach you during a fire?',
+    'Does your house have nearby vegetation or trees that could catch fire and spread to your home?',
+    'Are there many nearby homes or buildings with poorly maintained wiring or other fire hazards?',
+    'Is your house located near a landfill, dump site, or area where trash burning is common?',
   ];
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(Array(initialQuestions.length).fill(''));
+  const [skippedIndices, setSkippedIndices] = useState<number[]>([]);
+
+  // Calculate score dynamically based on answers to avoid double counting
+  const score = answers.filter((ans) => ans === 'Yes').length;
+
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -50,37 +60,95 @@ const Questions = () => {
   if (!fontsLoaded) return null;
 
   const handleAnswer = (answer: string) => {
-    if (answer === 'Yes') {
-      setScore((prev) => prev + 1);
+    const currentIndex = questionIndex;
+
+    // Store answer at the original question index
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = answer;
+    setAnswers(updatedAnswers);
+
+    console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    // If this question was skipped before and now answered, remove from skipped
+    if (skippedIndices.includes(currentIndex)) {
+      setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
     }
 
-    const nextIndex = questionIndex + 1;
-
-    if (nextIndex < questionsQueue.length) {
+    // Move to next question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
       setQuestionIndex(nextIndex);
     } else {
-      router.push({
-        pathname: '/Forms/typhoon_results',
-        params: { score: (answer === 'Yes' ? score + 1 : score).toString() },
-      });
+      // If no more unanswered questions, check if skipped questions remain
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All done - navigate to results
+        router.push({
+          pathname: '/Forms/fire_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
   };
 
-  const handleSkip = () => {
-    const skippedQuestion = questionsQueue[questionIndex];
-    const updatedQueue = [...questionsQueue.slice(0, questionIndex), ...questionsQueue.slice(questionIndex + 1), skippedQuestion];
+  // Helper to find next unanswered question index after current
+  const findNextUnansweredQuestion = (startIdx: number, answersArr: string[], skippedArr: number[]) => {
+    for (let i = startIdx; i < answersArr.length; i++) {
+      if (answersArr[i] === '') return i;
+    }
+    // Also check skipped questions
+    for (let i = 0; i < answersArr.length; i++) {
+      if (skippedArr.includes(i) && answersArr[i] === 'Skipped') {
+        return i;
+      }
+    }
+    return -1; // none found
+  };
 
-    setQuestionsQueue(updatedQueue);
-    if (questionIndex < updatedQueue.length - 1) {
-      setQuestionIndex(questionIndex); // Stay at same index (next question comes forward)
+  const handleSkip = () => {
+    const currentIndex = questionIndex;
+
+    // Mark question as skipped
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = 'Skipped';
+    setAnswers(updatedAnswers);
+
+    console.log(`Skipped Question ${currentIndex + 1}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    if (!skippedIndices.includes(currentIndex)) {
+      setSkippedIndices([...skippedIndices, currentIndex]);
+    }
+
+    // Move to next unanswered question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
+      setQuestionIndex(nextIndex);
     } else {
-      setQuestionIndex(updatedQueue.length - 1);
+      // If no more questions, but skipped remain, show first skipped
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All answered/skipped, go to results
+        router.push({
+          pathname: '/Forms/fire_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
   };
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/typhoon_bg.png')}
+      source={require('../../../assets/images/fire_bg.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -93,7 +161,7 @@ const Questions = () => {
           />
         </TouchableOpacity>
 
-        <Text style={styles.categoryTitle}>TYPHOON</Text>
+        <Text style={styles.categoryTitle}>FIRE</Text>
 
         <TouchableOpacity onPress={handleSkip}>
           <Text style={styles.skipText}>SKIP</Text>

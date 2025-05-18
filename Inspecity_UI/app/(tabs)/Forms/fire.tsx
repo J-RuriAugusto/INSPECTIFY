@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const Typhoon = () => {
+const Fire = () => {
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -19,7 +19,7 @@ const Typhoon = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/typhoon_bg.png')}
+      source={require('../../../assets/images/fire_bg.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -31,15 +31,15 @@ const Typhoon = () => {
 
       {/* EARTHQUAKE Label at the top */}
       <View style={styles.textContainer}>
-        <Image source={require('../../../assets/images/typhoon-icon.png')} style={styles.icon} />
-        <Text style={styles.title1}>TYPHOON</Text>
+        <Image source={require('../../../assets/images/fire-icon.png')} style={styles.icon} />
+        <Text style={styles.title1}>FIRE</Text>
       </View>
 
       {/* Centered content */}
       <View style={styles.content}>
         <Text style={styles.title2}>CATEGORY</Text>
 
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('typhoonQueries')}>
+        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('fireQueries')}>
           <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
       </View>
@@ -112,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Typhoon;
+export default Fire;

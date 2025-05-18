@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
@@ -8,26 +8,33 @@ const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
   const initialQuestions = [
-    'Is your house located near a fault line or earthquake-prone area?',
-    'Is your house built on soft or unstable soil (e.g., near a river or reclaimed land)?',
-    'Is your house near a steep slope or hill that could collapse during an earthquake?',
-    'Is your house made of weak materials (e.g., wood, hollow blocks without reinforcement)?',
-    'Is your house more than 30 years old?',
-    'Is your house located near a large body of water that could cause liquefaction?',
-    'Is your house near a construction site or tall building that could collapse?',
-    'Is your house located in an area with frequent small earthquakes?',
-    'Is your house near a volcano or in a volcanic area?',
-    'Is your house near a dam or reservoir that could fail during an earthquake?',
-    'Is your house located in an area with poor building code enforcement?',
-    'Is your house near a highway or bridge that could collapse during an earthquake?',
-    'Is your house near a power plant or industrial area that could be hazardous during an earthquake?',
-    'Is your house near a landfill or area with unstable ground?',
-    'Is your house in an area where earthquakes have caused damage in the past?',
+    'Is your house located within 10 kilometers of a known fault line or mapped earthquake zone? (e.g., West Valley Fault, Central Cebu Fault)',
+    'Is your house built on soft or unstable ground (e.g., near rivers, swamps, reclaimed land, or loose soil)?',
+    'Is your house located within 100 meters of a steep hill or slope that may collapse during an earthquake (landslide-prone)?',
+    'During minor earthquakes, do you notice any shaking in your house, such as swaying of hanging objects, movement of light fixtures, or a feeling of unsteadiness?',
+    'Is your house within 1 km of a dam, reservoir, or large body of water? (Risk of liquefaction/flooding)',
+
+    // Vulnerability
+    'Is your house made of weak materials? (e.g., wood, hollow blocks without steel bars, weak foundation)',
+    'Is your house older than 30 years and has not undergone recent inspection by an engineer?',
+    'Was your house built without following safety standards? (No architect/engineer supervision)',
+    'Does your house have visible cracks or signs of structural damage (walls, beams, columns)?',
+    'Are there limited building safety inspections or enforcement in your barangay?',
+
+    // Exposure
+    'Is your house near tall or unstable structures? (Within 100 m of towers, billboards, construction sites)',
+    'Is your house near hazardous facilities? (e.g., power plants, gas stations, chemical storage)',
+    'Is your house within 200 meters of a bridge, flyover, or elevated road that may fall or block access during a quake?',
+    'Is your house beside a quarry, landfill, or loose soil area? (Land may shift or sink)',
+    'Has your area suffered serious earthquake damage before? (In the past 20 years)',
   ];
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(Array(initialQuestions.length).fill(''));
+  const [skippedIndices, setSkippedIndices] = useState<number[]>([]);
+  // Calculate score dynamically based on answers to avoid double counting
+  const score = answers.filter((ans) => ans === 'Yes').length;
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -41,39 +48,92 @@ const Questions = () => {
 
   if (!fontsLoaded) return null;
 
-  const handleAnswer = (answer: string) => {
-    if (answer === 'Yes') {
-      setScore((prev) => prev + 1);
+const handleAnswer = (answer: string) => {
+    const currentIndex = questionIndex;
+
+    // Store answer at the original question index
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = answer;
+    setAnswers(updatedAnswers);
+
+    console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    // If this question was skipped before and now answered, remove from skipped
+    if (skippedIndices.includes(currentIndex)) {
+      setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
     }
 
-    const nextIndex = questionIndex + 1;
-
-    if (nextIndex < questionsQueue.length) {
+    // Move to next question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
       setQuestionIndex(nextIndex);
     } else {
-      router.push({
-        pathname: '/Forms/earthquake_results',
-        params: { score: (answer === 'Yes' ? score + 1 : score).toString() },
-      });
+      // If no more unanswered questions, check if skipped questions remain
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All done - navigate to results
+        router.push({
+          pathname: '/Forms/earthquake_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
+  };
+
+  // Helper to find next unanswered question index after current
+  const findNextUnansweredQuestion = (startIdx: number, answersArr: string[], skippedArr: number[]) => {
+    for (let i = startIdx; i < answersArr.length; i++) {
+      if (answersArr[i] === '') return i;
+    }
+    // Also check skipped questions
+    for (let i = 0; i < answersArr.length; i++) {
+      if (skippedArr.includes(i) && answersArr[i] === 'Skipped') {
+        return i;
+      }
+    }
+    return -1; // none found
   };
 
   const handleSkip = () => {
-    const skippedQuestion = questionsQueue[questionIndex];
-    const updatedQueue = [
-      ...questionsQueue.slice(0, questionIndex),
-      ...questionsQueue.slice(questionIndex + 1),
-      skippedQuestion,
-    ];
+    const currentIndex = questionIndex;
 
-    setQuestionsQueue(updatedQueue);
-    if (questionIndex < updatedQueue.length - 1) {
-      setQuestionIndex(questionIndex);
+    // Mark question as skipped
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentIndex] = 'Skipped';
+    setAnswers(updatedAnswers);
+
+    console.log(`Skipped Question ${currentIndex + 1}`);
+    console.log('Updated Answers:', updatedAnswers);
+
+    if (!skippedIndices.includes(currentIndex)) {
+      setSkippedIndices([...skippedIndices, currentIndex]);
+    }
+
+    // Move to next unanswered question
+    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+    if (nextIndex !== -1) {
+      setQuestionIndex(nextIndex);
     } else {
-      setQuestionIndex(updatedQueue.length - 1);
+      // If no more questions, but skipped remain, show first skipped
+      if (skippedIndices.length > 0) {
+        setQuestionIndex(skippedIndices[0]);
+      } else {
+        // All answered/skipped, go to results
+        router.push({
+          pathname: '/Forms/earthquake_results',
+          params: {
+            score: score.toString(),
+            answers: JSON.stringify(updatedAnswers),
+          },
+        });
+      }
     }
   };
-
   return (
     <ImageBackground
       source={require('../../../assets/images/earthquake_bg.png')}

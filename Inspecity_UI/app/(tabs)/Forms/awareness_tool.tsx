@@ -45,13 +45,13 @@ const AwarenessTool = () => {
       </View>
 
       <View style={styles.row}>
-        <Link href="/Forms/typhoon" asChild>
+        <Link href="/Forms/fire" asChild>
           <TouchableOpacity style={styles.largeContainer}>
             <Image
-              source={require('../../../assets/images/typhoon-icon.png')}
+              source={require('../../../assets/images/fire-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>TYPHOON</Text>
+            <Text style={styles.buttonText}>FIRE</Text>
           </TouchableOpacity>
         </Link>
         <Link href="/Forms/general" asChild>
