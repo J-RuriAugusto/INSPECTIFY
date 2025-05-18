@@ -140,15 +140,11 @@ const Results = () => {
               'Content-Type': 'application/json',
               'X-API-KEY': API_KEY,
             },
-<<<<<<< HEAD
             body: JSON.stringify({
               score: numericScore,
               answers: validAnswers,
               language: settings.language,
             }),
-=======
-            body: JSON.stringify(requestBody),
->>>>>>> 984a3e86f0c8537ddd1d7afa6ce1c9a096055a7a
           }
         );
 
