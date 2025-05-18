@@ -110,6 +110,19 @@ const Results = () => {
           throw new Error('No valid answers provided');
         }
 
+        // Log what will be sent to backend
+        // console.log('Sending to backend:', {
+        //   score: numericScore,
+        //   answers: validAnswers
+        // });
+
+        const requestBody = {
+          score: numericScore,
+          answers: validAnswers,
+        };
+
+        // console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
         const response = await fetch(
           'https://flask-railway-sample-production.up.railway.app/earthquake-recommendation',
           {
@@ -118,19 +131,34 @@ const Results = () => {
               'Content-Type': 'application/json',
               'X-API-KEY': API_KEY,
             },
-            body: JSON.stringify({
-              score: numericScore,
-              answers: validAnswers,
-            }),
+            body: JSON.stringify(requestBody),
           }
         );
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unknown error from backend');
+        // Debug response
+        // alert('Debug - Response Status: ' + response.status);
+        
+        const responseText = await response.text();
+        // console.log('Raw response:', responseText);
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+          // console.log('Parsed response:', data);
+        } catch (e) {
+          // console.error('Failed to parse response as JSON:', e);
+          alert('Error: Server returned invalid JSON response');
+          throw new Error('Invalid JSON response from server');
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Unknown error from backend');
+        }
 
         setRecommendation(data.gemini_recommendation);
       } catch (err) {
-        console.error('Fetch error:', err);
+        // console.error('Fetch error:', err);
+        alert('Error: ' + (err instanceof Error ? err.message : 'Error fetching recommendation.'));
         setError(err instanceof Error ? err.message : 'Error fetching recommendation.');
       }
     };

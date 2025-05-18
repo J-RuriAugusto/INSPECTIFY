@@ -56,8 +56,12 @@ const handleAnswer = (answer: string) => {
     updatedAnswers[currentIndex] = answer;
     setAnswers(updatedAnswers);
 
+    // Calculate score with the updated answers
+    const updatedScore = updatedAnswers.filter((ans) => ans === 'Yes').length;
+
     console.log('Current answers before navigation:', updatedAnswers);
     console.log('Stringified answers:', JSON.stringify(updatedAnswers));
+    console.log('Updated score:', updatedScore);
 
     // If this question was skipped before and now answered, remove from skipped
     if (skippedIndices.includes(currentIndex)) {
@@ -77,7 +81,7 @@ const handleAnswer = (answer: string) => {
         router.push({
           pathname: '/Forms/earthquake_results',
           params: {
-            score: score.toString(),
+            score: updatedScore.toString(),
             answers: JSON.stringify(updatedAnswers),
           },
         });

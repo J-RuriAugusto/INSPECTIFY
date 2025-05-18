@@ -66,8 +66,8 @@ const Questions = () => {
       updatedAnswers[currentIndex] = answer;
       setAnswers(updatedAnswers);
 
-      console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
-      console.log('Updated Answers:', updatedAnswers);
+      // Calculate score with the updated answers
+      const updatedScore = updatedAnswers.filter((ans) => ans === 'Yes').length;
 
       // If this question was skipped before and now answered, remove from skipped
       if (skippedIndices.includes(currentIndex)) {
@@ -87,7 +87,7 @@ const Questions = () => {
           router.push({
             pathname: '/Forms/flood_results',
             params: {
-              score: score.toString(),
+              score: updatedScore.toString(),
               answers: JSON.stringify(updatedAnswers),
             },
           });
