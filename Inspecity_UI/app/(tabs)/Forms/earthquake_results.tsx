@@ -96,6 +96,20 @@ const Results = () => {
 
     const fetchRecommendation = async () => {
       try {
+        // Validate answers array
+        if (!Array.isArray(answersArray)) {
+          throw new Error('Invalid answers format');
+        }
+
+        // Filter out any invalid answers (only allow 'Yes' and 'No')
+        const validAnswers = answersArray.filter(answer => 
+          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no')
+        );
+
+        if (validAnswers.length === 0) {
+          throw new Error('No valid answers provided');
+        }
+
         const response = await fetch(
           'https://flask-railway-sample-production.up.railway.app/earthquake-recommendation',
           {
@@ -106,7 +120,7 @@ const Results = () => {
             },
             body: JSON.stringify({
               score: numericScore,
-              answers: answersArray,
+              answers: validAnswers,
             }),
           }
         );
@@ -117,7 +131,7 @@ const Results = () => {
         setRecommendation(data.gemini_recommendation);
       } catch (err) {
         console.error('Fetch error:', err);
-        setError('Error fetching recommendation.');
+        setError(err instanceof Error ? err.message : 'Error fetching recommendation.');
       }
     };
 

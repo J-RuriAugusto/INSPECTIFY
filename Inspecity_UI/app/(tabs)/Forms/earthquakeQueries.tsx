@@ -56,8 +56,8 @@ const handleAnswer = (answer: string) => {
     updatedAnswers[currentIndex] = answer;
     setAnswers(updatedAnswers);
 
-    console.log(`Answered Question ${currentIndex + 1}: ${answer}`);
-    console.log('Updated Answers:', updatedAnswers);
+    console.log('Current answers before navigation:', updatedAnswers);
+    console.log('Stringified answers:', JSON.stringify(updatedAnswers));
 
     // If this question was skipped before and now answered, remove from skipped
     if (skippedIndices.includes(currentIndex)) {
