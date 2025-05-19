@@ -36,11 +36,7 @@ const Dashboard = () => {
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newReportName, setNewReportName] = useState('');
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
-
-  const filteredReports = reportsTitleID.filter((report) =>
-    report.report_name.toLowerCase().includes(search.toLowerCase())
-  
-);
+  const filteredReports = reportsTitleID.filter((report) => report.report_name.toLowerCase().includes(search.toLowerCase()));
 
   const handleRename = (reportId: string, newName: string) => {
     // Example: update the report name locally
@@ -53,24 +49,24 @@ const Dashboard = () => {
   };
 
   const onRenameReport = (report: Reports) => {
-  setSelectedReportId(report.report_id);
-  setNewReportName(report.report_name);
-  setRenameModalVisible(true);
-};
+    setSelectedReportId(report.report_id);
+    setNewReportName(report.report_name);
+    setRenameModalVisible(true);
+  };
 
-const handleRenameSubmit = async () => {
-  if (!newReportName.trim() || selectedReportId === null) return;
+  const handleRenameSubmit = async () => {
+    if (!newReportName.trim() || selectedReportId === null) return;
 
-  try {
-    await axios.put(`${API_BASE_URL}/api/update-report/${selectedReportId}`, {
-      report_name: newReportName,
-    });
-    setRenameModalVisible(false);
-    fetchReports(); // Refresh data
-  } catch (error) {
-    console.error('Failed to rename report:', error);
-  }
-};
+    try {
+      await axios.put(`${API_BASE_URL}/api/update-report/${selectedReportId}`, {
+        report_name: newReportName,
+      });
+      setRenameModalVisible(false);
+      fetchReports(); // Refresh data
+    } catch (error) {
+      console.error('Failed to rename report:', error);
+    }
+  };
 
   // Swipe action component
   const renderRightActions = (onEdit: () => void) => (
@@ -212,14 +208,14 @@ const handleRenameSubmit = async () => {
         setLocation(t('LOCATION_PLACEHOLDER'));
       }
     } catch (error) {
-      let errorMessage = "Backend is not accessible.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      console.log("Error fetching house details:", errorMessage);
-      Alert.alert(t('ERROR_FETCHING_HOUSE'), errorMessage);
-      setHouseName(t('HOUSE_NAME_PLACEHOLDER'));
-      setLocation(t('LOCATION_PLACEHOLDER'));
+        let errorMessage = "Backend is not accessible.";
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        console.log("Error fetching house details:", errorMessage);
+        Alert.alert(t('ERROR_FETCHING_HOUSE'), errorMessage);
+        setHouseName(t('HOUSE_NAME_PLACEHOLDER'));
+        setLocation(t('LOCATION_PLACEHOLDER'));
     }
   };
   
@@ -244,8 +240,6 @@ const handleRenameSubmit = async () => {
       return [];
     }
   };
-
-  
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true); // Start refresh animation
@@ -310,251 +304,236 @@ const handleRenameSubmit = async () => {
       }
     >
       <View style={styles.container}>
-      {/* Header with House and Settings Icons */}
-      <View style={styles.header}>
-        <Link href="/(tabs)/Dashboard/MyProperties" asChild>
-          <TouchableOpacity>
-            <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
-          </TouchableOpacity>
-        </Link>
+        {/* Header with House and Settings Icons */}
+        <View style={styles.header}>
+          <Link href="/(tabs)/Dashboard/MyProperties" asChild>
+            <TouchableOpacity>
+              <Image source={require('../../../assets/images/houseicon.png')} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </Link>
 
-        <Link href="/(tabs)/Dashboard/settings" asChild>
-        <TouchableOpacity>            
-          <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
-          </TouchableOpacity>
-        </Link>
-      </View>
+          <Link href="/(tabs)/Dashboard/settings" asChild>
+            <TouchableOpacity>            
+              <Image source={require('../../../assets/images/settings_icon.png')} style={styles.headerIcon} />
+            </TouchableOpacity>
+          </Link>
+        </View>
 
-      {/* Main Content */}
-      <Text style={styles.title1}>{houseName}</Text>
-      <Text style={styles.title2}>{location}</Text>
+        {/* Main Content */}
+        <Text style={styles.title1}>{houseName}</Text>
+        <Text style={styles.title2}>{location}</Text>
 
-      {/* Search Bar */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder={t('SEARCH_PLACEHOLDER')}
-        placeholderTextColor="#AFAFAF"
-        value={search}
-        onChangeText={setSearch}
-      />
+        {/* Search Bar */}
+        <TextInput
+          style={styles.searchBar}
+          placeholder={t('SEARCH_PLACEHOLDER')}
+          placeholderTextColor="#AFAFAF"
+          value={search}
+          onChangeText={setSearch}
+        />
 
-      {/* Saved Shops (Horizontal Scroll) */}
-      <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
-      {savedShops.length > 0 ? (
-        <FlatList
-          data={savedShops}
-          horizontal
-          keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => handleShopPress(item.id)}
-              style={{
-                backgroundColor: '#0B417D',
-                padding: wp(3),
-                borderRadius: wp(3),
-                marginHorizontal: wp(1.5),
-                marginTop: hp(0.5),
-                marginBottom: hp(3),
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: wp(40),
-                height: hp(12),
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: hp(0.25) },
-                shadowOpacity: 0.1,
-                shadowRadius: wp(1),
-                elevation: 3,
-              }}
-            >
-              {/* <Image
-                source={{ uri: item.image }}
+        {/* Saved Shops (Horizontal Scroll) */}
+        <Text style={styles.title3}>{t('SAVED_SHOPS')}</Text>
+        {savedShops.length > 0 ? (
+          <FlatList
+            data={savedShops}
+            horizontal
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => handleShopPress(item.id)}
                 style={{
-                  width: wp(20),
-                  height: wp(20),
-                  borderRadius: wp(2),
-                  marginRight: wp(2.5),
+                  backgroundColor: '#0B417D',
+                  padding: wp(3),
+                  borderRadius: wp(3),
+                  marginHorizontal: wp(1.5),
+                  marginTop: hp(0.5),
+                  marginBottom: hp(3),
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: wp(40),
+                  height: hp(12),
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: hp(0.25) },
+                  shadowOpacity: 0.1,
+                  shadowRadius: wp(1),
+                  elevation: 3,
                 }}
-              /> */}
-              <View style={{ flex: 1 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: hp(0.25),
-                  }}
-                >
-                  <Text
-                    numberOfLines={3}
-                    style={{ fontSize: wp(3.5), fontWeight: 'bold', color: '#fff', flex: 1 }}
-                  >
-                    {item.name}
-                  </Text>
+              >
+                <View style={{ flex: 1 }}>
                   <View
                     style={{
-                      width: wp(7),
-                      height: wp(7),
-                      justifyContent: 'center',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
+                      marginBottom: hp(0.25),
                     }}
                   >
-                    <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
+                    <Text
+                      numberOfLines={3}
+                      style={{ fontSize: wp(3.5), fontWeight: 'bold', color: '#fff', flex: 1 }}
+                    >
+                      {item.name}
+                    </Text>
+                    <View
+                      style={{
+                        width: wp(7),
+                        height: wp(7),
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <MaterialIcons name="favorite" size={22} color="#FF4D4D" />
+                    </View>
                   </View>
+                  <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on Shops</Text>
                 </View>
-                <Text style={{ fontSize: wp(3), color: '#fff' }}>Tap to view on Shops</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      ) : (
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: hp(2),
-            paddingHorizontal: wp(5),
-          }}
-        >
-          <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
-          <Text
-            style={{
-              fontSize: wp('3.9%'),
-              fontWeight: '600',
-              fontFamily: 'Archivo-Bold',
-              color: '#777',
-              marginTop: hp(1),
-              textAlign: 'center',
-            }}
-          >
-            {t('YOU_HAVENT_BOOKMARKED_ANY_SHOPS_YET')}
-          </Text>
-          <Text
-            style={{
-              fontSize: wp('3.5%'),
-              fontFamily: 'Archivo-Regular',
-              color: '#AFAFAF',
-              // marginTop: hp(0.5),
-              textAlign: 'center',
-            }}
-          >
-            {t('GO_TO_THE_SHOPS_AND_TAP_THE_HEART_ICON_ON_A_STORE_TO_SAVE_IT_HERE')}
-          </Text>
-        </View>
-      )}
-
-      {/* Reports Section (Vertical Scroll) */}
-<Text style={styles.title4}>{t('REPORTS')}</Text>
-<View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-  <ScrollView contentContainerStyle={styles.reportsContainer}>
-    {filteredReports.length === 0 ? (
-      <View style={styles.noReportsContainer}>
-        <Image
-          source={
-            reportsTitleID.length === 0
-              ? require('../../../assets/images/add_report.png')
-              : require('../../../assets/images/no_result.png')
-          }
-          style={styles.noReportsImage}
-          resizeMode="contain"
-        />
-        <Text style={styles.noReportsText}>
-          {reportsTitleID.length === 0
-            ? t('NO_REPORTS')
-            : t('NO_MATCHING_RESULTS')}
-        </Text>
-        <Text style={styles.noReportsSubtext}>
-          {reportsTitleID.length === 0
-            ? t('ADD_A_REPORT_BY_SCANNING')
-            : t('CHECK_SPELLING_OR_TRY_AGAIN')}
-        </Text>
-      </View>
-    ) : (
-      filteredReports.map((report) => (
-  <View key={report.report_id} style={{ width: '100%', alignItems: 'center', }}>
-
-    <Swipeable
-  renderRightActions={() =>
-    renderRightActions(() => onRenameReport(report))
-  }
-  containerStyle={{ width: '100%', }}
->
-  <TouchableOpacity
-    onPress={() => handleReportPress(report.report_id)}
-    style={[styles.reportItem, { width: '97%', marginLeft: 5, }]}
-  >
-
-        <View style={styles.reportContent}>
-          <Image
-            source={require('../../../assets/images/report_icon.png')}
-            style={styles.reportIcon}
+              </TouchableOpacity>
+            )}
           />
-          <Text style={styles.reportText}>
-            {report.report_name || t('UNTITLED')}
-          </Text>
+        ) : (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: hp(2),
+              paddingHorizontal: wp(5),
+            }}
+          >
+            <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
+            <Text
+              style={{
+                fontSize: wp('3.9%'),
+                fontWeight: '600',
+                fontFamily: 'Archivo-Bold',
+                color: '#777',
+                marginTop: hp(1),
+                textAlign: 'center',
+              }}
+            >
+              {t('YOU_HAVENT_BOOKMARKED_ANY_SHOPS_YET')}
+            </Text>
+            <Text
+              style={{
+                fontSize: wp('3.5%'),
+                fontFamily: 'Archivo-Regular',
+                color: '#AFAFAF',
+                // marginTop: hp(0.5),
+                textAlign: 'center',
+              }}
+            >
+              {t('GO_TO_THE_SHOPS_AND_TAP_THE_HEART_ICON_ON_A_STORE_TO_SAVE_IT_HERE')}
+            </Text>
+          </View>
+        )}
+
+        {/* Reports Section (Vertical Scroll) */}
+        <Text style={styles.title4}>{t('REPORTS')}</Text>
+        <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+          <ScrollView contentContainerStyle={styles.reportsContainer}>
+            {filteredReports.length === 0 ? (
+              <View style={styles.noReportsContainer}>
+                <Image
+                  source={
+                    reportsTitleID.length === 0
+                      ? require('../../../assets/images/add_report.png')
+                      : require('../../../assets/images/no_result.png')
+                  }
+                  style={styles.noReportsImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.noReportsText}>
+                  {reportsTitleID.length === 0
+                    ? t('NO_REPORTS')
+                    : t('NO_MATCHING_RESULTS')}
+                </Text>
+                <Text style={styles.noReportsSubtext}>
+                  {reportsTitleID.length === 0
+                    ? t('ADD_A_REPORT_BY_SCANNING')
+                    : t('CHECK_SPELLING_OR_TRY_AGAIN')}
+                </Text>
+              </View>
+            ) : (
+              filteredReports.map((report) => (
+                <View key={report.report_id} style={{ width: '100%', alignItems: 'center', }}>
+                  <Swipeable
+                    renderRightActions={() =>
+                      renderRightActions(() => onRenameReport(report))
+                    }
+                    containerStyle={{ width: '100%', }}
+                  >
+                  <TouchableOpacity
+                    onPress={() => handleReportPress(report.report_id)}
+                    style={[styles.reportItem, { width: '97%', marginLeft: 5, }]}
+                  >
+                    <View style={styles.reportContent}>
+                      <Image
+                        source={require('../../../assets/images/report_icon.png')}
+                        style={styles.reportIcon}
+                      />
+                      <Text style={styles.reportText}>
+                        {report.report_name || t('UNTITLED')}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  </Swipeable>
+                </View>
+              )))}
+          </ScrollView>
         </View>
-      </TouchableOpacity>
-    </Swipeable>
       </View>
-    )))}
+      <Modal
+        visible={renameModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRenameModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#000000', textAlign:'center' }}>Rename Report</Text>
+            <TextInput
+              value={newReportName}
+              onChangeText={setNewReportName}
+              style={{
+                borderColor: '#ccc',
+                borderWidth: 1,
+                padding: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <TouchableOpacity
+                onPress={() => setRenameModalVisible(false)}
+                style={{
+                  marginRight: 10,
+                  backgroundColor: '#f44336', // red
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={handleRenameSubmit}
+                style={{
+                  backgroundColor: '#2196f3', // blue
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
-    </View>
-    </View>
-<Modal
-  visible={renameModalVisible}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setRenameModalVisible(false)}
->
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-    <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#000000', textAlign:'center' }}>Rename Report</Text>
-      <TextInput
-        value={newReportName}
-        onChangeText={setNewReportName}
-        style={{
-          borderColor: '#ccc',
-          borderWidth: 1,
-          padding: 10,
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-      />
-<View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-  <TouchableOpacity
-    onPress={() => setRenameModalVisible(false)}
-    style={{
-      marginRight: 10,
-      backgroundColor: '#f44336', // red
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-    }}
-  >
-    <Text style={{ color: 'white', fontWeight: 'bold' }}>Cancel</Text>
-  </TouchableOpacity>
-  
-  <TouchableOpacity
-    onPress={handleRenameSubmit}
-    style={{
-      backgroundColor: '#2196f3', // blue
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-    }}
-  >
-    <Text style={{ color: 'white', fontWeight: 'bold' }}>Save</Text>
-  </TouchableOpacity>
-</View>
-
-    </View>
-  </View>
-</Modal>
-
-
-
-    </ScrollView>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
@@ -683,62 +662,60 @@ const styles = StyleSheet.create({
   },
 
   noReportsText: {
-              fontSize: wp('4%'),
-              fontWeight: '600',
-              fontFamily: 'Archivo-Bold',
-              color: '#777',
-              marginTop: hp(1),
-              textAlign: 'center',
+    fontSize: wp('4%'),
+    fontWeight: '600',
+    fontFamily: 'Archivo-Bold',
+    color: '#777',
+    marginTop: hp(1),
+    textAlign: 'center',
   },
 
   noReportsSubtext: {
-              fontSize: wp('3.8%'),
-              fontFamily: 'Archivo-Regular',
-              color: '#AFAFAF',
-              // marginTop: hp(0.5),
-              textAlign: 'center',
+    fontSize: wp('3.8%'),
+    fontFamily: 'Archivo-Regular',
+    color: '#AFAFAF',
+    // marginTop: hp(0.5),
+    textAlign: 'center',
   },
   modalOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-modalContent: {
-  width: '80%',
-  backgroundColor: 'white',
-  borderRadius: 10,
-  padding: 20,
-  elevation: 5,
-},
-modalTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  marginBottom: 10,
-},
-modalInput: {
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 5,
-  padding: 10,
-  marginBottom: 20,
-},
-modalButtons: {
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  gap: 10,
-},
-cancelButton: {
-  marginRight: 10,
-  color: 'red',
-  fontWeight: 'bold',
-},
-confirmButton: {
-  color: 'green',
-  fontWeight: 'bold',
-},
-
-
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+  },
+  cancelButton: {
+    marginRight: 10,
+    color: 'red',
+    fontWeight: 'bold',
+  },
+  confirmButton: {
+    color: 'green',
+    fontWeight: 'bold',
+  },
 });
                 
 export default Dashboard;
