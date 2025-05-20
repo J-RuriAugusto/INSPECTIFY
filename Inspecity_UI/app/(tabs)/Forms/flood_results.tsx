@@ -11,6 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
+import Markdown from 'react-native-markdown-display';
 
 const { height } = Dimensions.get('window');
 
@@ -499,9 +500,21 @@ const Results = () => {
             {/* Expanded modal content */}
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Recommendations</Text>
-              <Text style={styles.modalText}>
-                {recommendation}
-              </Text>
+              <View style={styles.recommendationContainer}>
+                <Markdown style={{
+                  body: styles.modalText,
+                  heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
+                  heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
+                  heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
+                  bullet_list: { marginBottom: 10 },
+                  list_item: { marginBottom: 5 },
+                  strong: { fontWeight: 'bold', color: '#2E86C1' },
+                  em: { fontStyle: 'italic', color: '#666' },
+                  link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                }}>
+                  {recommendation}
+                </Markdown>
+              </View>
 
               <Text style={styles.modalTitle}>Critical Facilities Near You</Text>
 
@@ -655,10 +668,21 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   modalText: {
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'justify',
+    fontSize: 16,
+    lineHeight: 24,
     color: '#333',
+    marginBottom: 20,
+  },
+  recommendationContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   facilityItem: {
     flexDirection: 'row',
