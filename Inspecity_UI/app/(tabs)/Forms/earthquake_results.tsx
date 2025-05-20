@@ -12,6 +12,8 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
 import { Animated } from 'react-native';
+import { useTranslation } from '../../../hooks/useTranslation';
+import { useSettings } from '../Dashboard/settingsContext';
 
 const { height } = Dimensions.get('window');
 
@@ -34,6 +36,8 @@ const Results = () => {
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const { settings } = useSettings();
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -109,6 +113,11 @@ const Results = () => {
         if (validAnswers.length === 0) {
           throw new Error('No valid answers provided');
         }
+        console.log({
+          score: numericScore,
+          answers: validAnswers,
+          language: settings.language,
+        })
 
         // Log what will be sent to backend
         // console.log('Sending to backend:', {
@@ -131,7 +140,11 @@ const Results = () => {
               'Content-Type': 'application/json',
               'X-API-KEY': API_KEY,
             },
-            body: JSON.stringify(requestBody),
+            body: JSON.stringify({
+              score: numericScore,
+              answers: validAnswers,
+              language: settings.language,
+            }),
           }
         );
 
