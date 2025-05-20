@@ -473,7 +473,7 @@ const Results = () => {
                 style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>You answered {numericScore} out of 15</Text>
+            <Text style={styles.score}>You answered "Yes" to {numericScore} out of 15 questions</Text>
                     
             <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
               <MaterialIcons name="visibility" size={24} color="#fff" />

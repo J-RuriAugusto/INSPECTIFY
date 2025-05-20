@@ -13,6 +13,7 @@ import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
+import Markdown from 'react-native-markdown-display';
 
 const { height } = Dimensions.get('window');
 
@@ -431,6 +432,63 @@ const Results = () => {
     }
   };
 
+  // Inside the Results component, add markdownStyles
+  const markdownStyles = {
+    body: {
+      color: '#333',
+      fontSize: 14,
+      lineHeight: 20,
+    },
+    heading1: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#2E86C1',
+      marginTop: 10,
+      marginBottom: 5,
+    },
+    heading2: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#2E86C1',
+      marginTop: 8,
+      marginBottom: 4,
+    },
+    heading3: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#2E86C1',
+      marginTop: 6,
+      marginBottom: 3,
+    },
+    list_item: {
+      marginBottom: 5,
+    },
+    bullet_list: {
+      marginBottom: 10,
+    },
+    ordered_list: {
+      marginBottom: 10,
+    },
+    code_inline: {
+      backgroundColor: '#f0f0f0',
+      padding: 2,
+      borderRadius: 3,
+    },
+    code_block: {
+      backgroundColor: '#f0f0f0',
+      padding: 10,
+      borderRadius: 5,
+      marginVertical: 5,
+    },
+    blockquote: {
+      borderLeftWidth: 4,
+      borderLeftColor: '#2E86C1',
+      paddingLeft: 10,
+      marginVertical: 5,
+      fontStyle: 'italic',
+    },
+  };
+
   return (
     <View style={styles.container}>
       {/* Background Video */}
@@ -463,7 +521,7 @@ const Results = () => {
                 style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>You answered {numericScore} out of 15</Text>
+            <Text style={styles.score}>You answered "Yes" to {numericScore} out of 15 questions</Text>
                     
             <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
               <MaterialIcons name="visibility" size={24} color="#fff" />
@@ -495,9 +553,21 @@ const Results = () => {
             {/* Expanded modal content */}
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Recommendations</Text>
-              <Text style={styles.modalText}>
-                {recommendation}
-              </Text>
+              <View style={styles.recommendationContainer}>
+                <Markdown style={{
+                  body: styles.modalText,
+                  heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
+                  heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
+                  heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
+                  bullet_list: { marginBottom: 10 },
+                  list_item: { marginBottom: 5 },
+                  strong: { fontWeight: 'bold', color: '#2E86C1' },
+                  em: { fontStyle: 'italic', color: '#666' },
+                  link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                }}>
+                  {recommendation}
+                </Markdown>
+              </View>
 
               <Text style={styles.modalTitle}>Critical Facilities Near You</Text>
 
@@ -638,10 +708,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   modalText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'justify',
     color: '#333',
+    marginBottom: 20,
   },
   facilityItem: {
     flexDirection: 'row',
@@ -789,6 +860,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#19477B',
     fontWeight: '600',
+  },
+  recommendationContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
 
