@@ -331,7 +331,9 @@ const Results = () => {
             }
             .header img {
               height: 80px;
+              width: auto;
               margin-right: 20px;
+              object-fit: contain;
             }
             .header-text h1 {
               font-size: 24px;
@@ -454,7 +456,7 @@ const Results = () => {
         </head>
         <body>
           <div class="header">
-            <img src="${logoBase64}" alt="Inspectify Logo" />
+            <img src="https://res.cloudinary.com/dyk1pt3m0/image/upload/v1747717972/4e71edc6-3f82-4d38-86f4-b30d02dfd25c_hdhxcu.jpg" alt="Inspectify Logo" />
             <div class="header-text">
               <h1>General Preparedness Assessment</h1>
               <p>Comprehensive Risk Evaluation Report</p>
