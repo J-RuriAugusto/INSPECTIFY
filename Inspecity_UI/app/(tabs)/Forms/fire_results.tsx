@@ -243,6 +243,29 @@ const Results = () => {
       hour12: true
     });
 
+    // Convert markdown to HTML
+    const convertMarkdownToHtml = (markdown: string) => {
+      return markdown
+        // Headers
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Lists
+        .replace(/^\s*[-*+]\s+(.*$)/gm, '<li>$1</li>')
+        // Paragraphs
+        .replace(/^(?!<[h|li])(.*$)/gm, '<p>$1</p>')
+        // Clean up empty paragraphs
+        .replace(/<p><\/p>/g, '')
+        // Wrap lists in ul tags
+        .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+        // Clean up multiple ul tags
+        .replace(/<\/ul><ul>/g, '');
+    };
+
     return `
       <!DOCTYPE html>
       <html>
@@ -251,111 +274,144 @@ const Results = () => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Fire Preparedness Assessment</title>
           <style>
+            @page {
+              margin: 0.5in;
+            }
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
               padding: 20px;
               color: #333;
               line-height: 1.6;
+              max-width: 800px;
+              margin: 0 auto;
             }
             .header {
               display: flex;
               align-items: center;
-              border-bottom: 2px solid #4CAF50;
-              padding-bottom: 15px;
-              margin-bottom: 20px;
+              border-bottom: 2px solid #2E86C1;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
             }
             .header img {
-              height: 60px;
-              margin-right: 15px;
+              height: 80px;
+              margin-right: 20px;
             }
             .header-text h1 {
-              font-size: 1.4rem;
+              font-size: 24px;
               color: #2E86C1;
-              margin: 0 0 5px 0;
+              margin: 0 0 8px 0;
               font-weight: 600;
             }
             .header-text p {
-              font-size: 0.875rem;
+              font-size: 16px;
               color: #666;
               margin: 0;
             }
             .meta {
-              margin-bottom: 20px;
-              font-size: 0.875rem;
+              margin-bottom: 30px;
+              font-size: 14px;
               color: #555;
               background: #f8f9fa;
-              padding: 15px;
-              border-radius: 4px;
+              padding: 20px;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            h1 { 
-              color: #2E86C1; 
-              margin-bottom: 10px;
+            .meta p {
+              margin: 8px 0;
             }
-            h2 {
-              font-size: 1.2rem;
+            .meta strong {
               color: #2E86C1;
-              margin-top: 20px;
-              margin-bottom: 10px;
               font-weight: 600;
             }
-            .label { 
-              font-weight: bold; 
-              margin-top: 10px; 
+            .section {
+              margin: 30px 0;
+              padding: 25px;
+              background: #fff;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            ul { 
-              padding-left: 20px; 
-            }
-            li { 
-              margin-bottom: 5px;
+            .section-title {
+              font-size: 20px;
+              font-weight: 600;
+              color: #2E86C1;
+              margin-bottom: 15px;
+              padding-bottom: 10px;
+              border-bottom: 2px solid #e9ecef;
             }
             .risk-level {
-              font-size: 1.5rem;
+              font-size: 28px;
               font-weight: bold;
               color: ${color};
               text-align: center;
-              margin: 15px 0;
-              padding: 10px;
-              background: #f8f9fa;
-              border-radius: 4px;
-            }
-            .score {
-              text-align: center;
-              font-size: 1.2rem;
-              margin: 10px 0;
-              color: #555;
-            }
-            .section {
               margin: 20px 0;
               padding: 15px;
               background: #f8f9fa;
-              border-radius: 4px;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            .section-title {
-              font-size: 1.1rem;
-              font-weight: bold;
-              color: #2E86C1;
-              margin-bottom: 10px;
+            .score {
+              text-align: center;
+              font-size: 18px;
+              margin: 15px 0;
+              color: #555;
             }
             .facility-item {
-              margin: 8px 0;
-              padding: 8px;
-              background: white;
-              border-radius: 4px;
-              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              margin: 12px 0;
+              padding: 15px;
+              background: #f8f9fa;
+              border-radius: 6px;
+              border: 1px solid #e9ecef;
             }
             .facility-distance {
-              font-size: 0.875rem;
+              font-size: 14px;
               color: #666;
               font-style: italic;
-              margin-top: 2px;
+              margin-top: 5px;
             }
             .footer {
-              font-size: 0.75rem;
+              font-size: 12px;
               text-align: center;
-              color: #777;
-              margin-top: 30px;
-              padding-top: 15px;
-              border-top: 1px solid #eee;
+              color: #666;
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #e9ecef;
+            }
+            .recommendations {
+              font-size: 16px;
+              line-height: 1.8;
+            }
+            .recommendations h1 {
+              font-size: 24px;
+              color: #2E86C1;
+              margin: 20px 0 15px 0;
+            }
+            .recommendations h2 {
+              font-size: 20px;
+              color: #2E86C1;
+              margin: 18px 0 12px 0;
+            }
+            .recommendations h3 {
+              font-size: 18px;
+              color: #2E86C1;
+              margin: 15px 0 10px 0;
+            }
+            .recommendations ul {
+              margin: 10px 0;
+              padding-left: 20px;
+            }
+            .recommendations li {
+              margin: 8px 0;
+            }
+            .recommendations strong {
+              color: #2E86C1;
+              font-weight: 600;
+            }
+            .recommendations em {
+              color: #666;
+              font-style: italic;
+            }
+            .recommendations p {
+              margin: 10px 0;
             }
           </style>
         </head>
@@ -364,7 +420,7 @@ const Results = () => {
             <img src="${logoBase64}" alt="Inspectify Logo" />
             <div class="header-text">
               <h1>Fire Preparedness Assessment</h1>
-              <p>Comprehensive Risk Evaluation</p>
+              <p>Comprehensive Risk Evaluation Report</p>
             </div>
           </div>
 
@@ -375,8 +431,10 @@ const Results = () => {
           </div>
 
           <div class="section">
-            <div class="section-title">Recommendations</div>
-            <p>${recommendation}</p>
+            <div class="section-title">Detailed Recommendations</div>
+            <div class="recommendations">
+              ${convertMarkdownToHtml(recommendation)}
+            </div>
           </div>
 
           <div class="section">
@@ -432,63 +490,7 @@ const Results = () => {
     }
   };
 
-  // Inside the Results component, add markdownStyles
-  const markdownStyles = {
-    body: {
-      color: '#333',
-      fontSize: 14,
-      lineHeight: 20,
-    },
-    heading1: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#2E86C1',
-      marginTop: 10,
-      marginBottom: 5,
-    },
-    heading2: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: '#2E86C1',
-      marginTop: 8,
-      marginBottom: 4,
-    },
-    heading3: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: '#2E86C1',
-      marginTop: 6,
-      marginBottom: 3,
-    },
-    list_item: {
-      marginBottom: 5,
-    },
-    bullet_list: {
-      marginBottom: 10,
-    },
-    ordered_list: {
-      marginBottom: 10,
-    },
-    code_inline: {
-      backgroundColor: '#f0f0f0',
-      padding: 2,
-      borderRadius: 3,
-    },
-    code_block: {
-      backgroundColor: '#f0f0f0',
-      padding: 10,
-      borderRadius: 5,
-      marginVertical: 5,
-    },
-    blockquote: {
-      borderLeftWidth: 4,
-      borderLeftColor: '#2E86C1',
-      paddingLeft: 10,
-      marginVertical: 5,
-      fontStyle: 'italic',
-    },
-  };
-
+  
   return (
     <View style={styles.container}>
       {/* Background Video */}
@@ -559,11 +561,20 @@ const Results = () => {
                   heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
                   heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
                   heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
-                  bullet_list: { marginBottom: 10 },
+                  bullet_list: { marginBottom: 10, paddingLeft: 20 },
                   list_item: { marginBottom: 5 },
                   strong: { fontWeight: 'bold', color: '#2E86C1' },
                   em: { fontStyle: 'italic', color: '#666' },
                   link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                  paragraph: { marginBottom: 10, lineHeight: 24 },
+                  blockquote: { 
+                    borderLeftWidth: 4,
+                    borderLeftColor: '#2E86C1',
+                    paddingLeft: 10,
+                    marginVertical: 5,
+                    fontStyle: 'italic',
+                    color: '#666'
+                  }
                 }}>
                   {recommendation}
                 </Markdown>

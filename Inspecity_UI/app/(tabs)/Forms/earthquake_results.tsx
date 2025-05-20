@@ -269,7 +269,6 @@ const Results = () => {
   };
   
   const generatePreviewHtml = () => {
-    // Use the provided base64 logo
     const logoBase64 = `data:image/png;base64,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`;
 
     const currentDate = new Date();
@@ -282,6 +281,29 @@ const Results = () => {
       hour12: true
     });
 
+    // Convert markdown to HTML
+    const convertMarkdownToHtml = (markdown: string) => {
+      return markdown
+        // Headers
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Lists
+        .replace(/^\s*[-*+]\s+(.*$)/gm, '<li>$1</li>')
+        // Paragraphs
+        .replace(/^(?!<[h|li])(.*$)/gm, '<p>$1</p>')
+        // Clean up empty paragraphs
+        .replace(/<p><\/p>/g, '')
+        // Wrap lists in ul tags
+        .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+        // Clean up multiple ul tags
+        .replace(/<\/ul><ul>/g, '');
+    };
+
     return `
       <!DOCTYPE html>
       <html>
@@ -290,111 +312,144 @@ const Results = () => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Earthquake Preparedness Assessment</title>
           <style>
+            @page {
+              margin: 0.5in;
+            }
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
               padding: 20px;
               color: #333;
               line-height: 1.6;
+              max-width: 800px;
+              margin: 0 auto;
             }
             .header {
               display: flex;
               align-items: center;
-              border-bottom: 2px solid #4CAF50;
-              padding-bottom: 15px;
-              margin-bottom: 20px;
+              border-bottom: 2px solid #2E86C1;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
             }
             .header img {
-              height: 60px;
-              margin-right: 15px;
+              height: 80px;
+              margin-right: 20px;
             }
             .header-text h1 {
-              font-size: 1.4rem;
+              font-size: 24px;
               color: #2E86C1;
-              margin: 0 0 5px 0;
+              margin: 0 0 8px 0;
               font-weight: 600;
             }
             .header-text p {
-              font-size: 0.875rem;
+              font-size: 16px;
               color: #666;
               margin: 0;
             }
             .meta {
-              margin-bottom: 20px;
-              font-size: 0.875rem;
+              margin-bottom: 30px;
+              font-size: 14px;
               color: #555;
               background: #f8f9fa;
-              padding: 15px;
-              border-radius: 4px;
+              padding: 20px;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            h1 { 
-              color: #2E86C1; 
-              margin-bottom: 10px;
+            .meta p {
+              margin: 8px 0;
             }
-            h2 {
-              font-size: 1.2rem;
+            .meta strong {
               color: #2E86C1;
-              margin-top: 20px;
-              margin-bottom: 10px;
               font-weight: 600;
             }
-            .label { 
-              font-weight: bold; 
-              margin-top: 10px; 
+            .section {
+              margin: 30px 0;
+              padding: 25px;
+              background: #fff;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            ul { 
-              padding-left: 20px; 
-            }
-            li { 
-              margin-bottom: 5px;
+            .section-title {
+              font-size: 20px;
+              font-weight: 600;
+              color: #2E86C1;
+              margin-bottom: 15px;
+              padding-bottom: 10px;
+              border-bottom: 2px solid #e9ecef;
             }
             .risk-level {
-              font-size: 1.5rem;
+              font-size: 28px;
               font-weight: bold;
               color: ${color};
               text-align: center;
-              margin: 15px 0;
-              padding: 10px;
-              background: #f8f9fa;
-              border-radius: 4px;
-            }
-            .score {
-              text-align: center;
-              font-size: 1.2rem;
-              margin: 10px 0;
-              color: #555;
-            }
-            .section {
               margin: 20px 0;
               padding: 15px;
               background: #f8f9fa;
-              border-radius: 4px;
+              border-radius: 8px;
+              border: 1px solid #e9ecef;
             }
-            .section-title {
-              font-size: 1.1rem;
-              font-weight: bold;
-              color: #2E86C1;
-              margin-bottom: 10px;
+            .score {
+              text-align: center;
+              font-size: 18px;
+              margin: 15px 0;
+              color: #555;
             }
             .facility-item {
-              margin: 8px 0;
-              padding: 8px;
-              background: white;
-              border-radius: 4px;
-              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            .footer {
-              font-size: 0.75rem;
-              text-align: center;
-              color: #777;
-              margin-top: 30px;
-              padding-top: 15px;
-              border-top: 1px solid #eee;
+              margin: 12px 0;
+              padding: 15px;
+              background: #f8f9fa;
+              border-radius: 6px;
+              border: 1px solid #e9ecef;
             }
             .facility-distance {
-              font-size: 0.875rem;
+              font-size: 14px;
               color: #666;
               font-style: italic;
-              margin-top: 2px;
+              margin-top: 5px;
+            }
+            .footer {
+              font-size: 12px;
+              text-align: center;
+              color: #666;
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #e9ecef;
+            }
+            .recommendations {
+              font-size: 16px;
+              line-height: 1.8;
+            }
+            .recommendations h1 {
+              font-size: 24px;
+              color: #2E86C1;
+              margin: 20px 0 15px 0;
+            }
+            .recommendations h2 {
+              font-size: 20px;
+              color: #2E86C1;
+              margin: 18px 0 12px 0;
+            }
+            .recommendations h3 {
+              font-size: 18px;
+              color: #2E86C1;
+              margin: 15px 0 10px 0;
+            }
+            .recommendations ul {
+              margin: 10px 0;
+              padding-left: 20px;
+            }
+            .recommendations li {
+              margin: 8px 0;
+            }
+            .recommendations strong {
+              color: #2E86C1;
+              font-weight: 600;
+            }
+            .recommendations em {
+              color: #666;
+              font-style: italic;
+            }
+            .recommendations p {
+              margin: 10px 0;
             }
           </style>
         </head>
@@ -403,7 +458,7 @@ const Results = () => {
             <img src="${logoBase64}" alt="Inspectify Logo" />
             <div class="header-text">
               <h1>Earthquake Preparedness Assessment</h1>
-              <p>Comprehensive Risk Evaluation</p>
+              <p>Comprehensive Risk Evaluation Report</p>
             </div>
           </div>
 
@@ -414,8 +469,10 @@ const Results = () => {
           </div>
 
           <div class="section">
-            <div class="section-title">Recommendations</div>
-            <p>${recommendation}</p>
+            <div class="section-title">Detailed Recommendations</div>
+            <div class="recommendations">
+              ${convertMarkdownToHtml(recommendation)}
+            </div>
           </div>
 
           <div class="section">
@@ -599,7 +656,7 @@ const Results = () => {
                   heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
                   heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
                   heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
-                  bullet_list: { marginBottom: 10 },
+                  bullet_list: { marginBottom: 10, paddingLeft: 20 },
                   list_item: { marginBottom: 5 },
                   strong: { fontWeight: 'bold', color: '#2E86C1' },
                   em: { fontStyle: 'italic', color: '#666' },
