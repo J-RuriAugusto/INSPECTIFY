@@ -11,32 +11,13 @@ import {
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
-  const initialQuestions = [
-    // HAZARD
-    'Is your house located within 100 meters of a river, creek, canal, or estero?',
-    'Has your community experienced flooding within the last 2 years?',
-    'Is your house situated at a lower elevation than the road, causing water to flow into it during rains?',
-    'Does your street flood even during light rain (e.g., ankle-deep water)?',
-    'Is there a dam, large lake, or reservoir within 1 kilometer of your home?',
-
-    // VULNERABILITY
-    'Does any amount of water enter your home during heavy rain, including minor leaks or major flooding?',
-    'Is your house made of light materials (e.g., wood, bamboo, or thin sheets) that can be damaged by floodwater?',
-    'Are important items like documents, appliances, or food stored on the floor or below waist level?',
-    'Is your family unfamiliar with evacuation routes or flood safety plans in your barangay?',
-    'Are there children, elderly, pregnant women, or persons with disabilities in your household?',
-
-    // EXPOSURE
-    'Is there a clogged drainage system or canal within 50 meters of your house?',
-    'Is your area mostly concrete, preventing water from soaking into the ground?',
-    'Is there ongoing construction within 200 meters that could block natural water flow?',
-    'Are there large trees, signs, or weak structures nearby that could fall during a flood?',
-    'When it floods in your area, does it take more than 12 hours for the water to subside?',
-  ];
+  const { t, translateFloodQuestions } = useTranslation();
+  const initialQuestions = translateFloodQuestions();
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -160,10 +141,10 @@ const Questions = () => {
           />
         </TouchableOpacity>
 
-        <Text style={styles.categoryTitle}>FLOOD</Text>
+        <Text style={styles.categoryTitle}>{t('FLOOD')}</Text>
 
         <TouchableOpacity onPress={handleSkip}>
-          <Text style={styles.skipText}>SKIP</Text>
+          <Text style={styles.skipText}>{t('SKIP')}</Text>
         </TouchableOpacity>
       </View>
 

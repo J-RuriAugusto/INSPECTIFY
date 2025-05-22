@@ -3,31 +3,13 @@ import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimen
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
-  const initialQuestions = [
-    'Is your house located within 10 kilometers of a known fault line or mapped earthquake zone? (e.g., West Valley Fault, Central Cebu Fault)',
-    'Is your house built on soft or unstable ground (e.g., near rivers, swamps, reclaimed land, or loose soil)?',
-    'Is your house located within 100 meters of a steep hill or slope that may collapse during an earthquake (landslide-prone)?',
-    'During minor earthquakes, do you notice any shaking in your house, such as swaying of hanging objects, movement of light fixtures, or a feeling of unsteadiness?',
-    'Is your house within 1 km of a dam, reservoir, or large body of water? (Risk of liquefaction/flooding)',
-
-    // Vulnerability
-    'Is your house made of weak materials? (e.g., wood, hollow blocks without steel bars, weak foundation)',
-    'Is your house older than 30 years and has not undergone recent inspection by an engineer?',
-    'Was your house built without following safety standards? (No architect/engineer supervision)',
-    'Does your house have visible cracks or signs of structural damage (walls, beams, columns)?',
-    'Are there limited building safety inspections or enforcement in your barangay?',
-
-    // Exposure
-    'Is your house near tall or unstable structures? (Within 100 m of towers, billboards, construction sites)',
-    'Is your house near hazardous facilities? (e.g., power plants, gas stations, chemical storage)',
-    'Is your house within 200 meters of a bridge, flyover, or elevated road that may fall or block access during a quake?',
-    'Is your house beside a quarry, landfill, or loose soil area? (Land may shift or sink)',
-    'Has your area suffered serious earthquake damage before? (In the past 20 years)',
-  ];
+  const { t, translateEarthquakeQuestions } = useTranslation();
+  const initialQuestions = translateEarthquakeQuestions();
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);
