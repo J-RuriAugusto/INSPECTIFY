@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Bold',
     fontSize: width * 0.05,
     color: '#5CD2FF',
-    left: '50%',
+    left: '40%',
   },
   skipText: {
     fontFamily: 'Epilogue-Medium',

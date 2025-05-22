@@ -108,7 +108,7 @@ export default {
     CHECK_DISASTER: "Check Your Disaster",
     SELECT_DISASTER: "Select Disaster",
     FLOOD: "FLOOD",
-    EARTHQUAKE: "EARTH- QUAKE",
+    EARTHQUAKE: "EARTHQUAKE",
     FIRE: "FIRE",
     GENERAL: "GENERAL",
     CATEGORY: "CATEGORY",
