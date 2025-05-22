@@ -1106,23 +1106,6 @@ const PhotoDetails = () => {
                 <Text style={styles.shopButtonText}>{t('FIND_SHOPS')}</Text>
               </TouchableOpacity>
   
-              <View style={styles.rowContainer}>
-                <Text style={styles.sectionTitle}>{t('NOTES')}</Text>
-                <TouchableOpacity style={styles.editButton} onPress={() => setEditNoteModalVisible(true)}>
-                  <Text style={styles.editButtonText}>{t('EDIT_NOTE')}</Text>
-                </TouchableOpacity>
-              </View>
-                <TextInput
-                  style={[styles.notesInput, { height: inputHeight }]}
-                  placeholder={notes ? notes : t('CLICK_EDIT')}
-                  placeholderTextColor="#A0A0A0"
-                  value={notes}
-                  editable={false} // You can toggle this to true when in edit mode
-                  multiline
-                  onContentSizeChange={(e) =>
-                    setInputHeight(e.nativeEvent.contentSize.height)
-                  }
-                />
             </View>
           </ScrollView>
           
