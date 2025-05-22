@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert, ScrollView } f
 import { Picker } from '@react-native-picker/picker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { useSettings, defaultSettings } from './settingsContext'; // Add defaultSettings to the import
+import { useSettings, defaultSettings } from './settingsContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
@@ -16,14 +17,14 @@ const Settings = () => {
   const [changesMade, setChangesMade] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
 
-  // Check for changes
   useEffect(() => {
     const isChanged =
       localSettings.darkMode !== settings.darkMode ||
       localSettings.language !== settings.language ||
       localSettings.reportFormat !== settings.reportFormat ||
       localSettings.autoSave !== settings.autoSave ||
-      localSettings.backupLocation !== settings.backupLocation;
+      localSettings.backupLocation !== settings.backupLocation ||
+      localSettings.enableLocation !== settings.enableLocation;
     setChangesMade(isChanged);
   }, [localSettings, settings]);
 
@@ -90,6 +91,18 @@ const Settings = () => {
     }
   };
 
+  const handleToggleLocation = async () => {
+    const newValue = !localSettings.enableLocation;
+    if (newValue) {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location access is required to enable this feature.');
+        return;
+      }
+    }
+    updateLocalSetting('enableLocation', newValue);
+  };
+
   const saveChanges = () => {
     updateSettings(localSettings);
     Alert.alert('Settings Saved', 'Your changes have been saved successfully.');
@@ -104,13 +117,13 @@ const Settings = () => {
         {/* General */}
         <Text style={styles.sectionTitle}>General</Text>
 
-        <View style={styles.optionRow}>
+        {/* <View style={styles.optionRow}>
           <Text style={styles.optionText}>Dark Mode</Text>
           <Switch 
             value={localSettings.darkMode} 
             onValueChange={() => updateLocalSetting('darkMode', !localSettings.darkMode)} 
           />
-        </View>
+        </View> */}
 
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Language</Text>
@@ -128,7 +141,7 @@ const Settings = () => {
         {/* Inspection Preferences */}
         <Text style={styles.sectionTitle}>Inspection Preferences</Text>
 
-        <View style={styles.optionRow}>
+        {/* <View style={styles.optionRow}>
           <Text style={styles.optionText}>Default Report Format</Text>
           <Picker
             selectedValue={localSettings.reportFormat}
@@ -140,7 +153,7 @@ const Settings = () => {
             <Picker.Item label="PNG" value="PNG" />
             <Picker.Item label="JPEG" value="JPEG" />
           </Picker>
-        </View>
+        </View> */}
 
         <View style={styles.optionRow}>
           <Text style={styles.optionText}>Auto-Save Inspections</Text>
@@ -150,11 +163,19 @@ const Settings = () => {
           />
         </View>
 
+        <View style={styles.optionRow}>
+          <Text style={styles.optionText}>Use Location</Text>
+          <Switch
+            value={localSettings.enableLocation}
+            onValueChange={handleToggleLocation}
+          />
+        </View>
+
         {/* App Management */}
         <Text style={styles.sectionTitle}>App Management</Text>
 
         <TouchableOpacity style={styles.optionButton} onPress={clearCache}>
-          <Text style={styles.optionText}>Clear Cache</Text>
+          <Text style={styles.optionText}>Clear Data</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionButton} onPress={chooseBackupLocation}>

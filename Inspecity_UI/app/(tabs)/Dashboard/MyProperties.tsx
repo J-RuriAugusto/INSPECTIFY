@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
   propertyLocation: { fontSize: 14, color: '#B0C4DE', fontFamily: 'Archivo-Regular' },
   swipeActions: { flexDirection: 'row' },
   editAction: { marginTop: 5, height: 80, backgroundColor: '#007BFF', padding: 15, marginRight: 5, borderRadius: 5 },
-  deleteAction: { marginTop: 5, height: 80, backgroundColor: '#D11A2A', padding: 15, borderRadius: 5 },
+  deleteAction: { marginTop: 5, height: 80, backgroundColor: '#E55050', padding: 15, borderRadius: 5 },
   swipeText: { marginTop: 15, color: '#FFFFFF', fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
   modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },

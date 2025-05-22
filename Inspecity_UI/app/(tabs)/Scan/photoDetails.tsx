@@ -995,7 +995,19 @@ const styles = StyleSheet.create({
   detailText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%') },
 
   // Condition & Tags
-  conditionWrapper: { width: wp('40%'), alignSelf: 'center', backgroundColor: '#FFF', borderRadius: wp('4%'), padding: wp('3%'), marginBottom: hp('3%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%') },
+  // conditionWrapper: { width: wp('40%'), alignSelf: 'center', backgroundColor: '#FFF', borderRadius: wp('4%'), padding: wp('3%'), marginBottom: hp('3%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%') },
+  conditionWrapper: {
+  alignSelf: 'center',            // aligns it to the left (or center if you prefer)
+  backgroundColor: '#FFF',
+  borderRadius: wp('4%'),
+  paddingVertical: hp('1.5%'),
+  paddingHorizontal: wp('3%'),
+  marginBottom: hp('3%'),
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
   conditionText: { fontFamily: 'Epilogue-Bold', fontSize: wp('4%'), textAlign: 'center', color: '#071C34' },
   conditionBadge: { backgroundColor: '#FFA500', fontFamily: 'Epilogue-Regular', textAlign: 'center', fontSize: wp('3.5%'), borderRadius: wp('5%'), marginVertical: hp('0.5%') },
   ageText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Bold', color: '#071C34' },

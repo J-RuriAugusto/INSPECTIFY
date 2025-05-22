@@ -431,7 +431,8 @@ const Dashboard = () => {
         {/* Reports Section (Vertical Scroll) */}
         <Text style={styles.title4}>{t('REPORTS')}</Text>
         <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-          <ScrollView contentContainerStyle={styles.reportsContainer}>
+          <ScrollView contentContainerStyle={[styles.reportsContainer, { flexGrow: 1 }]}
+>
             {filteredReports.length === 0 ? (
               <View style={styles.noReportsContainer}>
                 <Image
@@ -508,7 +509,7 @@ const Dashboard = () => {
                 onPress={() => setRenameModalVisible(false)}
                 style={{
                   marginRight: 10,
-                  backgroundColor: '#f44336', // red
+                  backgroundColor: '#E55050', // red
                   paddingVertical: 8,
                   paddingHorizontal: 16,
                   borderRadius: 8,
@@ -562,14 +563,16 @@ const styles = StyleSheet.create({
     fontSize: wp('6.5%'),
     color: '#05173F',
     fontFamily: 'Epilogue-Black',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    textAlign: 'center',
   },
   title2: {
     fontSize: wp('4.5%'),
     color: '#AFAFAF',
     fontFamily: 'Archivo-Regular',
     marginBottom: hp('1%'),
-    alignSelf: 'center'
+    alignSelf: 'center',
+    textAlign: 'center',
   },
   title3: {
     fontSize: wp('4.8%'),
@@ -578,6 +581,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: hp('1.5%'),
     marginBottom: hp('1.5%'),
+    textAlign: 'left',
   },
   title4: {
     fontSize: wp('4.8%'),
@@ -585,6 +589,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Bold',
     alignSelf: 'flex-start',
     marginBottom: hp('1.5%'),
+    textAlign: 'left',
   },
   searchBar: {
     height: hp('5.5%'),
@@ -597,6 +602,7 @@ const styles = StyleSheet.create({
     fontSize: wp('4%'),
     color: '#C0C0C0',
     backgroundColor: '#FFFFFF',
+    textAlign: 'left',
   },
   shopImage: {
     width: wp('30%'),
@@ -652,7 +658,7 @@ const styles = StyleSheet.create({
     fontSize: wp('4.5%'),
     color: '#2B3C62',
     fontFamily: 'Epilogue-Bold',
-    textAlign: 'left'
+    textAlign: 'left',
   },
   noReportsImage: {
     width: wp('12%'),

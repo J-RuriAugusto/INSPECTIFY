@@ -214,10 +214,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   categoryTitle: {
+    position:'absolute',
     textAlign: 'center',
     fontFamily: 'Epilogue-Bold',
     fontSize: width * 0.05,
     color: '#5CD2FF',
+    left: '50%',
   },
   skipText: {
     fontFamily: 'Epilogue-Medium',
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: 25,
+    fontSize: 19,
     color: '#030F1C',
     textAlign: 'center',
   },

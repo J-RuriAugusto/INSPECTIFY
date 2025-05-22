@@ -473,22 +473,17 @@ const Results = () => {
         width: 612,
         height: 792,
       });
-
-      const downloadDir = FileSystem.documentDirectory;
-      const fileName = `fire_results_${new Date().getTime()}.pdf`;
-      const destinationUri = `${downloadDir}${fileName}`;
-
-      await FileSystem.copyAsync({
-        from: uri,
-        to: destinationUri
-      });
-
-      setIsPreviewVisible(false);
-      alert('PDF has been downloaded successfully!');
+  
+      const canShare = await Sharing.isAvailableAsync();
+      if (!canShare) {
+        alert('Sharing is not available on this device');
+        return;
+      }
+  
+      await Sharing.shareAsync(uri);
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      setError('Failed to generate PDF');
-      alert('Failed to download PDF. Please try again.');
+      console.error('Error opening PDF:', error);
+      alert('Failed to open PDF');
     }
   };
 
@@ -527,10 +522,7 @@ const Results = () => {
             </View>
             <Text style={styles.score}>You answered "Yes" to {numericScore} out of 15 questions</Text>
                     
-            <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
-              <MaterialIcons name="visibility" size={24} color="#fff" />
-              <Text style={styles.downloadButtonText}>Preview & Download</Text>
-            </TouchableOpacity>
+
 
             <Text style={styles.swipeUpLabel}>⬆ Swipe up for recommendations</Text>
           </View>
@@ -553,6 +545,11 @@ const Results = () => {
             <View style={styles.collapsedHeader}>
               <Text style={styles.collapsedLabel}>Recommendations & Critical Facilities</Text>
             </View>
+
+                        <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
+                          <MaterialIcons name="visibility" size={20} color="#fff" />
+                          <Text style={styles.downloadButtonText}>Preview & Download</Text>
+                        </TouchableOpacity>
 
             {/* Expanded modal content */}
             <View style={styles.modalContent}>
@@ -801,10 +798,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 120,
   },
-  cancelButton: {
-    backgroundColor: '#e0e0e0',
-    marginRight: 8,
-  },
+  // cancelButton: {
+  //   backgroundColor: '#e0e0e0',
+  //   marginRight: 8,
+  // },
   actionButtonText: {
     color: '#fff',
     fontSize: 16,
@@ -834,6 +831,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   downloadButton: {
+    marginTop: -3,
+    marginBottom: -3,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -846,7 +845,7 @@ const styles = StyleSheet.create({
   downloadButtonText: {
     color: '#fff',
     marginLeft: 8,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   },
   loadingContainer: {

@@ -106,7 +106,7 @@ export default {
     FLOOD: "BAHA",
     EARTHQUAKE: "LINOG",
     FIRE: "SUNOG",
-    GENERAL: "KASAGARAN",
+    GENERAL: "KASA- GARAN",
     CATEGORY: "KATEGORIYA",
     START: "SUGDI",
     SKIP: "LAKTAWAN",
