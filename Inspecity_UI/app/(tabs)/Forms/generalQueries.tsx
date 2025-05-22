@@ -11,37 +11,13 @@ import {
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
-  const initialQuestions = [
-    // Emergency Supplies & Equipment
-    'Do you have an emergency kit with basic supplies (e.g., flashlight, first aid, food, water)?',
-    'Do you have a battery-powered radio for updates during power outages?',
-    'Do you store important documents (e.g., IDs, land titles) in a waterproof and fireproof container?',
-    'Do you regularly check and maintain your emergency supplies?',
-    'Do you have a backup power source (e.g., generator, power bank)?',
-    'Do you have a fire extinguisher at home?',
-
-    // Family & Household Preparedness
-    'Do you have a family emergency plan in case of disasters?',
-    'Do you have a plan for evacuating elderly or disabled family members?',
-    'If you have pets, do you have a plan for them during disasters?',
-    'Do you have a plan for communicating with family members during disasters?',
-
-    // Knowledge & Skills
-    'Do you know the nearest evacuation center in your area?',
-    'Do you have a list of emergency contact numbers (e.g., barangay, hospital, fire station)?',
-    'Do you know how to turn off utilities (electricity, water, gas) in case of emergencies?',
-    'Do you know basic first aid procedures (e.g., CPR, wound care)?',
-
-    // Community Engagement
-    'Are you aware of any disaster drills regularly conducted in your barangay or community?',
-
-    // Awareness of Hazard Assessment Tools
-    'Are you familiar with any of the following free hazard assessment tools: NOAH, HazardHunterPH, or How Safe is My House?',
-  ];
+  const { t, translateGeneralQuestions } = useTranslation();
+  const initialQuestions = translateGeneralQuestions();
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);

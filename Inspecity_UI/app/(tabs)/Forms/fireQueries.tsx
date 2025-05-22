@@ -11,32 +11,13 @@ import {
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
 
 const Questions = () => {
-  const initialQuestions = [
-    // HAZARD
-    'Is your house located near facilities that pose a fire risk (e.g., factories, warehouses, gas stations, chemical plants, or power plants)?',
-    'Is your house located in an area with a high risk of consecutive fires (e.g., congested neighborhoods with wooden buildings or poor fire safety enforcement)?',
-    'Is your house near streets that are difficult for emergency responders to access (e.g., narrow or blocked roads)?',
-    'Is your house near areas where outdoor fires such as bonfires or trash burning are common?',
-
-    // VULNERABILITY
-    'Is your house built with easily combustible materials (e.g., wood, plastic, non-fire-resistant materials)?',
-    'Does your house have electrical wiring that is old or has not been inspected (e.g., exposed or improperly installed wires)?',
-    'Do you have electrical appliances or devices that are often left on for long periods or haven’t undergone safety inspections?',
-    'Does your house have a fireplace, stove, or open flame source that is not regularly maintained?',
-    'Are fire extinguishers or other fire safety equipment in your house old, expired, or not easily accessible?',
-
-    // EXPOSURE
-    'Does your home have easy access to fire suppression resources (e.g., hydrants, fire trucks, or water tanks)?',
-    'Is your house near a high-rise building, tower, or construction site that could pose a fire hazard?',
-    'Is your house in an area where emergency services may struggle to reach you during a fire?',
-    'Does your house have nearby vegetation or trees that could catch fire and spread to your home?',
-    'Are there many nearby homes or buildings with poorly maintained wiring or other fire hazards?',
-    'Is your house located near a landfill, dump site, or area where trash burning is common?',
-  ];
+  const { t, translateFireQuestions } = useTranslation();
+  const initialQuestions = translateFireQuestions();
 
   const [questionsQueue, setQuestionsQueue] = useState(initialQuestions);
   const [questionIndex, setQuestionIndex] = useState(0);

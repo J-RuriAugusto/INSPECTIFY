@@ -22,6 +22,30 @@ export const useTranslation = () => {
       return translations[language]?.HOME_TIPS || 
              translations['English'].HOME_TIPS;
     };
+
+    const translateEarthquakeQuestions = (): string[] => {
+      const language = settings.language || 'English';
+      return translations[language]?.EARTHQUAKE_QUESTIONS || 
+             translations['English'].EARTHQUAKE_QUESTIONS;
+    };
+
+    const translateFloodQuestions = (): string[] => {
+      const language = settings.language || 'English';
+      return translations[language]?.FLOOD_QUESTIONS || 
+             translations['English'].FLOOD_QUESTIONS;
+    };
+
+    const translateFireQuestions = (): string[] => {
+      const language = settings.language || 'English';
+      return translations[language]?.FIRE_QUESTIONS || 
+             translations['English'].FIRE_QUESTIONS;
+    };
+
+    const translateGeneralQuestions = (): string[] => {
+      const language = settings.language || 'English';
+      return translations[language]?.GENERAL_QUESTIONS || 
+             translations['English'].GENERAL_QUESTIONS;
+    };
   
-    return { t, translateMessages };
+    return { t, translateMessages, translateEarthquakeQuestions, translateFloodQuestions, translateFireQuestions, translateGeneralQuestions };
   };

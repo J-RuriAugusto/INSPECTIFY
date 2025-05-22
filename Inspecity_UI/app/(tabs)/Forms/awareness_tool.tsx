@@ -3,8 +3,10 @@ import { StyleSheet, TouchableOpacity, Image, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useFonts } from 'expo-font';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const AwarenessTool = () => {
+  const { t } = useTranslation();
   // const [fontsLoaded] = useFonts({
   //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
   //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -18,8 +20,8 @@ const AwarenessTool = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title1}>Check Your Disaster Preparedness.</Text>
-      <Text style={styles.title2}>Select Disaster Type</Text>
+      <Text style={styles.title1}>{t('CHECK_DISASTER')}</Text>
+      <Text style={styles.title2}>{t('SELECT_DISASTER')}</Text>
 
       {/* Button Containers */}
       <View style={styles.row}>
@@ -29,7 +31,7 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/flood-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>FLOOD</Text>
+            <Text style={styles.buttonText}>{t('FLOOD')}</Text>
           </TouchableOpacity>
         </Link>
         <Link href="/Forms/earthquake" asChild>
@@ -38,8 +40,7 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/earthquake-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>EARTH-</Text>
-            <Text style={styles.buttonText2}>QUAKE</Text>
+            <Text style={styles.buttonText}>{t('EARTHQUAKE')}</Text>
           </TouchableOpacity>
         </Link>
       </View>
@@ -51,7 +52,7 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/fire-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>FIRE</Text>
+            <Text style={styles.buttonText}>{t('FIRE')}</Text>
           </TouchableOpacity>
         </Link>
         <Link href="/Forms/general" asChild>
@@ -60,7 +61,7 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/general-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>GENERAL</Text>
+            <Text style={styles.buttonText}>{t('GENERAL')}</Text>
           </TouchableOpacity>
         </Link>
       </View>

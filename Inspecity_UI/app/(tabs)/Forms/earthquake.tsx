@@ -2,10 +2,12 @@ import React from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
 
 const Earthquake = () => {
+  const { t } = useTranslation();
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
@@ -26,21 +28,21 @@ const Earthquake = () => {
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
-        <Text style={styles.backText}>Back</Text>
+        <Text style={styles.backText}>{t('BACK')}</Text>
       </TouchableOpacity>
 
       {/* EARTHQUAKE Label at the top */}
       <View style={styles.textContainer}>
         <Image source={require('../../../assets/images/earthquake-icon.png')} style={styles.icon} />
-        <Text style={styles.title1}>EARTHQUAKE</Text>
+        <Text style={styles.title1}>{t('EARTHQUAKE')}</Text>
       </View>
 
       {/* Centered content */}
       <View style={styles.content}>
-        <Text style={styles.title2}>CATEGORY</Text>
+        <Text style={styles.title2}>{t('CATEGORY')}</Text>
 
         <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('earthquakeQueries')}>
-          <Text style={styles.startButtonText}>Start</Text>
+          <Text style={styles.startButtonText}>{t('START')}</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
