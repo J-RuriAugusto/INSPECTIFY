@@ -55,13 +55,22 @@ const ReportDetails = () => {
     
     // Default to English if language not set or not found
     const lang = settings.language;
+    let recommendation = '';
     if(lang === "Cebuano"){
-      return recommendations.cebuano
+      recommendation = recommendations.cebuano;
     }
-    if(lang === "Tagalog"){
-      return recommendations.tagalog
+    else if(lang === "Tagalog"){
+      recommendation = recommendations.tagalog;
     }
-    return recommendations.english;
+    else {
+      recommendation = recommendations.english;
+    }
+
+    // Process the recommendation text to ensure proper line breaks
+    return recommendation
+      .replace(/\r\n/g, '\n') // Convert Windows line endings to Unix
+      .replace(/\n{3,}/g, '\n\n') // Replace 3 or more newlines with 2
+      .trim(); // Trim leading/trailing whitespace
   };
 
   const deleteReport = async () => {
