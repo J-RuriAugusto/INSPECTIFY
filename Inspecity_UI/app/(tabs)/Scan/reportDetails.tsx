@@ -12,6 +12,7 @@ import { Asset } from 'expo-asset';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSettings } from '../Dashboard/settingsContext';
+import Markdown from 'react-native-markdown-display';
 
 interface Recommendations {
   english: string;
@@ -54,13 +55,22 @@ const ReportDetails = () => {
     
     // Default to English if language not set or not found
     const lang = settings.language;
+    let recommendation = '';
     if(lang === "Cebuano"){
-      return recommendations.cebuano
+      recommendation = recommendations.cebuano;
     }
-    if(lang === "Tagalog"){
-      return recommendations.tagalog
+    else if(lang === "Tagalog"){
+      recommendation = recommendations.tagalog;
     }
-    return recommendations.english;
+    else {
+      recommendation = recommendations.english;
+    }
+
+    // Process the recommendation text to ensure proper line breaks
+    return recommendation
+      .replace(/\r\n/g, '\n') // Convert Windows line endings to Unix
+      .replace(/\n{3,}/g, '\n\n') // Replace 3 or more newlines with 2
+      .trim(); // Trim leading/trailing whitespace
   };
 
   const deleteReport = async () => {
@@ -199,8 +209,8 @@ const ReportDetails = () => {
           return;
         }
     
-        // Use the provided base64 logo
-        const logoBase64 = `data:image/png;base64,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`;
+        // Use the provided Cloudinary URL
+        const logoBase64 = `https://res.cloudinary.com/dyk1pt3m0/image/upload/v1747717972/4e71edc6-3f82-4d38-86f4-b30d02dfd25c_hdhxcu.jpg`;
     
         // Convert damageTypes (previously called issues) into <li> elements
         const processedDamageTypes = Array.isArray(damageTypes) 
@@ -217,8 +227,60 @@ const ReportDetails = () => {
         : [];
         
         const recommendationsHTML = processedRecommendations.length > 0
-        ? `<ul>${processedRecommendations.map(rec => `<li>${escapeHTML(rec)}</li>`).join('')}</ul>`
-        : `<p>${t('NO_RECOMMENDATIONS')}</p>`;
+        ? `<div class="markdown-content">
+            <div class="recommendations-container">
+              ${getCurrentRecommendation().split('\n').map(line => {
+                // Handle headers
+                if (line.startsWith('# ')) {
+                  return `<h1 class="recommendation-header">${escapeHTML(line.substring(2))}</h1>`;
+                } else if (line.startsWith('## ')) {
+                  return `<h2 class="recommendation-subheader">${escapeHTML(line.substring(3))}</h2>`;
+                } else if (line.startsWith('### ')) {
+                  return `<h3 class="recommendation-subheader">${escapeHTML(line.substring(4))}</h3>`;
+                }
+                // Handle bullet points
+                else if (line.startsWith('- ')) {
+                  return `<div class="recommendation-item">
+                    <span class="bullet-point">•</span>
+                    <span class="recommendation-text">${escapeHTML(line.substring(2))}</span>
+                  </div>`;
+                }
+                // Handle bold text
+                else if (line.includes('**')) {
+                  return `<div class="recommendation-item">
+                    <span class="recommendation-text">${line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>
+                  </div>`;
+                }
+                // Handle italic text
+                else if (line.includes('*')) {
+                  return `<div class="recommendation-item">
+                    <span class="recommendation-text">${line.replace(/\*(.*?)\*/g, '<em>$1</em>')}</span>
+                  </div>`;
+                }
+                // Handle links
+                else if (line.includes('[') && line.includes('](')) {
+                  return `<div class="recommendation-item">
+                    <span class="recommendation-text">${line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')}</span>
+                  </div>`;
+                }
+                // Handle blockquotes
+                else if (line.startsWith('> ')) {
+                  return `<div class="recommendation-blockquote">
+                    <span class="blockquote-text">${escapeHTML(line.substring(2))}</span>
+                  </div>`;
+                }
+                // Regular paragraph
+                else if (line.trim()) {
+                  return `<div class="recommendation-item">
+                    <span class="recommendation-text">${escapeHTML(line)}</span>
+                  </div>`;
+                }
+                return '';
+              }).join('')}
+            </div>
+          </div>`
+        : `<p class="no-recommendations">${t('NO_RECOMMENDATIONS')}</p>`;
+
         // Format dates properly
         const currentDate = new Date();
         const formattedCurrentDate = currentDate.toLocaleDateString('en-US', {
@@ -246,9 +308,9 @@ const ReportDetails = () => {
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>${t('REPORT_HAZARD_TITLE')}</title>
               <style>
-              @page {
-                margin: 1in;
-              }
+                @page {
+                  margin: 1in;
+                }
                 body { 
                   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
                   padding: 20px;
@@ -288,6 +350,7 @@ const ReportDetails = () => {
                 h1 { 
                   color: #2E86C1; 
                   margin-bottom: 10px;
+                  font-size: 1.4rem;
                 }
                 h2 {
                   font-size: 1.2rem;
@@ -296,15 +359,91 @@ const ReportDetails = () => {
                   margin-bottom: 10px;
                   font-weight: 600;
                 }
+                h3 {
+                  font-size: 1.1rem;
+                  color: #2E86C1;
+                  margin-top: 15px;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                }
                 .label { 
                   font-weight: bold; 
                   margin-top: 10px; 
                 }
-                ul { 
-                  padding-left: 20px; 
+                .recommendations-container {
+                  background-color: #fff;
+                  border-radius: 8px;
+                  padding: 20px;
+                  margin: 15px 0;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
-                li { 
-                  margin-bottom: 5px;
+                .recommendation-header {
+                  color: #2E86C1;
+                  font-size: 1.4rem;
+                  font-weight: 600;
+                  margin-bottom: 15px;
+                  padding-bottom: 8px;
+                  border-bottom: 2px solid #2E86C1;
+                }
+                .recommendation-subheader {
+                  color: #2E86C1;
+                  font-size: 1.2rem;
+                  font-weight: 600;
+                  margin: 15px 0 10px;
+                }
+                .recommendation-item {
+                  display: flex;
+                  align-items: flex-start;
+                  margin-bottom: 12px;
+                  padding-left: 10px;
+                }
+                .bullet-point {
+                  color: #2E86C1;
+                  font-size: 1.2rem;
+                  margin-right: 8px;
+                  line-height: 1.4;
+                }
+                .recommendation-text {
+                  flex: 1;
+                  font-size: 1rem;
+                  line-height: 1.5;
+                  color: #333;
+                }
+                .recommendation-blockquote {
+                  background-color: #f8f9fa;
+                  border-left: 4px solid #2E86C1;
+                  padding: 12px 15px;
+                  margin: 15px 0;
+                  font-style: italic;
+                  color: #666;
+                }
+                .blockquote-text {
+                  font-size: 1rem;
+                  line-height: 1.5;
+                }
+                .no-recommendations {
+                  color: #666;
+                  font-style: italic;
+                  text-align: center;
+                  padding: 20px;
+                }
+                .markdown-content {
+                  margin: 15px 0;
+                }
+                .markdown-content p {
+                  margin-bottom: 10px;
+                }
+                .markdown-content strong {
+                  font-weight: bold;
+                  color: #2E86C1;
+                }
+                .markdown-content em {
+                  font-style: italic;
+                  color: #666;
+                }
+                .markdown-content a {
+                  color: #2E86C1;
+                  text-decoration: underline;
                 }
                 .image-container {
                   margin: 15px 0;
@@ -353,7 +492,43 @@ const ReportDetails = () => {
               ${recommendationsHTML}
     
               <h2>${t('NOTES')}</h2>
-              <p>${escapeHTML(notes || t('NO_NOTES'))}</p>
+              <div class="markdown-content">
+                ${notes ? notes.split('\n').map(line => {
+                  // Handle headers
+                  if (line.startsWith('# ')) {
+                    return `<h1>${escapeHTML(line.substring(2))}</h1>`;
+                  } else if (line.startsWith('## ')) {
+                    return `<h2>${escapeHTML(line.substring(3))}</h2>`;
+                  } else if (line.startsWith('### ')) {
+                    return `<h3>${escapeHTML(line.substring(4))}</h3>`;
+                  }
+                  // Handle bullet points
+                  else if (line.startsWith('- ')) {
+                    return `<li>${escapeHTML(line.substring(2))}</li>`;
+                  }
+                  // Handle bold text
+                  else if (line.includes('**')) {
+                    return line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                  }
+                  // Handle italic text
+                  else if (line.includes('*')) {
+                    return line.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                  }
+                  // Handle links
+                  else if (line.includes('[') && line.includes('](')) {
+                    return line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+                  }
+                  // Handle blockquotes
+                  else if (line.startsWith('> ')) {
+                    return `<blockquote>${escapeHTML(line.substring(2))}</blockquote>`;
+                  }
+                  // Regular paragraph
+                  else if (line.trim()) {
+                    return `<p>${escapeHTML(line)}</p>`;
+                  }
+                  return '';
+                }).join('') : `<p>${t('NO_NOTES')}</p>`}
+              </div>
     
               <h2>${t('SCANNED_IMAGE')}</h2>
               <div class="image-container">
@@ -511,7 +686,86 @@ const ReportDetails = () => {
               </View>
   
               <Text style={styles.sectionTitle}>{t('RECOMMENDATIONS')}</Text>
-              <Text style={styles.detailText}>• {getCurrentRecommendation()}</Text>
+              <View style={styles.recommendationContainer}>
+                <Markdown style={{
+                  body: styles.modalText,
+                  heading1: { 
+                    fontSize: wp('5%'), 
+                    fontWeight: 'bold', 
+                    marginBottom: hp('1%'), 
+                    color: '#2E86C1',
+                    borderBottomWidth: 2,
+                    borderBottomColor: '#2E86C1',
+                    paddingBottom: hp('0.5%')
+                  },
+                  heading2: { 
+                    fontSize: wp('4.5%'), 
+                    fontWeight: 'bold', 
+                    marginBottom: hp('0.8%'), 
+                    color: '#2E86C1',
+                    marginTop: hp('1.5%')
+                  },
+                  heading3: { 
+                    fontSize: wp('4%'), 
+                    fontWeight: 'bold', 
+                    marginBottom: hp('0.6%'), 
+                    color: '#2E86C1',
+                    marginTop: hp('1.2%')
+                  },
+                  bullet_list: { 
+                    marginBottom: hp('1%'), 
+                    paddingLeft: wp('5%')
+                  },
+                  list_item: { 
+                    marginBottom: hp('0.8%'),
+                    flexDirection: 'row',
+                    alignItems: 'flex-start'
+                  },
+                  list_item_bullet: {
+                    color: '#2E86C1',
+                    fontSize: wp('4%'),
+                    marginRight: wp('2%'),
+                    lineHeight: wp('5%')
+                  },
+                  list_item_content: {
+                    flex: 1,
+                    fontSize: wp('4%'),
+                    color: '#32373E',
+                    lineHeight: wp('5%')
+                  },
+                  strong: { 
+                    fontWeight: 'bold', 
+                    color: '#2E86C1' 
+                  },
+                  em: { 
+                    fontStyle: 'italic', 
+                    color: '#666' 
+                  },
+                  link: { 
+                    color: '#2E86C1', 
+                    textDecorationLine: 'underline' 
+                  },
+                  paragraph: { 
+                    marginBottom: hp('1%'), 
+                    lineHeight: wp('5%'),
+                    fontSize: wp('4%'),
+                    color: '#32373E'
+                  },
+                  blockquote: { 
+                    borderLeftWidth: 4,
+                    borderLeftColor: '#2E86C1',
+                    paddingLeft: wp('3%'),
+                    marginVertical: hp('0.8%'),
+                    fontStyle: 'italic',
+                    color: '#666',
+                    backgroundColor: '#f8f9fa',
+                    padding: wp('3%'),
+                    borderRadius: wp('2%')
+                  }
+                }}>
+                  {getCurrentRecommendation()}
+                </Markdown>
+              </View>
               <TouchableOpacity 
                 style={styles.shopButton} 
                 onPress={() => router.push('/(tabs)/Shops')}
@@ -762,6 +1016,23 @@ editNotesInput: {
   modalButtonText: { color: '#FFF', fontSize: wp('4%'), fontFamily: 'Epilogue-Bold' },
   closeButton: { paddingTop: hp('1%'), alignItems: 'center' },
   closeButtonText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium' },
+
+  recommendationContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: wp('5%'),
+    padding: wp('4%'),
+    marginBottom: hp('2%'),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: wp('4%'),
+    elevation: wp('2%'),
+  },
+  modalText: {
+    fontSize: wp('4%'),
+    color: '#32373E',
+    fontFamily: 'Epilogue-Regular',
+    lineHeight: wp('5%'),
+  },
 });
 
 
