@@ -141,10 +141,10 @@ const Questions = () => {
           />
         </TouchableOpacity>
 
-        <Text style={styles.categoryTitle}>GENERAL</Text>
+        <Text style={styles.categoryTitle}>{t('GENERAL')}</Text>
 
         <TouchableOpacity onPress={handleSkip}>
-          <Text style={styles.skipText}>SKIP</Text>
+          <Text style={styles.skipText}>{t('SKIP')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -172,13 +172,13 @@ const Questions = () => {
               style={styles.optionButton}
               onPress={() => handleAnswer('Yes')}
             >
-              <Text style={styles.optionText}>Yes</Text>
+              <Text style={styles.optionText}>{t('YES')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.optionButton}
               onPress={() => handleAnswer('No')}
             >
-              <Text style={styles.optionText}>No</Text>
+              <Text style={styles.optionText}>{t('NO')}</Text>
             </TouchableOpacity>
           </View>
         </View>

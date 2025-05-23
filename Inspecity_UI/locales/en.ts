@@ -57,7 +57,7 @@ export default {
     NOTES: "Notes",
     EDIT_NOTE: "Edit Note",
     CLICK_EDIT: "Click edit note to add/edit a note.",
-    ENTER_NOTE_HERE: "Enter your note here.",
+    EDIT_NOTE_HERE: "Enter your note here.",
     SAVE_NOTE: "Save Note",
     MANAGE_REPORT: "Manage Report",
     DELETE_REPORT: "Delete Report",
@@ -146,6 +146,11 @@ export default {
     FIRE_BASED_ON_YOUR_RESPONSE: "This assessment is generated based on your responses to the fire preparedness questionnaire.",
     GENERAL_BASED_ON_YOUR_RESPONSE: "This assessment is generated based on your responses to the general preparedness questionnaire.",
     DOWNLOAD_PDF: "Download PDF",
+    COMPREHENSIVE_REPORT: "Comprehensive Risk Evaluation Report",
+    HIGH_RISK: "High Risk",
+    LOW_RISK: "Low Risk",
+    MODERATE_RISK: "Moderate Risk",
+    LOADING_YOUR_RESULTS: "Loading your results...",
 
     EARTHQUAKE_QUESTIONS: [
         "Is your house located within 10 kilometers of a known fault line or mapped earthquake zone? Examples: West Valley Fault, Central Cebu Fault",

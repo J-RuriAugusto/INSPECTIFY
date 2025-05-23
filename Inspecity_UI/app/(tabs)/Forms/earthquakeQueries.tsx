@@ -132,10 +132,10 @@ const handleAnswer = (answer: string) => {
           <Image source={require('../../../assets/images/back-icon.png')} style={styles.backIcon} />
         </TouchableOpacity>
 
-        <Text style={styles.categoryTitle}>EARTHQUAKE</Text>
+        <Text style={styles.categoryTitle}>{t('EARTHQUAKE')}</Text>
 
         <TouchableOpacity onPress={handleSkip}>
-          <Text style={styles.skipText}>SKIP</Text>
+          <Text style={styles.skipText}>{t('SKIP')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -161,13 +161,13 @@ const handleAnswer = (answer: string) => {
               style={styles.optionButton}
               onPress={() => handleAnswer('Yes')}
             >
-              <Text style={styles.optionText}>Yes</Text>
+              <Text style={styles.optionText}>{t('YES')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.optionButton}
               onPress={() => handleAnswer('No')}
             >
-              <Text style={styles.optionText}>No</Text>
+              <Text style={styles.optionText}>{t('NO')}</Text>
             </TouchableOpacity>
           </View>
         </View>
