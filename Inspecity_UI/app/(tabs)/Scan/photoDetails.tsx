@@ -34,7 +34,7 @@ const PhotoDetails = () => {
   const photo = params.photo as string;
   const reportName = params.reportName as string;
   const homeId = params.homeId as string;
-  const API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi';
+  const API_KEY = '***REMOVED***';
   console.log("ReportName: ")
   console.log(reportName)
   console.log("HomeID: ")

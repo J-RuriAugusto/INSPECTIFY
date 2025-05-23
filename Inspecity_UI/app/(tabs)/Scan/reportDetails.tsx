@@ -27,7 +27,7 @@ const ReportDetails = () => {
   const navigation = useNavigation<any>();
   const router = useRouter();
   const reportID = parseInt(Array.isArray(params.report_id) ? params.report_id[0] : params.report_id, 10);
-  const API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi';
+  const API_KEY = '***REMOVED***';
 
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
