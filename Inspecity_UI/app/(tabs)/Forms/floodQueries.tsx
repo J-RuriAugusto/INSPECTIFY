@@ -172,13 +172,13 @@ const Questions = () => {
               style={styles.optionButton}
               onPress={() => handleAnswer('Yes')}
             >
-              <Text style={styles.optionText}>Yes</Text>
+              <Text style={styles.optionText}>{t('YES')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.optionButton}
               onPress={() => handleAnswer('No')}
             >
-              <Text style={styles.optionText}>No</Text>
+              <Text style={styles.optionText}>{t('NO')}</Text>
             </TouchableOpacity>
           </View>
         </View>

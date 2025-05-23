@@ -146,6 +146,11 @@ export default {
     FIRE_BASED_ON_YOUR_RESPONSE: "This assessment is generated based on your responses to the fire preparedness questionnaire.",
     GENERAL_BASED_ON_YOUR_RESPONSE: "This assessment is generated based on your responses to the general preparedness questionnaire.",
     DOWNLOAD_PDF: "Download PDF",
+    COMPREHENSIVE_REPORT: "Comprehensive Risk Evaluation Report",
+    HIGH_RISK: "High Risk",
+    LOW_RISK: "Low Risk",
+    MODERATE_RISK: "Moderate Risk",
+    LOADING_YOUR_RESULTS: "Loading your results...",
 
     EARTHQUAKE_QUESTIONS: [
         "Is your house located within 10 kilometers of a known fault line or mapped earthquake zone? Examples: West Valley Fault, Central Cebu Fault",

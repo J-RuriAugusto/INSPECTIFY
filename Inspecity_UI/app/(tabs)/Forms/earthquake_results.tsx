@@ -48,9 +48,9 @@ const Results = () => {
   };
 
   const getRiskLevel = () => {
-    if (numericScore <= 5) return { label: 'Low Risk', color: '#4CAF50' };
-    if (numericScore <= 10) return { label: 'Moderate Risk', color: '#FFC107' };
-    return { label: 'High Risk', color: '#F44336' };
+    if (numericScore <= 5) return { label: t('LOW_RISK'), color: '#4CAF50' };
+    if (numericScore <= 10) return { label: t('MODERATE_RISK'), color: '#FFC107' };
+    return { label: t('HIGH_RISK'), color: '#F44336' };
   };
 
   const { label, color } = getRiskLevel();
@@ -310,7 +310,7 @@ const Results = () => {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Earthquake Preparedness Assessment</title>
+          <title>${t('EARTHQUAKE_PREPAREDNESS_ASSESSMENT')}</title>
           <style>
             @page {
               margin: 0.5in;
@@ -459,26 +459,26 @@ const Results = () => {
           <div class="header">
             <img src="https://res.cloudinary.com/dyk1pt3m0/image/upload/v1747717972/4e71edc6-3f82-4d38-86f4-b30d02dfd25c_hdhxcu.jpg" alt="Inspectify Logo" />
             <div class="header-text">
-              <h1>Earthquake Preparedness Assessment</h1>
-              <p>Comprehensive Risk Evaluation Report</p>
+              <h1>${t('EARTHQUAKE_PREPAREDNESS_ASSESSMENT')}</h1>
+              <p>${t('COMPREHENSIVE_REPORT')}</p>
             </div>
           </div>
 
           <div class="meta">
-            <p><strong>Date Generated:</strong> ${formattedCurrentDate}</p>
-            <p><strong>Risk Level:</strong> ${label}</p>
-            <p><strong>Score:</strong> ${numericScore} out of 15</p>
+            <p><strong>${t('DATE_GENERATED')}:</strong> ${formattedCurrentDate}</p>
+            <p><strong>${t('RISK_LEVEL')}:</strong> ${label}</p>
+            <p><strong>${t('SCORE')}:</strong> ${numericScore} ${t('OUT_OF')}15</p>
           </div>
 
           <div class="section">
-            <div class="section-title">Detailed Recommendations</div>
+            <div class="section-title">${t('DETAILED_RECOMMENDATIONS')}</div>
             <div class="recommendations">
               ${convertMarkdownToHtml(recommendation)}
             </div>
           </div>
 
           <div class="section">
-            <div class="section-title">Critical Facilities Near You</div>
+            <div class="section-title">${t('CRITICAL_FACILITIES_NEAR')}</div>
             ${facilities.map(facility => `
               <div class="facility-item">
                 • ${facility.label}
@@ -490,7 +490,7 @@ const Results = () => {
           </div>
 
           <div class="footer">
-            <p>This assessment is generated based on your responses to the earthquake preparedness questionnaire.</p>
+            <p>${t('EARTHQUAKE_BASED_ON_YOUR_RESPONSE')}</p>
             <p>© ${currentDate.getFullYear()} Inspectify. All rights reserved.</p>
           </div>
         </body>
@@ -600,24 +600,24 @@ const Results = () => {
             <Animated.View style={[styles.loadingIcon, { transform: [{ scale: pulseAnim }] }]}>
               <MaterialIcons name="sync" size={40} color="#19477B" />
             </Animated.View>
-            <Text style={styles.loadingText}>Loading your results...</Text>
+            <Text style={styles.loadingText}>{t('LOADING_YOUR_RESULTS')}</Text>
           </View>
         </View>
       ) : (
         <>
           {/* Top Content */}
           <View style={styles.content}>
-            <Text style={styles.title}>Earthquake Preparedness Result</Text>
+            <Text style={styles.title}>{t('EARTHQUAKE_PREPAREDNESS_RESULT')}</Text>
             <Text style={[styles.riskLevel, { color }]}>{label}</Text>
             <View style={styles.barContainer}>
               <View
                 style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>You answered "Yes" to {numericScore} out of 15 questions</Text>
+            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
                     
 
-            <Text style={styles.swipeUpLabel}>⬆ Swipe up for recommendations</Text>
+            <Text style={styles.swipeUpLabel}>⬆ {t('SWIPE_UP')}</Text>
           </View>
 
           {/* Always-Open Modal */}
@@ -637,17 +637,17 @@ const Results = () => {
 
             {/* This section is always visible when modal is collapsed */}
             <View style={styles.collapsedHeader}>
-              <Text style={styles.collapsedLabel}>Recommendations & Critical Facilities</Text>
+              <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
             </View>
 
             <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
               <MaterialIcons name="visibility" size={20} color="#fff" />
-              <Text style={styles.downloadButtonText}>Preview & Download</Text>
+              <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_DOWNLOAD')}</Text>
             </TouchableOpacity>
 
             {/* Full content shown when expanded */}
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Recommendations</Text>
+              <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
               <View style={styles.recommendationContainer}>
                 <Markdown style={{
                   body: styles.modalText,
@@ -664,11 +664,11 @@ const Results = () => {
                 </Markdown>
               </View>
 
-              <Text style={styles.modalTitle}>Critical Facilities Near You</Text>
+              <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
 
               <View style={styles.criticalFacilities}>
                 {facilities.length === 0 && (
-                  <Text style={styles.recommendationText}>No facilities found or still loading...</Text>
+                  <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
                 )}
                 {facilities.map((facility, index) => (
                   <View key={index} style={styles.facilityItem}>
@@ -695,7 +695,7 @@ const Results = () => {
             <View style={styles.modalOverlay}>
               <View style={styles.previewContainer}>
                 <View style={styles.previewHeader}>
-                  <Text style={styles.previewTitle}>Preview Results</Text>
+                  <Text style={styles.previewTitle}>{t('PREVIEW_RESULTS')}</Text>
                   <TouchableOpacity 
                     style={styles.closeButton}
                     onPress={() => setIsPreviewVisible(false)}
@@ -715,7 +715,7 @@ const Results = () => {
                     style={[styles.actionButton, styles.cancelButton]}
                     onPress={() => setIsPreviewVisible(false)}
                   >
-                    <Text style={styles.actionButtonText}>Cancel</Text>
+                    <Text style={styles.actionButtonText}>{t('CANCEL')}</Text>
                   </TouchableOpacity>
                   
                   <TouchableOpacity 
@@ -723,7 +723,7 @@ const Results = () => {
                     onPress={handleDownload}
                   >
                     <MaterialIcons name="download" size={20} color="#fff" />
-                    <Text style={styles.actionButtonText}>Download PDF</Text>
+                    <Text style={styles.actionButtonText}>{t('DOWNLOAD_PDF')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>

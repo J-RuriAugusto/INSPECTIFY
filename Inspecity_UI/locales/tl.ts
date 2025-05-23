@@ -122,7 +122,7 @@ export default {
   GENERAL_PREPAREDNESS_RESULT: "Resulta ng Pangkalahatang Paghahanda",
   YOU_ANSWERED_YES: `Sumagot ka ng "Oo" sa `,
   OUT_OF: "sa kabuuang ",
-  QUESTIONS: "mga tanong",
+  QUESTIONS: "na mga tanong",
   PREVIEW_AND_DOWNLOAD: "I-preview at I-download",
   PREVIEW_RESULTS: "I-preview ang Mga Resulta",
   SWIPE_UP: "Mag-swipe pataas para sa mga rekomendasyon",
@@ -146,6 +146,13 @@ export default {
   FIRE_BASED_ON_YOUR_RESPONSE: "Ang pagsusuring ito ay ginawa batay sa iyong mga sagot sa talatanungan sa paghahanda sa sunog.",
   GENERAL_BASED_ON_YOUR_RESPONSE: "Ang pagsusuring ito ay ginawa batay sa iyong mga sagot sa talatanungan sa pangkalahatang paghahanda.",
   DOWNLOAD_PDF: "I-download ang PDF",
+  COMPREHENSIVE_REPORT: "Komprehensibong Ulat sa Pagsusuri ng Panganib",
+  HIGH_RISK: "Mataas na Panganib",
+  LOW_RISK: "Mababang Panganib",
+  MODERATE_RISK: "Katamtamang Panganib",
+  LOADING_YOUR_RESULTS: "Nag-loading sa iyong mga resulta...",
+
+
 
   EARTHQUAKE_QUESTIONS: [
     "Nasa loob ba ng 10 kilometro mula sa kilalang fault line o earthquake zone ang inyong bahay? Halimbawa: West Valley Fault, Central Cebu Fault",
