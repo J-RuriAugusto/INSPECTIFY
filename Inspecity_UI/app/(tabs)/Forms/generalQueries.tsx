@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
@@ -162,10 +163,13 @@ const Questions = () => {
       <View style={styles.contentWrapper}>
         <View style={styles.modal}>
           <View style={styles.questionContainer}>
-            <Text style={styles.questionText}>
-              {questionsQueue[questionIndex]}
-            </Text>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+              <Text style={styles.questionText}>
+                {questionsQueue[questionIndex]}
+              </Text>
+            </ScrollView>
           </View>
+
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity
@@ -219,11 +223,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Epilogue-Bold',
     fontSize: width * 0.05,
     color: '#5CD2FF',
-    left: '45%',
+    left: '30%',
+    right:'30%',
   },
   skipText: {
     fontFamily: 'Epilogue-Medium',
-    fontSize: width * 0.045,
+    fontSize: width * 0.040,
     color: '#FFFFFF',
   },
   progressContainer: {
@@ -259,16 +264,15 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: 19,
+    fontSize: 23,
     color: '#030F1C',
     textAlign: 'center',
   },
-  questionContainer: {
-    minHeight: height * 0.15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
+questionContainer: {
+  maxHeight: height * 0.35, // adjusted from minHeight
+  width: '100%',
+},
+
   optionsContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
@@ -284,10 +288,15 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: 20,
+    fontSize: 15,
     color: '#FFFFFF',
     textAlign: 'center',
   },
+  scrollContent: {
+  paddingHorizontal: 10,
+  paddingVertical: 1,
+},
+
 });
 
 export default Questions;
