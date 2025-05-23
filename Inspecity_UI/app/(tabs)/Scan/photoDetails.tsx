@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 // import Modal from 'react-native-modal'; // Only import Modal from react-native-modal
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
@@ -34,7 +34,7 @@ const PhotoDetails = () => {
   const photo = params.photo as string;
   const reportName = params.reportName as string;
   const homeId = params.homeId as string;
-  const API_KEY = '***REMOVED***';
+  const API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi';
   console.log("ReportName: ")
   console.log(reportName)
   console.log("HomeID: ")
@@ -1021,6 +1021,13 @@ const PhotoDetails = () => {
                 </Markdown>
               </View>
 
+              <TouchableOpacity 
+                style={styles.shopButton} 
+                onPress={handleFindNearbyShops}
+              >
+                <Text style={styles.shopButtonText}>{t('FIND_SHOPS')}</Text>
+              </TouchableOpacity>
+
               <View style={styles.rowContainer}>
                 <Text style={styles.sectionTitle}>{t('NOTES')}</Text>
                 <TouchableOpacity style={styles.editButton} onPress={() => setEditNoteModalVisible(true)}>
@@ -1107,13 +1114,6 @@ const PhotoDetails = () => {
                   {notes || t('CLICK_EDIT')}
                 </Markdown>
               </View>
-
-              <TouchableOpacity 
-                style={styles.shopButton} 
-                onPress={handleFindNearbyShops}
-              >
-                <Text style={styles.shopButtonText}>{t('FIND_SHOPS')}</Text>
-              </TouchableOpacity>
   
             </View>
           </ScrollView>
@@ -1134,8 +1134,14 @@ const PhotoDetails = () => {
                 {/* Save Report Button */}
                 <TouchableOpacity 
                   style={styles.modalButton} 
-                  onPress={() => {
-                    saveReport();
+                  onPress={async () => {
+                    await saveReport();
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'Scan' }], // or 'Dashboard'
+                      })
+                    );
                   }}
                   activeOpacity={0.7}
                 >
@@ -1144,9 +1150,15 @@ const PhotoDetails = () => {
 
                 {/* Delete Report Button */}
                 <TouchableOpacity 
-                  style={[styles.modalButton, { backgroundColor: 'red' }]} 
-                  onPress={() => {
-                    deleteReport();
+                  style={[styles.modalButton, { backgroundColor: '#E55050' }]} 
+                  onPress={async () => {
+                    await deleteReport();
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'reportName' }], // Make sure 'Scan' matches your tab screen name
+                      })
+                    );
                   }}
                   activeOpacity={0.7}
                 >
@@ -1239,7 +1251,7 @@ const styles = StyleSheet.create({
 
   // Header
   header: { position: 'absolute', top: hp('3%'), right: wp('3%'), zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('45%') },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('47%') },
   backIcon: { width: wp('8%'), height: hp('4%'), marginRight: wp('2%') },
   backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
   shareButton: { padding: wp('2%') },
@@ -1289,7 +1301,7 @@ const styles = StyleSheet.create({
   saveButtonText: { color: '#05173F', fontSize: wp('5%'), fontFamily: 'Epilogue-Bold' },
 
   // Inputs
-  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('13%'), textAlign: 'left', padding: wp('4%'), minHeight: hp('10%') },
+  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('10%'), textAlign: 'left', padding: wp('4%'), minHeight: hp('10%') },
   editNotesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', textAlignVertical: 'top' },
 
   // Row Layouts

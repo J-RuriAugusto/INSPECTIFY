@@ -61,8 +61,8 @@ const Results = () => {
   const [recommendation, setRecommendation] = useState('');
   const [facilities, setFacilities] = useState<Facility[]>([]);
 
-  const API_KEY = '***REMOVED***'; // Flask
-  const GOOGLE_API_KEY = 'AlzaSykSYFuBf5L9fCC0YEoewTViPsGtHSGvJOL'; // Replace with your actual Google Maps API Key
+  const API_KEY = 'AAlzaSylbH3rLRAXSI2ItbA7aFinv7hoUQIVst8Q'; // Flask
+  const GOOGLE_API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi'; // Replace with your actual Google Maps API Key
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in kilometers

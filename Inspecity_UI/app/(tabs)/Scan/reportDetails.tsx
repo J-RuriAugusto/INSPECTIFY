@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ImageBackground, ScrollView, ActivityIndicator, Alert, BackHandler, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, CommonActions } from '@react-navigation/native';
 // import Modal from 'react-native-modal'; // Only import Modal from react-native-modal
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
@@ -27,7 +27,7 @@ const ReportDetails = () => {
   const navigation = useNavigation<any>();
   const router = useRouter();
   const reportID = parseInt(Array.isArray(params.report_id) ? params.report_id[0] : params.report_id, 10);
-  const API_KEY = '***REMOVED***';
+  const API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi';
 
   const [editModalVisible, setEditNoteModalVisible] = useState(false);
   const [notes, setNotes] = useState('');
@@ -808,9 +808,15 @@ const ReportDetails = () => {
 
                 {/* Delete Report Button */}
                 <TouchableOpacity 
-                  style={[styles.modalButton, { backgroundColor: 'red' }]} 
-                  onPress={() => {
-                    deleteReport();
+                  style={[styles.modalButton, { backgroundColor: '#E55050' }]} 
+                  onPress={async () => {
+                    await deleteReport();
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'reportName' }], // Make sure 'Scan' matches your tab screen name
+                      })
+                    );
                   }}
                   activeOpacity={0.7}
                 >

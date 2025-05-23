@@ -57,7 +57,7 @@ export default {
     NOTES: "Notes",
     EDIT_NOTE: "Edit Note",
     CLICK_EDIT: "Click edit note to add/edit a note.",
-    ENTER_NOTE_HERE: "Enter your note here.",
+    EDIT_NOTE_HERE: "Enter your note here.",
     SAVE_NOTE: "Save Note",
     MANAGE_REPORT: "Manage Report",
     DELETE_REPORT: "Delete Report",

@@ -77,8 +77,8 @@ const Results = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const API_KEY = '***REMOVED***'; // Flask
-  const GOOGLE_API_KEY = 'AlzaSykSYFuBf5L9fCC0YEoewTViPsGtHSGvJOL';
+  const API_KEY = 'AlzaSylbH3rLRAXSI2ItbA7aFinv7hoUQIVst8Q'; // Flask
+  const GOOGLE_API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi';
 
   // const facilities = [
   //   { icon: 'local-hospital', color: '#F44336', label: 'Cebu City Medical Center' },

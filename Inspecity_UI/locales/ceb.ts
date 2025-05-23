@@ -56,7 +56,7 @@ export default {
     NOTES: "Mga Nota",
     EDIT_NOTE: "Usba ang Nota",
     CLICK_EDIT: "I-klik ang 'usba ang nota' aron magdugang/usab sa nota.",
-    ENTER_NOTE_HERE: "I-type ang imong nota dinhi.",
+    EDIT_NOTE_HERE: "I-type ang imong nota dinhi.",
     SAVE_NOTE: "I-save ang Nota",
     MANAGE_REPORT: "Pagdumala sa Report",
     DELETE_REPORT: "Pagtangtang sa Report",
