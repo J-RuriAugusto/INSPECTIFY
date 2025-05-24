@@ -54,17 +54,51 @@ const Dashboard = () => {
     setRenameModalVisible(true);
   };
 
-  const handleRenameSubmit = async () => {
-    if (!newReportName.trim() || selectedReportId === null) return;
 
+  const handleRenameSubmit = async () => {
+    if (selectedReportId === null) return;
     try {
-      await axios.put(`${API_BASE_URL}/api/update-report/${selectedReportId}`, {
-        report_name: newReportName,
+      const response = await fetch(`https://flask-railway-sample-production.up.railway.app/reports/${selectedReportId}/rename`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY,
+        },
+        body: JSON.stringify({
+          new_name: newReportName
+        })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Update local state immediately
+      setReportsTitleID(prev =>
+        prev.map(report =>
+          report.report_id === selectedReportId.toString() 
+            ? { ...report, report_name: newReportName } 
+            : report
+        )
+      );
+
       setRenameModalVisible(false);
-      fetchReports(); // Refresh data
+      const refreshData = async () => {
+        if (userId) {
+          await fetchHouseDetails(userId);
+        }
+        const homeId = HomeDetails.homeId;
+        if (homeId) {
+          const reports = await fetchReportTitles(homeId);
+          setReportsTitleID(reports);
+        }
+      };
+      
+      refreshData();
+      Alert.alert('Success', 'Report renamed successfully');
     } catch (error) {
       console.error('Failed to rename report:', error);
+      Alert.alert('Error', 'Failed to rename report. Please try again.');
     }
   };
 
@@ -128,14 +162,30 @@ const Dashboard = () => {
         BackHandler.exitApp();
         return true;
       };
-
+  
       const backHandler = BackHandler.addEventListener(
         'hardwareBackPress',
         backAction
       );
-
-      return () => backHandler.remove();
-    }, [])
+  
+      // Add refresh logic here
+      const refreshData = async () => {
+        if (userId) {
+          await fetchHouseDetails(userId);
+        }
+        const homeId = HomeDetails.homeId;
+        if (homeId) {
+          const reports = await fetchReportTitles(homeId);
+          setReportsTitleID(reports);
+        }
+      };
+      
+      refreshData();
+  
+      return () => {
+        backHandler.remove();
+      };
+    }, [userId])
   );
 
   const fetchHouseDetails = async (userId: string) => {
@@ -474,7 +524,7 @@ const Dashboard = () => {
                         style={styles.reportIcon}
                       />
                       <Text style={styles.reportText}>
-                        {report.report_name || t('UNTITLED')}
+                        {report.report_name.trim() === '' ? t('UNTITLED') : report.report_name}
                       </Text>
                     </View>
                   </TouchableOpacity>
