@@ -16,6 +16,7 @@ const Settings = () => {
   const [backupLocation, setBackupLocation] = useState<string | null>(settings.backupLocation);
   const [changesMade, setChangesMade] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
+  const API_KEY = '***REMOVED***';
 
   useEffect(() => {
     const isChanged =
@@ -42,9 +43,36 @@ const Settings = () => {
           text: 'Clear Data',
           onPress: async () => {
             try {
+              // Get the homeowner ID from storage
+              const homeownerId = await AsyncStorage.getItem('userId');
+              
+              // If homeowner ID exists, call the delete endpoint
+              if (homeownerId) {
+                try {
+                  const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homeowners/${homeownerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                      'X-API-KEY': API_KEY, 
+                      'Content-Type': 'application/json',
+                    },
+                  });
+  
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+  
+                  const result = await response.json();
+                  console.log('Delete successful:', result);
+                } catch (error) {
+                  console.error('Error calling delete endpoint:', error);
+                }
+              }
+  
+              // Clear local storage
               await AsyncStorage.clear();
               updateSettings(defaultSettings);
               setLocalSettings(defaultSettings);
+              
               router.replace('../../../getstarted_1');
             } catch (error) {
               Alert.alert('Error', 'Failed to clear cache');
