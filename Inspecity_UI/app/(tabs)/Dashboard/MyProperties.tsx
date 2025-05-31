@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Modal, TextInput, KeyboardAvoidingView,Platform, ScrollView,} from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as Location from 'expo-location';
@@ -879,54 +880,149 @@ const MyProperties = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0B417D', paddingTop: 50, paddingHorizontal: 20, paddingBottom: 30 },
-  title: { fontSize: 30, color: '#FFFFFF', fontFamily: 'Epilogue-Black', textAlign: 'center', marginBottom: 20 },
-  propertyItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#08294E', borderRadius: 10, marginVertical: 5, padding: 0 },
-  propertyImage: { width: 70, height: 80, borderRadius: 10, marginRight: 15 },
-  propertyInfo: { flex: 1 },
-  propertyText: { fontSize: 18, color: '#7DBAFF', fontFamily: 'Epilogue-Bold' },
-  propertyLocation: { fontSize: 14, color: '#B0C4DE', fontFamily: 'Archivo-Regular' },
-  swipeActions: { flexDirection: 'row' },
-  editAction: { marginTop: 5, height: 80, backgroundColor: '#007BFF', padding: 15, marginRight: 5, borderRadius: 5 },
-  deleteAction: { marginTop: 5, height: 80, backgroundColor: '#E55050', padding: 15, borderRadius: 5 },
-  swipeText: { marginTop: 15, color: '#FFFFFF', fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalContent: { width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  modalImage: { width: 100, height: 100, borderRadius: 10, marginBottom: 10 },
-  changeImageText: { color: '#007BFF', fontSize: 16 },
-  input: { width: '100%', padding: 10, marginVertical: 5, borderRadius: 5, backgroundColor: '#f0f0f0' },
-  saveButton: { backgroundColor: '#007BFF', padding: 12, borderRadius: 5 },
-  saveText: { color: 'white', fontWeight: 'bold' },
-  cancelButton: { marginTop: 10 },
-  cancelText: { color: '#D11A2A', fontSize: 16 },
-  addButton: { 
-    backgroundColor: '#007BFF', 
-    padding: 12, 
-    borderRadius: 5, 
-    marginTop: -100, 
-    alignSelf: 'center', 
-    width: 200, 
-    alignItems: 'center' 
+  container: {
+    flex: 1,
+    backgroundColor: '#0B417D',
+    paddingTop: hp('6%'),
+    paddingHorizontal: wp('5%'),
+    paddingBottom: hp('4%')
   },
-  addButtonText: { 
-    color: 'white', 
-    fontWeight: 'bold', 
-    textAlign: 'center' 
+  title: {
+    fontSize: wp('7.5%'),
+    color: '#FFFFFF',
+    fontFamily: 'Epilogue-Black',
+    textAlign: 'center',
+    marginBottom: hp('2.5%')
+  },
+  propertyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#08294E',
+    borderRadius: wp('2.5%'),
+    marginVertical: hp('0.8%'),
+    padding: 0
+  },
+  propertyImage: {
+    width: wp('18%'),
+    height: hp('10%'),
+    borderRadius: wp('2.5%'),
+    marginRight: wp('4%')
+  },
+  propertyInfo: {
+    flex: 1
+  },
+  propertyText: {
+    fontSize: wp('4.5%'),
+    color: '#7DBAFF',
+    fontFamily: 'Epilogue-Bold'
+  },
+  propertyLocation: {
+    fontSize: wp('3.5%'),
+    color: '#B0C4DE',
+    fontFamily: 'Archivo-Regular'
+  },
+  swipeActions: {
+    flexDirection: 'row'
+  },
+  editAction: {
+    marginTop: hp('0.8%'),
+    height: hp('10%'),
+    backgroundColor: '#007BFF',
+    padding: wp('4%'),
+    marginRight: wp('1.5%'),
+    borderRadius: wp('1.5%')
+  },
+  deleteAction: {
+    marginTop: hp('0.8%'),
+    height: hp('10%'),
+    backgroundColor: '#E55050',
+    padding: wp('4%'),
+    borderRadius: wp('1.5%')
+  },
+  swipeText: {
+    marginTop: hp('2%'),
+    color: '#FFFFFF',
+    fontSize: wp('4%'),
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
+  modalContent: {
+    width: wp('75%'),
+    backgroundColor: 'white',
+    padding: wp('5%'),
+    borderRadius: wp('2.5%'),
+    alignItems: 'center'
+  },
+  modalTitle: {
+    fontSize: wp('5%'),
+    fontWeight: 'bold',
+    marginBottom: hp('1.2%')
+  },
+  modalImage: {
+    width: wp('25%'),
+    height: wp('25%'),
+    borderRadius: wp('2.5%'),
+    marginBottom: hp('1.5%')
+  },
+  changeImageText: {
+    color: '#007BFF',
+    fontSize: wp('4%')
+  },
+  input: {
+    width: '100%',
+    padding: wp('3%'),
+    marginVertical: hp('0.8%'),
+    borderRadius: wp('1.5%'),
+    backgroundColor: '#f0f0f0'
+  },
+  saveButton: {
+    backgroundColor: '#007BFF',
+    padding: hp('1.5%'),
+    borderRadius: wp('1.5%')
+  },
+  saveText: {
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  cancelButton: {
+    marginTop: hp('1.5%')
+  },
+  cancelText: {
+    color: '#D11A2A',
+    fontSize: wp('4%')
+  },
+  addButton: {
+    backgroundColor: '#007BFF',
+    padding: hp('1.5%'),
+    borderRadius: wp('1.5%'),
+    marginTop: -hp('12%'),
+    alignSelf: 'center',
+    width: wp('50%'),
+    alignItems: 'center'
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   picker: {
     width: '100%',
     backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    marginVertical: 5
+    borderRadius: wp('1.5%'),
+    marginVertical: hp('0.8%')
   },
   label: {
-    fontSize: 16,
+    fontSize: wp('4%'),
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: hp('1.5%'),
     alignSelf: 'flex-start'
   },
-  });
-
+});
 
 export default MyProperties;

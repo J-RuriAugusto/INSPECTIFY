@@ -448,7 +448,7 @@ const NearbyShops = () => {
                 maximumValue={20000}
                 step={500}
                 value={distanceFilter}
-                onValueChange={(value) => setDistanceFilter(value)}
+                onSlidingComplete={(value) => setDistanceFilter(value)} // Change here
                 minimumTrackTintColor="#1E90FF"
                 maximumTrackTintColor="#D3D3D3"
               />
@@ -570,7 +570,11 @@ const NearbyShops = () => {
               
               {/* Store Image */}
               <Image 
-                source={{ uri: selectedStore.image }} 
+                source={
+                  selectedStore.image
+                    ? { uri: selectedStore.image }
+                    : require('../../assets/images/inspectify_logo.png')
+                }
                 style={styles.modalImage}
                 resizeMode="cover"
               />

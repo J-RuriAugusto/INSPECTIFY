@@ -1251,7 +1251,7 @@ const styles = StyleSheet.create({
 
   // Header
   header: { position: 'absolute', top: hp('3%'), right: wp('3%'), zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('47%') },
+  backButton: { flexDirection: 'row', alignItems: 'center', right: wp('52%') },
   backIcon: { width: wp('8%'), height: hp('4%'), marginRight: wp('2%') },
   backText: { fontSize: wp('4.5%'), fontFamily: 'Epilogue-Bold', color: '#FFF' },
   shareButton: { padding: wp('2%') },
@@ -1301,8 +1301,18 @@ const styles = StyleSheet.create({
   saveButtonText: { color: '#05173F', fontSize: wp('5%'), fontFamily: 'Epilogue-Bold' },
 
   // Inputs
-  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('10%'), textAlign: 'left', padding: wp('4%'), minHeight: hp('10%') },
+  notesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), shadowColor: '#000', shadowOpacity: wp('0.3%'), shadowRadius: wp('4%'), elevation: wp('2%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', marginTop: hp('1%'), marginBottom: hp('6%'), textAlign: 'left', padding: wp('4%'), minHeight: hp('10%') },
   editNotesInput: { backgroundColor: '#FFF', borderRadius: wp('5%'), flex: 1, fontSize: wp('4%'), color: '#32373E', fontFamily: 'Epilogue-Regular', textAlignVertical: 'top' },
+  notesContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: wp('5%'),
+    padding: wp('4%'),
+    marginBottom: hp('7%'),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: wp('4%'),
+    elevation: wp('2%'),
+  },
 
   // Row Layouts
   rowContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp('0.1%') },
@@ -1325,16 +1335,6 @@ const styles = StyleSheet.create({
   closeButtonText: { fontSize: wp('4%'), fontFamily: 'Epilogue-Medium' },
   concText: { fontSize: 15, fontFamily: 'Epilogue-Medium', color: '#000', marginBottom: hp('2%') },
   recommendationContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: wp('5%'),
-    padding: wp('4%'),
-    marginBottom: hp('2%'),
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: wp('4%'),
-    elevation: wp('2%'),
-  },
-  notesContainer: {
     backgroundColor: '#FFF',
     borderRadius: wp('5%'),
     padding: wp('4%'),

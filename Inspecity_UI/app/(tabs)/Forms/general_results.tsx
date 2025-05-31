@@ -504,25 +504,50 @@ const Results = () => {
   };
 
   const handleDownload = async () => {
-  try {
-      const { uri } = await Print.printToFileAsync({
-        html: previewHtml,
+    try {
+      // 1. Format date and time
+      const currentDate = new Date();
+      const isoString = currentDate.toISOString(); // e.g., "2025-05-17T12:34:56.789Z"
+      const [date, time] = isoString.split('T');
+      const formattedTime = time.split('.')[0].replace(/:/g, '-'); // "12-34-56"
+      const formattedDateTime = `${date} | ${formattedTime}`; // e.g., "2025-05-17 12-34-56"
+      const fileName = `Preparedness Details ${formattedDateTime}.pdf`;
+
+      // 2. Create PDF from HTML
+      const { uri: tempUri } = await Print.printToFileAsync({
+        html: previewHtml, // your HTML content
         width: 612,
         height: 792,
       });
-  
+
+      // 3. Define final file path with formatted filename
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      // 4. Move the file to rename it
+      await FileSystem.moveAsync({
+        from: tempUri,
+        to: fileUri,
+      });
+
+      // 5. Check if sharing is available
       const canShare = await Sharing.isAvailableAsync();
       if (!canShare) {
         alert('Sharing is not available on this device');
         return;
       }
-  
-      await Sharing.shareAsync(uri);
+
+      // 6. Share the renamed file
+      await Sharing.shareAsync(fileUri, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'Share Report',
+        UTI: 'com.adobe.pdf', // iOS support
+      });
     } catch (error) {
-      console.error('Error opening PDF:', error);
-      alert('Failed to open PDF');
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate or share PDF');
     }
   };
+
   // Inside the Results component, add markdownStyles
   const markdownStyles = {
     body: {
@@ -639,7 +664,7 @@ const Results = () => {
             </View>
                         <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
                           <MaterialIcons name="visibility" size={20} color="#fff" />
-                          <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_DOWNLOAD')}</Text>
+                          <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_SHARE')}</Text>
                         </TouchableOpacity>
             {/* Expanded modal content */}
             <View style={styles.modalContent}>
@@ -727,8 +752,8 @@ const Results = () => {
                     style={[styles.actionButton, styles.downloadButton]}
                     onPress={handleDownload}
                   >
-                    <MaterialIcons name="download" size={20} color="#fff" />
-                    <Text style={styles.actionButtonText}>{t('DOWNLOAD_PDF')}</Text>
+                    <MaterialIcons name="share" size={20} color="#fff" />
+                    <Text style={styles.actionButtonText}>{t('SHARE_PDF')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
