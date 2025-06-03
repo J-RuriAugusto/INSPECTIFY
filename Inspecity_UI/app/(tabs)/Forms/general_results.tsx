@@ -14,6 +14,7 @@ import { WebView } from 'react-native-webview';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -79,7 +80,7 @@ const Results = () => {
   const [error, setError] = useState<string | null>(null);
 
   const API_KEY = '***REMOVED***'; // Flask
-  const GOOGLE_API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi'; // Replace with your actual Google Maps API Key
+  const GOOGLE_API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi'; // Replace with ar actual Google Maps API Key
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,7 +88,7 @@ const Results = () => {
       try {
         await Promise.all([
           fetchRecommendation(),
-          fetchNearbyFacilities()
+          fetchNearbyServices()
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -157,7 +158,7 @@ const Results = () => {
       }
     };
 
-    const fetchNearbyFacilities = async () => {
+    const fetchNearbyServices = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
@@ -167,56 +168,46 @@ const Results = () => {
 
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
+        const radius = 5000; // 5km radius
 
-        const types = ['hospital', 'police', 'school', 'city_hall'];
+        // Fetch all relevant services
+        const types = [
+          'hospital',
+          'police',
+          'fire_station',
+          'school',
+          'community_center',
+          'local_government_office'
+        ].join('|');
 
-        // Fetch results for each type
-        const results = await Promise.all(types.map(type =>
-          axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
-            params: {
-              location: `${latitude},${longitude}`,
-              radius: 5000,
-              type,
-              key: GOOGLE_API_KEY,
-            },
-          })
-        ));
-
-        // Limit 5 results per category and keep track of the results per type
-        const allPlaces = results.flatMap(res => res.data.results);
-        const groupedResults: GroupedResults = {};
-
-        types.forEach(type => {
-          groupedResults[type] = allPlaces.filter(place =>
-            place.types.includes(type)
-          ).slice(0, 5); // Limit to 5 per type
-        });
-
-        // Flatten the results and prepare the mapped data
-        const selected: Facility[] = [];
-        for (const type of types) {
-          const places = groupedResults[type];
-          places.forEach(place => {
-            const distance = calculateDistance(
+        const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${types}&key=${getCurrentApiKey()}`;
+        const data = await makeGoogleMapsApiCall(url);
+        
+        if (data.status === "OK") {
+          // Process the services data
+          const services = data.results.map((place: any) => ({
+            name: place.name,
+            type: place.types[0],
+            location: place.geometry.location,
+            address: place.vicinity,
+            distance: calculateDistance(
               latitude,
               longitude,
               place.geometry.location.lat,
               place.geometry.location.lng
-            );
-            selected.push({
-              icon: mapPlaceTypeToIcon(place.types || []),
-              color: '#4CAF50',
-              label: place.name,
-              distance: distance
-            });
-          });
+            )
+          }));
+          // Update your state with services
+          setFacilities(services.map(service => ({
+            icon: mapPlaceTypeToIcon(service.type),
+            color: '#4CAF50',
+            label: service.name,
+            distance: service.distance
+          })));
         }
-        // Sort facilities by distance
-        selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-        setFacilities(selected);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch nearby critical facilities.');
+      } catch (error) {
+        console.error('Error fetching nearby services:', error);
+        setError('Failed to fetch nearby services');
       }
     };
 
