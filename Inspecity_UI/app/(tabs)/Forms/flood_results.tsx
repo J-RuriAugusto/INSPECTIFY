@@ -18,6 +18,7 @@ import { WebView } from 'react-native-webview';
 import Markdown from 'react-native-markdown-display';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -579,6 +580,44 @@ const Results = () => {
       marginVertical: 5,
       fontStyle: 'italic',
     },
+  };
+
+  const fetchEvacuationCenters = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Location permission not granted');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      const radius = 5000; // 5km radius
+
+      // Fetch evacuation centers
+      const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=school|community_center|stadium&key=${getCurrentApiKey()}`;
+      const data = await makeGoogleMapsApiCall(url);
+      
+      if (data.status === "OK") {
+        // Process the evacuation centers data
+        const centers = data.results.map((place: any) => ({
+          name: place.name,
+          type: place.types[0],
+          location: place.geometry.location,
+          address: place.vicinity,
+          distance: calculateDistance(
+            latitude,
+            longitude,
+            place.geometry.location.lat,
+            place.geometry.location.lng
+          )
+        }));
+        // Update your state with centers
+      }
+    } catch (error) {
+      console.error('Error fetching evacuation centers:', error);
+      setError('Failed to fetch evacuation centers');
+    }
   };
 
   return (
