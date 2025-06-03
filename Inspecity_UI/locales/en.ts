@@ -112,6 +112,9 @@ export default {
     FIRE: "FIRE",
     GENERAL: "GENERAL",
     CATEGORY: "CATEGORY",
+    DISCLAIMER: "Disclaimer",
+    DISCLAIMER_TEXT: "Inspectify only uses your answers to give helpful tips. The system does not save or share any data. ",
+    ACCEPT: "Accept",
     START: "START",
     SKIP: "SKIP",
     YES: "Yes",
@@ -224,4 +227,5 @@ export default {
         "Are you aware of any disaster drills regularly conducted in your barangay or community?",
         "Are you familiar with any of the following free hazard assessment tools for households?\n\ta. NOAH (Nationwide Operational Assessment of Hazards by UP Resilience Institute)\n\tb. HazardHunterPH (Hazard assessment by GeoRiskPH, DOST)\n\tc. How Safe is My House? (Earthquake safety self-check for concrete hollow block houses by DOST-PHIVOLCS)" 
     ],
+    
 };

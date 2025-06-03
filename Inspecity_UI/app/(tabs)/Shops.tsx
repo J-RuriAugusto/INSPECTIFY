@@ -6,7 +6,6 @@ import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-
 const GOOGLE_MAPS_API_KEY = "AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi";
 
 type Store = {
@@ -387,12 +386,16 @@ const NearbyShops = () => {
             onPress={() => handleStoreSelect(store)}
           >
             <View style={{ alignItems: "center" }}>
-              {/* Custom Marker Icon */}
-              <Image
-                source={require("../../assets/images/store-icon.png")}
-                style={{ width: 40, height: 40 }}
-                resizeMode="contain"
-              />
+              {/* Location Icon Marker */}
+              <View style={{
+              backgroundColor: 'white',
+              borderRadius: 20,
+              padding: 5,
+              borderWidth: 2,
+              borderColor: '#007BFF'
+            }}>
+              <MaterialIcons name="location-pin" size={18.5} color="#007BFF" />
+            </View>
             </View>
           </Marker>
         ))}

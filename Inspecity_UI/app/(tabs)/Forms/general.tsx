@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimensions, Modal, Pressable } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -15,9 +15,19 @@ const General = () => {
     'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
   });
 
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   
   if (!fontsLoaded) return null;
+
+  const handleStartPress = () => {
+    setModalVisible(true);
+  };
+
+  const acceptDisclaimer = () => {
+    setModalVisible(false);
+    navigation.navigate('generalQueries');
+  };
 
   return (
     <ImageBackground
@@ -31,7 +41,7 @@ const General = () => {
         <Text style={styles.backText}>{t('BACK')}</Text>
       </TouchableOpacity>
 
-      {/* EARTHQUAKE Label at the top */}
+      {/* GENERAL Label at the top */}
       <View style={styles.textContainer}>
         <Image source={require('../../../assets/images/general-icon.png')} style={styles.icon} />
         <Text style={styles.title1}>{t('GENERAL')}</Text>
@@ -41,10 +51,41 @@ const General = () => {
       <View style={styles.content}>
         <Text style={styles.title2}>{t('CATEGORY')}</Text>
 
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('generalQueries')}>
+        <TouchableOpacity style={styles.startButton} onPress={handleStartPress}>
           <Text style={styles.startButtonText}>{t('START')}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Disclaimer Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{t('DISCLAIMER')}</Text>
+            <Text style={styles.modalText}>
+              {t('DISCLAIMER_TEXT')}
+            </Text>
+            <View style={styles.modalButtons}>
+              <Pressable
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>{t('CANCEL')}</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, styles.acceptButton]}
+                onPress={acceptDisclaimer}
+              >
+                <Text style={styles.buttonText}>{t('ACCEPT')}</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -69,13 +110,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backIcon: {
-    width: width * 0.07,     // ~7% of screen width
+    width: width * 0.07,
     height: width * 0.07,
     marginRight: width * 0.01,
   },
   backText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: width * 0.045, // ~16-18px on standard phones
+    fontSize: width * 0.045,
     color: '#FFFFFF',
   },
   textContainer: {
@@ -110,6 +151,57 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontFamily: 'Epilogue-Black',
     fontSize: width * 0.065,
+    color: '#FFFFFF',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: width * 0.8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: width * 0.05,
+    padding: width * 0.05,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontFamily: 'Epilogue-Bold',
+    fontSize: width * 0.06,
+    color: '#333',
+    marginBottom: height * 0.02,
+  },
+  modalText: {
+    fontFamily: 'Archivo-Regular',
+    fontSize: width * 0.04,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: height * 0.03,
+    lineHeight: height * 0.025,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.05,
+    borderRadius: width * 0.03,
+    flex: 1,
+    marginHorizontal: width * 0.02,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#E0E0E0',
+  },
+  acceptButton: {
+    backgroundColor: '#00A8E8',
+  },
+  buttonText: {
+    fontFamily: 'Epilogue-Bold',
+    fontSize: width * 0.04,
     color: '#FFFFFF',
   },
 });
