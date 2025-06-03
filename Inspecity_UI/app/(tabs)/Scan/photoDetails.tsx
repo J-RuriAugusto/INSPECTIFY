@@ -162,6 +162,27 @@ const PhotoDetails = () => {
 
   const deleteReport = async () => {
     if(!settings.autoSave){
+      // Delete both images from Cloudinary first
+      try {
+        const response = await axios.post(
+          'https://flask-railway-sample-production.up.railway.app/delete_cloudinary_image',
+          {
+            urls: [plainImageUrl, annotatedImage] // Send both URLs
+          },
+          {
+            headers: {
+              'X-API-KEY': API_KEY,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        console.log('Cloudinary deletion response:', response.data);
+      } catch (error) {
+        console.error('Error deleting images from Cloudinary:', error);
+        // Continue with report deletion even if image deletion fails
+      }
+      
       setReportModalVisible(false);
       navigation.popToTop();
       return;
@@ -219,7 +240,26 @@ const PhotoDetails = () => {
           {
             text: t('DELETE'),
             style: "destructive",
-            onPress: () => {
+            onPress: async () => { // Mark this onPress as async
+              // Call deleteCloudinaryImages before dispatching the action
+              try {
+                await axios.post(
+                  'https://flask-railway-sample-production.up.railway.app/delete_cloudinary_image',
+                  {
+                    urls: [plainImageUrl, annotatedImage]
+                  },
+                  {
+                    headers: {
+                      'X-API-KEY': API_KEY,
+                      'Content-Type': 'application/json'
+                    }
+                  }
+                );
+                console.log('Images deleted from Cloudinary during beforeRemove.');
+              } catch (error) {
+                console.error('Error deleting images from Cloudinary during beforeRemove:', error);
+                // Decide if you want to prevent navigation or just log the error
+              }
               navigation.dispatch(e.data.action);
             }
           },

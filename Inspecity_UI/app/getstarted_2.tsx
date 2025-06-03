@@ -5,9 +5,11 @@ import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { KeyboardAvoidingView, Platform, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { useTranslation } from '../hooks/useTranslation';
 
 
 const GettingStarted2 = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [homeName, setHomeName] = useState(''); // State to store the home name
   const [houseAge, setHouseAge] = useState(''); // State to store the age of the house
@@ -28,19 +30,19 @@ const GettingStarted2 = () => {
 
   const handleNavigateToGetStarted3 = () => {
     if (!homeName.trim()) {
-      Alert.alert('Error', 'Home name is required.');
+      Alert.alert(t('ERROR'), t('HOME_NAME_REQ'));
       return;
     }
   
     if (!houseAge.trim()) {
-      Alert.alert('Error', 'House age is required.');
+      Alert.alert(t('ERROR'), t('HOME_AGE_REQ'));
       return;
     }
   
     let age = parseInt(houseAge, 10);
   
     if (isNaN(age) || age <= 0) {
-      Alert.alert('Error', 'Please enter a valid positive integer for the house age.');
+      Alert.alert(t('ERROR'), t('ERROR_INVALID_AGE'));
       return;
     }
   
@@ -106,14 +108,14 @@ const GettingStarted2 = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Add Your Home</Text>
-        <Text style={styles.subtitle1}>Enter basic details about your</Text>
-        <Text style={styles.subtitle2}>home to begin.</Text>
+        <Text style={styles.title1}>{t('ADD_HOME')}</Text>
+        <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')}</Text>
+        <Text style={styles.subtitle2}>{t('BASIC_HOME_DETAILS2')}</Text>
 
         {/* Home Name Text Input */}
         <TextInput
           style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder="Enter your home name"
+          placeholder={t('ENTER_HOME_NAME')}
           placeholderTextColor="#BBBBBB"
           value={homeName}
           onChangeText={(text) => setHomeName(text)}
@@ -122,7 +124,7 @@ const GettingStarted2 = () => {
         {/* House Age Text Input */}
         <TextInput
           style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder="Enter the age of the house"
+          placeholder={t('ENTER_HOUSE_AGE')}
           placeholderTextColor="#BBBBBB"
           value={houseAge}
           onChangeText={(text) => setHouseAge(text)}
@@ -131,19 +133,19 @@ const GettingStarted2 = () => {
         {/* Primary Use Text Input */}
         <TextInput
           style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder="Enter the primary use of the House"
+          placeholder={t('ENTER_PRIMARY_USE')}
           placeholderTextColor="#BBBBBB"
           value={houseUse}
           onChangeText={(text) => setHouseUse(text)}
         />
 
-        <Text style={styles.label}>Has the house undergone</Text>
-        <Text style={styles.label}>renovations or repairs?</Text>
+        <Text style={styles.label}>{t('HAS_RENOVATIONS')}</Text>
+        <Text style={styles.label}>{t('HAS_RENOVATIONS2')}</Text>
 
         {/* Renovations Text Input */}
         <TextInput
           style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder="Yes/No, if yes, specify"
+          placeholder={t('RENOVATIONS_GUIDE')}
           placeholderTextColor="#BBBBBB"
           value={renovations}
           onChangeText={(text) => setRenovations(text)}
@@ -151,7 +153,7 @@ const GettingStarted2 = () => {
 
         {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3}>
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t('NEXT')}</Text>
         </TouchableOpacity>
       </View>
     </Animatable.View>

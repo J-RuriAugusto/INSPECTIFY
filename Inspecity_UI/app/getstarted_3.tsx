@@ -6,9 +6,11 @@ import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import * as Animatable from 'react-native-animatable';
 import { KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { useTranslation } from '../hooks/useTranslation';
 
 
 const GettingStarted3 = () => {
+  const { t } = useTranslation();
   const { homeData } = useLocalSearchParams();
   console.log(homeData)
   const router = useRouter();
@@ -37,23 +39,23 @@ const GettingStarted3 = () => {
 
   const handleNavigateToGetStarted3b = () => {
     if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
-      alert("Number of house floors must be a positive whole number.");
+      alert(t('ERROR_HOUSE_FLOOR'));
       return;
     }
   
     if (lotArea.trim() !== "" && (isNaN(parseFloat(lotArea)) || parseFloat(lotArea) <= 0)) {
-      alert("Estimated lot area must be a positive number.");
+      alert(t('ERROR_LOT_AREA'));
       return;
     }
   
     if (floorArea.trim() !== "" && (isNaN(parseFloat(floorArea)) || parseFloat(floorArea) <= 0)) {
-      alert("Estimated floor area must be a positive number.");
+      alert(t('ERROR_FLOOR_AREA'));
       return;
     }
   
     const updatedHomeData = {
       ...parsedHomeData,
-      typeOfHouse: selectedHouseType === "others" 
+      typeOfHouse: selectedHouseType === t('OTHERS')
     ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
     : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
       numFloor: numFloor.trim() !== "" ? parseInt(numFloor) : null,
@@ -107,27 +109,27 @@ const GettingStarted3 = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Tell Us About Your Home</Text>
-        <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
+        <Text style={styles.title1}>{t('TELL_US_YOUR_HOME')}</Text>
+        <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')} {t('BASIC_HOME_DETAILS2')}</Text>
         {/* Scrollable form */}
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
                 
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-            <Picker.Item label="Type of House" value="" enabled={false} />
+            <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
             <Picker.Item label="Single-detached" value="single" />
             <Picker.Item label="Townhouse" value="town" />
             <Picker.Item label="Apartment" value="apartment" />
             <Picker.Item label="Stilt house" value="stilt" />
             <Picker.Item label="Duplex" value="duplex" />
-            <Picker.Item label="Others" value="others" />
+            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
           </Picker>
         </View>
 
-        {selectedHouseType === "others" && (
+        {selectedHouseType === t('OTHERS') && (
           <TextInput
             style={styles.textBox1}
-            placeholder="Specify other house type"
+            placeholder={t('SPECIFY_HOUSE_TYPE')}
             placeholderTextColor="#BBBBBB"
             value={otherHouseType}
             onChangeText={(text) => setOtherHouseType(text)}
@@ -135,7 +137,7 @@ const GettingStarted3 = () => {
         )}
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>Number of house floors</Text>
+          <Text style={styles.label}>{t('NUMBER_HOUSE_FLOORS')}</Text>
           <TextInput 
             style={styles.textBox} 
             placeholder="(1, 2, 3, etc.)" 
@@ -146,7 +148,7 @@ const GettingStarted3 = () => {
         </View>
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated lot area?</Text>
+          <Text style={styles.label}>{t('ESTIMATED_LOT_AREA')}</Text>
           <TextInput 
             style={styles.textBox} 
             placeholder="sqm" 
@@ -157,7 +159,7 @@ const GettingStarted3 = () => {
         </View>
 
         <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated floor area?</Text>
+          <Text style={styles.label}>{t('ESTIMATED_FLOOR_AREA')}</Text>
           <TextInput 
             style={styles.textBox} 
             placeholder="sqm" 
@@ -170,7 +172,7 @@ const GettingStarted3 = () => {
         </ScrollView>
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t('NEXT')}</Text>
         </TouchableOpacity>
       </View>
     </Animatable.View>

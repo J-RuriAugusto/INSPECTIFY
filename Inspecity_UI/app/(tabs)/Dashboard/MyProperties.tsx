@@ -11,6 +11,7 @@ import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import useUserID from "../../useUserID";
+import { useTranslation } from '../../../hooks/useTranslation';
 
 interface Property {
   id: number;
@@ -41,6 +42,7 @@ interface Property {
 }
 
 const MyProperties = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   
   const [isEditModalVisible, setEditModalVisible] = useState(false);
@@ -305,12 +307,12 @@ const MyProperties = () => {
 
   const handleDelete = async (id: number) => {
     Alert.alert(
-      'Delete Property', 
-      'Are you sure you want to delete this property?', 
+      t('DELETE_PROPERTY'), 
+      t('DELETE_CONFIRMATION'), 
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('CANCEL'), style: 'cancel' },
         { 
-          text: 'Delete', 
+          text: t('DELETE'), 
           onPress: async () => {
             setIsDeleting(true);
             try {
@@ -334,10 +336,10 @@ const MyProperties = () => {
               setProperties(properties.filter((prop) => prop.id !== id));
               
               // Show success message
-              Alert.alert('Success', 'Property deleted successfully');
+              Alert.alert(t('SUCCESS'), t('SUCCESSFUL_PROPERTY_DELETE'));
             } catch (error) {
               console.error('Error deleting property:', error);
-              Alert.alert('Error', 'Failed to delete property. Please try again.');
+              Alert.alert(t('ERROR'), t('FAILED_PROPERTY_DELETE'));
             } finally {
               setIsDeleting(false);
             }
@@ -388,7 +390,7 @@ const MyProperties = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Properties</Text>
+      <Text style={styles.title}>{t('MY_PROPERTIES')}</Text>
       <FlatList
         data={properties}
         keyExtractor={(item) => item.id.toString()}
@@ -396,10 +398,10 @@ const MyProperties = () => {
           <Swipeable renderRightActions={() => (
             <View style={styles.swipeActions}>
               <TouchableOpacity style={styles.editAction} onPress={() => handleEdit(item)}>
-                <Text style={styles.swipeText}>Edit</Text>
+                <Text style={styles.swipeText}>{t('EDIT')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.deleteAction} onPress={() => handleDelete(item.id)}>
-                <Text style={styles.swipeText}>Delete</Text>
+                <Text style={styles.swipeText}>{t('DELETE')}</Text>
               </TouchableOpacity>
             </View>
           )}>
@@ -417,7 +419,7 @@ const MyProperties = () => {
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('./addproperty_2')}>
-        <Text style={styles.addButtonText}>Add Property</Text>
+        <Text style={styles.addButtonText}>{t('ADD_PROPERTY1')}</Text>
       </TouchableOpacity>
 
 <Modal
@@ -862,12 +864,12 @@ const MyProperties = () => {
             {isUploading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.saveText}>Save Changes</Text>
+              <Text style={styles.saveText}>{t('SAVE_CHANGES')}</Text>
             )}
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('CANCEL')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

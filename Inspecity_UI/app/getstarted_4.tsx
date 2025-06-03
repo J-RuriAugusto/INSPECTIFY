@@ -5,9 +5,10 @@ import { useFonts } from 'expo-font';
 import * as Location from 'expo-location';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import * as Animatable from 'react-native-animatable';
-
+import { useTranslation } from '../hooks/useTranslation';
 
 const GettingStarted4 = () => {
+  const { t } = useTranslation();
   const { homeData } = useLocalSearchParams();
   console.log(homeData)
   const router = useRouter();
@@ -27,24 +28,24 @@ const GettingStarted4 = () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === 'granted') {
       Alert.alert(
-        'Location Enabled',
-        'You have enabled location access!',
-        [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
+        t('LOCATION_ENABLED'),
+        t('LOCATION_ENABLED_DESCRIPTION'),
+        [{ text: t('OK'), onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
       );
     } else {
       Alert.alert(
-        'Location Denied',
-        'You have denied location access.',
-        [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
+        t('LOCATION_DENIED'),
+        t('LOCATION_DENIED_DESCRIPTION'),
+        [{ text: t('OK'), onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
       );
     }
   };
 
   const handleSkipForNow = () => {
     Alert.alert(
-      'Remind Me Later',
-      'You can enable location services anytime in settings.',
-      [{ text: 'OK', onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
+      t('REMIND_ME_LATER'),
+      t('ENABLE_LOCATION_IN_SETTINGS'),
+      [{ text: t('OK'), onPress: () => router.push({pathname: '/getstarted_5', params: { homeData }}) }] // Navigate to the next screen
     );
   };
 
@@ -91,15 +92,15 @@ const GettingStarted4 = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Enable Your Location Access</Text>
-        <Text style={styles.subtitle1}>Turn on location services to find nearby hardware shops and get accurate suggestions.</Text>
+        <Text style={styles.title1}>{t('ENABLE_LOCATION')}</Text>
+        <Text style={styles.subtitle1}>{t('TURN_ON_LOCATION_DESCRIPTION')}</Text>
 
         {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleTurnOnLocation}>
-          <Text style={styles.buttonText}>Turn on Location</Text>
+          <Text style={styles.buttonText}>{t('TURN_ON_LOCATION')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button1} onPress={handleSkipForNow}>
-          <Text style={styles.buttonText}>Skip for Now</Text>
+          <Text style={styles.buttonText}>{t('SKIP_FOR_NOW')}</Text>
         </TouchableOpacity>
       </View>
     </Animatable.View>

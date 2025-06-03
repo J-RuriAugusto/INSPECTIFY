@@ -6,7 +6,10 @@ import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from '../hooks/useTranslation';
+
 const GettingStarted1 = () => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   useFocusEffect(
@@ -80,14 +83,14 @@ const GettingStarted1 = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>Welcome to</Text>
+        <Text style={styles.title1}>{t('WELCOME')}</Text>
         <Text style={styles.title2}>Inspectify!</Text>
-        <Text style={styles.subtitle1}>Let's get started with setting up</Text>
-        <Text style={styles.subtitle2}>your first home.</Text>
+        <Text style={styles.subtitle1}>{t('GET_STARTED')}</Text>
+        <Text style={styles.subtitle2}>{t('FIRST_HOME')}</Text>
 
         {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted}>
-          <Text style={styles.buttonText}>Start</Text>
+          <Text style={styles.buttonText}>{t('START')}</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>

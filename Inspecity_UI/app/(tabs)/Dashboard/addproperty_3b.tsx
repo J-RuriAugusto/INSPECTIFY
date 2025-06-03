@@ -10,8 +10,10 @@ import * as Location from 'expo-location';
 import HomeDetails from '../../../constants/HomeDetails'
 import useUserID from "../../useUserID";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const GettingStarted3b = () => {
+  const { t } = useTranslation();
   const { homeData } = useLocalSearchParams();
   const userId = useUserID();
   const [location, setLocation] = useState<{latitude: number | null, longitude: number | null}>({latitude: null, longitude: null});
@@ -70,23 +72,23 @@ const GettingStarted3b = () => {
   const handleNavigateToGetStarted4 = async () => {
     const updatedHomeData = {
       ...parsedHomeData,
-      selectedHouseType: selectedHouseType === "others" 
+      selectedHouseType: selectedHouseType === t('OTHERS') 
         ? (otherHouseType.trim() !== "" ? otherHouseType : null) 
         : (selectedHouseType.trim() !== "" ? selectedHouseType : null),
 
-      selectedMaterial: selectedMaterial === "others" 
+      selectedMaterial: selectedMaterial === t('OTHERS') 
         ? (otherMaterial.trim() !== "" ? otherMaterial : null) 
         : (selectedMaterial.trim() !== "" ? selectedMaterial : null),
 
-      selectedFlooring: selectedFlooring === "others" 
+      selectedFlooring: selectedFlooring === t('OTHERS') 
         ? (otherFlooring.trim() !== "" ? otherFlooring : null) 
         : (selectedFlooring.trim() !== "" ? selectedFlooring : null),
 
-      selectedWall: selectedWall === "others" 
+      selectedWall: selectedWall === t('OTHERS') 
         ? (otherWall.trim() !== "" ? otherWall : null) 
         : (selectedWall.trim() !== "" ? selectedWall : null),
 
-      selectedCeiling: selectedCeiling === "others" 
+      selectedCeiling: selectedCeiling === t('OTHERS') 
         ? (otherCeiling.trim() !== "" ? otherCeiling : null) 
         : (selectedCeiling.trim() !== "" ? selectedCeiling : null),
         
@@ -144,8 +146,8 @@ const GettingStarted3b = () => {
         ))}
       </View> */}
 
-      <Text style={styles.title1}>Tell Us About Your Home</Text>
-      <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
+      <Text style={styles.title1}>{t('TELL_US_YOUR_HOME')}</Text>
+      <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')} {t('BASIC_HOME_DETAILS2')}</Text>
 
       {/* Scrollable form */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
@@ -161,10 +163,10 @@ const GettingStarted3b = () => {
           </Picker>
         </View>
 
-        {selectedHouseType === "others" && (
+        {selectedHouseType === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder="Specify other house type"
+            placeholder={t('SPECIFY_OTHER_HOUSE_TYPE')}
             placeholderTextColor="#BBBBBB"
             value={otherHouseType}
             onChangeText={(text) => setOtherHouseType(text)}
@@ -174,20 +176,20 @@ const GettingStarted3b = () => {
         {/* Roofing Material Dropdown */}
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedMaterial} onValueChange={(itemValue) => setSelectedMaterial(itemValue)} style={styles.picker}>
-            <Picker.Item label="Primary Roofing Material" value="" enabled={false} />
+            <Picker.Item label={t('PRIMARY_ROOFING_MATERIAL')} value="" enabled={false} />
             <Picker.Item label="GI sheets (yero)" value="yero" />
             <Picker.Item label="Clay tiles" value="clay" />
             <Picker.Item label="Concrete slab" value="slab" />
             <Picker.Item label="Nipa/ Bamboo" value="nipa" />
             <Picker.Item label="Asphalt shingles" value="asphalt" />
-            <Picker.Item label="Others" value="others" />
+            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
           </Picker>
         </View>
 
-        {selectedMaterial === "others" && (
+        {selectedMaterial === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder="Specify other roofing material"
+            placeholder={t('SPECIFY_OTHER_ROOFING_MATERIAL')}
             placeholderTextColor="#BBBBBB"
             value={otherMaterial}
             onChangeText={(text) => setOtherMaterial(text)}
@@ -197,19 +199,19 @@ const GettingStarted3b = () => {
         {/* Flooring Material Dropdown */}
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedFlooring} onValueChange={(itemValue) => setSelectedFlooring(itemValue)} style={styles.picker}>
-            <Picker.Item label="Flooring Materials" value="" enabled={false} />
+            <Picker.Item label={t('FLOORING_MATERIAL')} value="" enabled={false} />
             <Picker.Item label="Concrete" value="concrete" />
             <Picker.Item label="Wood" value="wood" />
             <Picker.Item label="Tiles" value="tiles" />
             <Picker.Item label="Vinyl" value="vinyl" />
-            <Picker.Item label="Others" value="others" />
+            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
           </Picker>
         </View>
 
-        {selectedFlooring === "others" && (
+        {selectedFlooring === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder="Specify other flooring material"
+            placeholder={t('SPECIFY_OTHER_FLOORING_MATERIAL')}
             placeholderTextColor="#BBBBBB"
             value={otherFlooring}
             onChangeText={(text) => setOtherFlooring(text)}
@@ -219,18 +221,18 @@ const GettingStarted3b = () => {
         {/* Wall Material Dropdown */}
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedWall} onValueChange={(itemValue) => setSelectedWall(itemValue)} style={styles.picker}>
-            <Picker.Item label="Wall Material" value="" enabled={false} />
+            <Picker.Item label={t('WALL_MATERIAL')} value="" enabled={false} />
             <Picker.Item label="Concrete" value="concrete" />
             <Picker.Item label="Wood" value="wood" />
             <Picker.Item label="Bamboo" value="bamboo" />
-            <Picker.Item label="Others" value="others" />
+            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
           </Picker>
         </View>
 
-        {selectedWall === "others" && (
+        {selectedWall === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder="Specify other wall material"
+            placeholder={t('SPECIFY_OTHER_WALL_MATERIAL')}
             placeholderTextColor="#BBBBBB"
             value={otherWall}
             onChangeText={(text) => setOtherWall(text)}
@@ -240,18 +242,18 @@ const GettingStarted3b = () => {
         {/* Ceiling Material Dropdown */}
         <View style={styles.pickerContainer}>
           <Picker selectedValue={selectedCeiling} onValueChange={(itemValue) => setSelectedCeiling(itemValue)} style={styles.picker}>
-            <Picker.Item label="Ceiling Material" value="" enabled={false} />
+            <Picker.Item label={t('CEILING_MATERIAL')} value="" enabled={false} />
             <Picker.Item label="Gypsum board" value="gypsum" />
             <Picker.Item label="Wood" value="wood" />
             <Picker.Item label="PVC" value="pvc" />
-            <Picker.Item label="Others" value="others" />
+            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
           </Picker>
         </View>
 
-        {selectedCeiling === "others" && (
+        {selectedCeiling === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder="Specify other ceiling material"
+            placeholder={('SPECIFY_OTHER_CEILING_MATERIAL')}
             placeholderTextColor="#BBBBBB"
             value={otherCeiling}
             onChangeText={(text) => setOtherCeiling(text)}
@@ -261,7 +263,7 @@ const GettingStarted3b = () => {
 
       
       <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted4}>
-        <Text style={styles.buttonText}>Add Property</Text>
+        <Text style={styles.buttonText}>{t('ADD_PROPERTY')}</Text>
       </TouchableOpacity>
       </View>
     </View>

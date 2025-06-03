@@ -9,8 +9,11 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { useSettings, defaultSettings } from './settingsContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { useTranslation } from '../../../hooks/useTranslation';
+
 
 const Settings = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { settings, updateSettings } = useSettings();
   const [backupLocation, setBackupLocation] = useState<string | null>(settings.backupLocation);
@@ -35,12 +38,12 @@ const Settings = () => {
 
   const clearCache = async () => {
     Alert.alert(
-      'Clear Cache',
-      'Are you sure you want to clear all app data?',
+      t('CLEAR_CACHE'),
+      t('CLEAR_CACHE_ALERT'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('CANCEL'), style: 'cancel' },
         {
-          text: 'Clear Data',
+          text: t('CLEAR_DATA'),
           onPress: async () => {
             try {
               // Get the homeowner ID from storage
@@ -73,9 +76,9 @@ const Settings = () => {
               updateSettings(defaultSettings);
               setLocalSettings(defaultSettings);
               
-              router.replace('../../../getstarted_1');
+              router.replace('/');
             } catch (error) {
-              Alert.alert('Error', 'Failed to clear cache');
+              Alert.alert(t('ERROR'), t('CLEAR_CACHE_FAIL'));
               console.error(error);
             }
           },
@@ -124,7 +127,7 @@ const Settings = () => {
     if (newValue) {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Location access is required to enable this feature.');
+        Alert.alert(t('PERMISSION_DENIED'), t('LOCATION_REQUIRED'));
         return;
       }
     }
@@ -133,17 +136,17 @@ const Settings = () => {
 
   const saveChanges = () => {
     updateSettings(localSettings);
-    Alert.alert('Settings Saved', 'Your changes have been saved successfully.');
+    Alert.alert(t('SETTINGS_SAVED'), t('CHANGES_SAVED'));
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('SETTINGS')}</Text>
 
         {/* General */}
-        <Text style={styles.sectionTitle}>General</Text>
+        <Text style={styles.sectionTitle}>{t('GENERAL')}</Text>
 
         {/* <View style={styles.optionRow}>
           <Text style={styles.optionText}>Dark Mode</Text>
@@ -154,7 +157,7 @@ const Settings = () => {
         </View> */}
 
         <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Language</Text>
+          <Text style={styles.optionText}>{t('LANGUAGE')}</Text>
           <Picker
             selectedValue={localSettings.language}
             style={styles.picker}
@@ -167,7 +170,7 @@ const Settings = () => {
         </View>
 
         {/* Inspection Preferences */}
-        <Text style={styles.sectionTitle}>Inspection Preferences</Text>
+        <Text style={styles.sectionTitle}>{t('INSPECTION_PREFERENCES')}</Text>
 
         {/* <View style={styles.optionRow}>
           <Text style={styles.optionText}>Default Report Format</Text>
@@ -184,7 +187,7 @@ const Settings = () => {
         </View> */}
 
         <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Auto-Save Inspections</Text>
+          <Text style={styles.optionText}>{t('AUTOSAVE')}</Text>
           <Switch 
             value={localSettings.autoSave} 
             onValueChange={() => updateLocalSetting('autoSave', !localSettings.autoSave)} 
@@ -192,7 +195,7 @@ const Settings = () => {
         </View>
 
         <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Use Location</Text>
+          <Text style={styles.optionText}>{t('USE_LOCATION')}</Text>
           <Switch
             value={localSettings.enableLocation}
             onValueChange={handleToggleLocation}
@@ -200,29 +203,29 @@ const Settings = () => {
         </View>
 
         {/* App Management */}
-        <Text style={styles.sectionTitle}>App Management</Text>
+        <Text style={styles.sectionTitle}>{t('APP_MANAGEMENT')}</Text>
 
         <TouchableOpacity style={styles.optionButton} onPress={clearCache}>
-          <Text style={styles.optionText}>Clear Data</Text>
+          <Text style={styles.optionText}>{t('CLEAR_DATA')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionButton} onPress={chooseBackupLocation}>
-          <Text style={styles.optionText}>Choose Backup Location</Text>
+          <Text style={styles.optionText}>{t('CHOOSE_BACKUP_LOCATION')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionButton} onPress={backupData}>
-          <Text style={styles.optionText}>Backup Data</Text>
+          <Text style={styles.optionText}>{t('BACKUP_DATA')}</Text>
         </TouchableOpacity>
 
         {/* Help & Support */}
-        <Text style={styles.sectionTitle}>Help & Support</Text>
+        <Text style={styles.sectionTitle}>{t('HELP_SUPPORT')}</Text>
 
-        <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('About Inspectify', 'Inspectify helps detect cracks in houses using AI.')}>
-          <Text style={styles.optionText}>About Inspectify</Text>
+        <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert(t('ABOUT_INSPECTIFY'), t('INSPECTIFY_DETAILS'))}>
+          <Text style={styles.optionText}>{t('ABOUT_INSPECTIFY')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Privacy Policy', 'Your data is safe and secure with Inspectify.')}>
-          <Text style={styles.optionText}>Privacy Policy</Text>
+        <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert(t('PRIVACY_POLICY'), t('PRIVACY_DETAILS'))}>
+          <Text style={styles.optionText}>{t('PRIVACY_POLICY')}</Text>
         </TouchableOpacity>
 
         {/* Save Changes Button */}
@@ -231,7 +234,7 @@ const Settings = () => {
           onPress={saveChanges}
           disabled={!changesMade}
         >
-          <Text style={styles.saveButtonText}>Save Changes</Text>
+          <Text style={styles.saveButtonText}>{t('SAVE_CHANGES')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

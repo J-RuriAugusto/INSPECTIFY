@@ -5,6 +5,7 @@ import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import useUserID from "./useUserID";
+import { useSettings } from '../app/(tabs)/Dashboard/settingsContext';
 
 const LoadingScreen = () => {
   const router = useRouter();
@@ -14,6 +15,7 @@ const LoadingScreen = () => {
   const API_KEY = '***REMOVED***';
   const [showLanguageOverlay, setShowLanguageOverlay] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // to prevent double nav
+  const { updateSettings } = useSettings();
 
 
   useEffect(() => {
@@ -98,7 +100,9 @@ const LoadingScreen = () => {
 
   const handleLanguageSelect = async (lang: string) => {
     try {
+      // Update both AsyncStorage and settings context
       await AsyncStorage.setItem('preferredLanguage', lang);
+      updateSettings({ language: lang }); // This updates the settings context
     } catch (err) {
       console.error('Error saving language:', err);
     }
@@ -148,7 +152,7 @@ const LoadingScreen = () => {
 
             <View style={styles.languageButtons}>
               <Text style={styles.languageOption} onPress={() => handleLanguageSelect('English')}>          English          </Text>
-              <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Filipino')}>         Tagalog         </Text>
+              <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Tagalog')}>         Tagalog         </Text>
               <Text style={styles.languageOption} onPress={() => handleLanguageSelect('Cebuano')}>        Cebuano        </Text>
  
 

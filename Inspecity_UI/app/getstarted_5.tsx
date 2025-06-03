@@ -8,9 +8,10 @@ import uuid from 'react-native-uuid';
 import * as Location from 'expo-location';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import * as Animatable from 'react-native-animatable';
-
+import { useTranslation } from '../hooks/useTranslation';
 
 const GettingStarted5 = () => {
+  const { t } = useTranslation();
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const { homeData } = useLocalSearchParams();
@@ -52,14 +53,30 @@ const GettingStarted5 = () => {
   : {};
 
   const handleNavigateToDashboard = () => {
-    const requiredFields = ['address', 'homeType', 'yearBuilt']; // Add all required fields
+    const requiredFields = [
+      'homeName',
+      'houseAge',
+      'houseUse',
+      'renovations',
+      'typeOfHouse',
+      'numFloor',
+      'lotArea',
+      'floorArea',
+      'selectedHouseType',
+      'selectedMaterial',
+      'selectedFlooring',
+      'selectedWall',
+      'selectedCeiling',
+      'latitude',
+      'longitude',
+    ];
     const missingFields = requiredFields.filter((field) => !parsedHomeData[field]);
   
     if (missingFields.length > 0) {
       Alert.alert(
-        'Reminder',
-        `Some fields are skipped.\nYou can update them in Settings for better AI recommendations.`,
-        [{ text: 'OK', onPress: () => navigateToDashboard() }]
+        t('REMINDER'),
+        t('SOME_FIELDS_ARE_SKIPPED'),
+        [{ text: t('OK'), onPress: () => navigateToDashboard() }]
       );
     } else {
       navigateToDashboard();
@@ -87,7 +104,7 @@ const GettingStarted5 = () => {
         }),
       });
       if (!homeownerResponse.ok) {
-        throw new Error('Failed to create homeowner');
+        throw new Error(t('FAILED_HOMEOWNER_CREATION'));
       }
       console.log('Homeowner created successfully');
     
@@ -101,7 +118,7 @@ const GettingStarted5 = () => {
       });
 
       if (!homeResponse.ok) {
-        throw new Error('Failed to create home');
+        throw new Error(t('FAILED_HOME_CREATION'));
       }
       console.log(JSON.stringify(updatedHomeData))
       console.log('Home created successfully');
@@ -111,9 +128,9 @@ const GettingStarted5 = () => {
       router.push('/(tabs)/Dashboard/board');
     } catch (error) {
       Alert.alert(
-        'Error',
-        'Failed to create homeowner. Try again later.',
-        [{ text: 'OK', onPress: () => BackHandler.exitApp() }]
+        t('ERROR'),
+        t('FAILED_HOMEOWNER_CREATION2'),
+        [{ text: t('OK'), onPress: () => BackHandler.exitApp() }]
       );
     }
   };
@@ -157,13 +174,13 @@ const GettingStarted5 = () => {
           ))}
         </View>
 
-        <Text style={styles.title1}>You're All Set!</Text>
-        <Text style={styles.subtitle1}>Inspectify is ready to help you</Text>
-        <Text style={styles.subtitle2}>inspect your home.</Text>
+        <Text style={styles.title1}>{t('ALL_SET')}</Text>
+        <Text style={styles.subtitle1}>{t('READY_TO_HELP')}</Text>
+        <Text style={styles.subtitle2}>{t('READY_TO_HELP2')}</Text>
 
         {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToDashboard}>
-          <Text style={styles.buttonText}>Go to Dashboard</Text>
+          <Text style={styles.buttonText}>{t('GO_TO_DASHBOARD')}</Text>
         </TouchableOpacity>
       </View>
     </Animatable.View>
