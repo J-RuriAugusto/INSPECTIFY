@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView} from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  TextInput, 
+  ScrollView, 
+  Modal,  
+  Keyboard, 
+  Platform,
+  KeyboardAvoidingView,
+  Pressable
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import * as Animatable from 'react-native-animatable';
-import { KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
-
+import { TouchableWithoutFeedback } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const GettingStarted3 = () => {
   const { homeData } = useLocalSearchParams();
@@ -20,12 +33,40 @@ const GettingStarted3 = () => {
   const [selectedMaterial, setSelectedMaterial] = useState(""); // Separate state for material
   const [otherMaterial, setOtherMaterial] = useState(''); // Separate state for other material
   const [otherHouseType, setOtherHouseType] = useState(''); // Separate state for other house type
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [activeInput, setActiveInput] = useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const textInputRef = useRef(null);
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
     'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
     'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
   });
+
+    useEffect(() => {
+      const keyboardDidShowListener = Keyboard.addListener(
+        'keyboardDidShow',
+        () => setIsKeyboardVisible(true)
+      );
+      const keyboardDidHideListener = Keyboard.addListener(
+        'keyboardDidHide',
+        () => setIsKeyboardVisible(false)
+      );
+  
+      return () => {
+        keyboardDidShowListener.remove();
+        keyboardDidHideListener.remove();
+      };
+    }, []);
+  
+    useEffect(() => {
+      if (activeInput && textInputRef.current) {
+        setTimeout(() => {
+          textInputRef.current.focus();
+        }, 100);
+      }
+    }, [activeInput]);
 
   if (!fontsLoaded) {
     return null;
@@ -34,6 +75,44 @@ const GettingStarted3 = () => {
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
   : {};
+
+  const handleInputPress = (field) => {
+    setActiveInput(field);
+    switch(field) {
+      case 'numFloor': 
+        setInputValue(numFloor); 
+        break;
+      case 'lotArea': 
+        setInputValue(lotArea); 
+        break;
+      case 'floorArea': 
+        setInputValue(floorArea); 
+        break;
+      case 'otherHouseType': 
+        setInputValue(otherHouseType); 
+        break;
+    }
+  };
+
+    const handleModalSubmit = () => {
+      switch(activeInput) {
+        case 'numFloor':
+          setNumFloor(inputValue);
+          break;
+        case 'lotArea':
+          setLotArea(inputValue);
+          break;
+        case 'floorArea':
+          setFloorArea(inputValue);
+          break;
+        case 'otherHouseType':
+          setOtherHouseType(inputValue);
+          break;
+      }
+      setActiveInput(null);
+      setInputValue('');
+      Keyboard.dismiss();
+    };
 
   const handleNavigateToGetStarted3b = () => {
     if (numFloor.trim() !== "" && (!/^\d+$/.test(numFloor) || parseInt(numFloor) <= 0)) {
@@ -71,19 +150,7 @@ const GettingStarted3 = () => {
   const currentStep = 3;
 
   return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-  behavior="height" // best for Android
-  keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
->
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-    <Animatable.View
-      style={styles.container}
-      animation="fadeIn"
-      duration={600}
-      easing="ease-out"
-    >
+<View style={styles.container}>
       <View style={styles.upperSection}>
 <Animatable.Image
     animation="slideInRight"
@@ -110,73 +177,131 @@ const GettingStarted3 = () => {
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
         {/* Scrollable form */}
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-                
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-            <Picker.Item label="Type of House" value="" enabled={false} />
-            <Picker.Item label="Single-detached" value="single" />
-            <Picker.Item label="Townhouse" value="town" />
-            <Picker.Item label="Apartment" value="apartment" />
-            <Picker.Item label="Stilt house" value="stilt" />
-            <Picker.Item label="Duplex" value="duplex" />
-            <Picker.Item label="Others" value="others" />
-          </Picker>
-        </View>
-
-        {selectedHouseType === "others" && (
-          <TextInput
-            style={styles.textBox1}
-            placeholder="Specify other house type"
-            placeholderTextColor="#BBBBBB"
-            value={otherHouseType}
-            onChangeText={(text) => setOtherHouseType(text)}
-          />
-        )}
-
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Number of house floors</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="(1, 2, 3, etc.)" 
-            placeholderTextColor="#BBBBBB" 
-            value={numFloor} 
-            onChangeText={(text) => setNumFloor(text)} 
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated lot area?</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="sqm" 
-            placeholderTextColor="#BBBBBB" 
-            value={lotArea} 
-            onChangeText={(text) => setLotArea(text)} 
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>What is the estimated floor area?</Text>
-          <TextInput 
-            style={styles.textBox} 
-            placeholder="sqm" 
-            placeholderTextColor="#BBBBBB" 
-            value={floorArea} 
-            onChangeText={(text) => setFloorArea(text)} 
-          />
-        </View>
-
-        </ScrollView>
+        <ScrollView 
+                  style={styles.scrollView} 
+                  contentContainerStyle={styles.scrollContainer} 
+                  keyboardShouldPersistTaps="handled"
+                >
+                  <View style={styles.pickerContainer}>
+                    <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+                      <Picker.Item label="Type of House" value="" enabled={false} />
+                      <Picker.Item label="Single-detached" value="single" />
+                      <Picker.Item label="Townhouse" value="town" />
+                      <Picker.Item label="Apartment" value="apartment" />
+                      <Picker.Item label="Stilt house" value="stilt" />
+                      <Picker.Item label="Duplex" value="duplex" />
+                      <Picker.Item label="Others" value="others" />
+                    </Picker>
+                  </View>
+        
+                  {selectedHouseType === "others" && (
+                    <TouchableOpacity 
+                      style={styles.textBox1} 
+                      onPress={() => handleInputPress('otherHouseType')}
+                    >
+                      <Text style={otherHouseType ? styles.inputText : styles.placeholderText}>
+                        {otherHouseType || "Specify other house type"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+        
+                  <View style={styles.inputRow}>
+                    <Text style={styles.label}>Enter the Height of the House</Text>
+                    <TouchableOpacity 
+                      style={styles.textBox} 
+                      onPress={() => handleInputPress('numFloor')}
+                    >
+                      <Text style={numFloor ? styles.inputText : styles.placeholderText}>
+                        {numFloor || "(1, 2, 3, etc.)"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+        
+                  <View style={styles.inputRow}>
+                    <Text style={styles.label}>What is the estimated lot area?</Text>
+                    <TouchableOpacity 
+                      style={styles.textBox} 
+                      onPress={() => handleInputPress('lotArea')}
+                    >
+                      <Text style={lotArea ? styles.inputText : styles.placeholderText}>
+                        {lotArea || "sqm"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+        
+                  <View style={styles.inputRow}>
+                    <Text style={styles.label}>What is the estimated floor area?</Text>
+                    <TouchableOpacity 
+                      style={styles.textBox} 
+                      onPress={() => handleInputPress('floorArea')}
+                    >
+                      <Text style={floorArea ? styles.inputText : styles.placeholderText}>
+                        {floorArea || "sqm"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+        
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
+        {/* Modal for input */}
+              
       </View>
-    </Animatable.View>
-         </ScrollView>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      <Modal
+              visible={!!activeInput}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => {
+                setActiveInput(null);
+                Keyboard.dismiss();
+              }}
+            >
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.modalOverlay}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? -hp('15%') : 0}
+              >
+                <Pressable 
+                  style={styles.modalOverlay} 
+                  onPress={() => {
+                    setActiveInput(null);
+                    Keyboard.dismiss();
+                  }}
+                >
+                  <View style={[styles.modalContent, isKeyboardVisible && styles.modalContentKeyboardOpen]}>
+                    <View style={styles.modalinputRow}>
+                      <TextInput
+                        ref={textInputRef}
+                        style={styles.modalInput}
+                        value={inputValue}
+                        onChangeText={setInputValue}
+                        placeholder={
+                          activeInput === 'numFloor' ? 'Enter number of floors' :
+                          activeInput === 'lotArea' ? 'Enter lot area' :
+                          activeInput === 'floorArea' ? 'Enter floor area' :
+                          'Specify other house type'
+                        }
+                        placeholderTextColor="#BBBBBB"
+                        keyboardType={
+                          activeInput === 'numFloor' || 
+                          activeInput === 'lotArea' || 
+                          activeInput === 'floorArea' ? 'numeric' : 'default'
+                        }
+                      />
+                      <Pressable
+                        style={styles.submitIconButton}
+                        onPress={handleModalSubmit}
+                      >
+                        <MaterialIcons name="check-circle" size={wp('10%')} color="#0B417D" />
+                      </Pressable>
+                    </View>
+                  </View>
+                </Pressable>
+              </KeyboardAvoidingView>
+            </Modal>
+    </View>
   );
 };
 
@@ -314,17 +439,51 @@ const styles = StyleSheet.create({
   scrollView: { width: '100%' },
   scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
 
-  // scrollView: {
-  //   width: wp('100%'),
-  // },
-
-  // scrollContainer: {
-  //   flexGrow: 1,
-  //   alignItems: 'center',
-  //   paddingBottom: hp('6%'),
-  //   backgroundColor: '#000',
-  //   paddingHorizontal: wp('5%'),
-  // },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    marginHorizontal: wp('5%'),
+    borderRadius: wp('5%'),
+    padding: wp('5%'),
+    backgroundColor: 'transparent',
+  },
+  modalContentKeyboardOpen: {
+    marginBottom: hp('-30%'),
+  },
+  modalinputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp('10%'),
+    paddingRight: wp('2%'),
+  },
+  modalInput: {
+    flex: 1,
+    borderWidth: 0,
+    borderRadius: wp('10%'),
+    padding: wp('4%'),
+    fontSize: wp('4%'),
+    fontFamily: 'Archivo-Regular',
+    backgroundColor: 'white',
+  },
+  submitIconButton: {
+    padding: wp('2%'),
+  },
+    placeholderText: {
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    color: '#BBBBBB',
+    textAlign: 'center',
+  },
+    inputText: {
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    color: '#05173F',
+    textAlign: 'center',
+  },
 });
 
 export default GettingStarted3;
