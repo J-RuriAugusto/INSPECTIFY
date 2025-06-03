@@ -67,7 +67,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-share": "^12.0.9",
     "react-native-svg": "15.8.0",
-    "react-native-tab-view": "^4.0.5",
+    "react-native-tab-view": "^4.1.1",
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^6.14.0",

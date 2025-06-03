@@ -3,6 +3,7 @@ import { StyleSheet, Image, Text, View, TouchableOpacity, ImageBackground, Dimen
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,6 +18,7 @@ const Fire = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
+  const router = useRouter();
   
   if (!fontsLoaded) return null;
 
@@ -26,7 +28,7 @@ const Fire = () => {
 
   const acceptDisclaimer = () => {
     setModalVisible(false);
-    navigation.navigate('fireQueries');
+    router.push('/(tabs)/Forms/fireQueries');
   };
 
   return (

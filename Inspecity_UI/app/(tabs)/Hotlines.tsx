@@ -358,16 +358,16 @@ const EmergencyHotlines = () => {
     favorites: FavoritesTab,
     all: AllTab,
   });
+type Route = {
+  key: string;
+  title: string;
+};
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Emergency Hotlines</Text>
       <TabView
         navigationState={{ index, routes }}
-        // renderScene={SceneMap({
-        //   favorites: FavoritesTab,
-        //   all: AllTab,
-        // })}
         renderScene={renderScene}
         onIndexChange={setIndex}
         renderTabBar={props => (
@@ -375,8 +375,12 @@ const EmergencyHotlines = () => {
             {...props}
             indicatorStyle={styles.indicator}
             style={styles.tabBar}
-            labelStyle={styles.label}
             pressColor="#f0f0f0"
+            renderLabel={({ route, focused, color }: { route: Route; focused: boolean; color: string }) => (
+              <Text style={[styles.label, { color }]}>
+                {route.title}
+              </Text>
+            )}
           />
         )}
         lazy

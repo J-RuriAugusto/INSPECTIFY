@@ -931,10 +931,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 120,
   },
-  // cancelButton: {
-  //   backgroundColor: '#E55050',
-  //   marginRight: 8,
-  // },
+  cancelButton: {
+    backgroundColor: '#E55050',
+    marginRight: 8,
+  },
   actionButtonText: {
     color: '#fff',
     fontSize: 16,
