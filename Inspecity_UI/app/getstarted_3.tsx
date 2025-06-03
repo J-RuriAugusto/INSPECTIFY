@@ -191,7 +191,7 @@ const GettingStarted3 = () => {
                 >
                   <View style={styles.pickerContainer}>
                     <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-                      <Picker.Item label="Type of House" value="" enabled={false} />
+                      <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
                       <Picker.Item label="Single-detached" value="single" />
                       <Picker.Item label="Townhouse" value="town" />
                       <Picker.Item label="Apartment" value="apartment" />
@@ -213,7 +213,7 @@ const GettingStarted3 = () => {
                   )}
         
                   <View style={styles.inputRow}>
-                    <Text style={styles.label}>Enter the Height of the House</Text>
+                    <Text style={styles.label}>{t('NUMBER_HOUSE_FLOORS')}</Text>
                     <TouchableOpacity 
                       style={styles.textBox} 
                       onPress={() => handleInputPress('numFloor')}
@@ -225,7 +225,7 @@ const GettingStarted3 = () => {
                   </View>
         
                   <View style={styles.inputRow}>
-                    <Text style={styles.label}>What is the estimated lot area?</Text>
+                    <Text style={styles.label}>{t('ESTIMATED_LOT_AREA')}</Text>
                     <TouchableOpacity 
                       style={styles.textBox} 
                       onPress={() => handleInputPress('lotArea')}
@@ -237,7 +237,7 @@ const GettingStarted3 = () => {
                   </View>
         
                   <View style={styles.inputRow}>
-                    <Text style={styles.label}>What is the estimated floor area?</Text>
+                    <Text style={styles.label}>{t('ESTIMATED_FLOOR_AREA')}</Text>
                     <TouchableOpacity 
                       style={styles.textBox} 
                       onPress={() => handleInputPress('floorArea')}
@@ -285,9 +285,9 @@ const GettingStarted3 = () => {
                         value={inputValue}
                         onChangeText={setInputValue}
                         placeholder={
-                          activeInput === 'numFloor' ? 'Enter number of floors' :
-                          activeInput === 'lotArea' ? 'Enter lot area' :
-                          activeInput === 'floorArea' ? 'Enter floor area' :
+                          activeInput === 'numFloor' ? t('NUMBER_HOUSE_FLOORS') :
+                          activeInput === 'lotArea' ? t('ENTER_LOT_AREA') :
+                          activeInput === 'floorArea' ? t('ENTER_FLOOR_AREA') :
                           'Specify other house type'
                         }
                         placeholderTextColor="#BBBBBB"

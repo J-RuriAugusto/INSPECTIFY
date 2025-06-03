@@ -159,7 +159,7 @@ const GettingStarted2 = () => {
           onPress={() => handleInputPress('homeName')}
         >
           <Text style={[styles.placeholderText, homeName ? styles.filledText : null]}>
-            {homeName || 'Enter your home name'}
+            {homeName || t('ENTER_HOME_NAME')}
           </Text>
         </TouchableOpacity>
 
@@ -168,7 +168,7 @@ const GettingStarted2 = () => {
           onPress={() => handleInputPress('houseAge')}
         >
           <Text style={[styles.placeholderText, houseAge ? styles.filledText : null]}>
-            {houseAge || 'Enter the age of the house'}
+            {houseAge || t('ENTER_HOUSE_AGE')}
           </Text>
         </TouchableOpacity>
 
@@ -177,7 +177,7 @@ const GettingStarted2 = () => {
           onPress={() => handleInputPress('houseUse')}
         >
           <Text style={[styles.placeholderText, houseUse ? styles.filledText : null]}>
-            {houseUse || 'Enter the primary use of the House'}
+            {houseUse || t('ENTER_PRIMARY_USE')}
           </Text>
         </TouchableOpacity>
 
@@ -189,7 +189,7 @@ const GettingStarted2 = () => {
           onPress={() => handleInputPress('renovations')}
         >
           <Text style={[styles.placeholderText, renovations ? styles.filledText : null]}>
-            {renovations || 'Yes/No, if yes, specify'}
+            {renovations || t('RENOVATIONS_GUIDE')}
           </Text>
         </TouchableOpacity>
 
@@ -228,10 +228,10 @@ const GettingStarted2 = () => {
                   value={inputValue}
                   onChangeText={setInputValue}
                   placeholder={
-                    activeInput === 'homeName' ? 'Enter your home name' :
-                    activeInput === 'houseAge' ? 'Enter the age of the house' :
-                    activeInput === 'houseUse' ? 'Enter the primary use of the House' :
-                    'Yes/No, if yes, specify'
+                    activeInput === 'homeName' ? t('ENTER_HOME_NAME') :
+                    activeInput === 'houseAge' ? t('ENTER_HOUSE_AGE') :
+                    activeInput === 'houseUse' ? t('ENTER_PRIMARY_USE') :
+                    t('RENOVATIONS_GUIDE')
                   }
                   placeholderTextColor="#BBBBBB"
                   keyboardType={activeInput === 'houseAge' ? 'numeric' : 'default'}

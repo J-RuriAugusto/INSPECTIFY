@@ -612,7 +612,7 @@ const MyProperties = () => {
             placeholder="Has the house undergone repairs?"
           />
 
-          <Text style={styles.label}>Type of House</Text>
+          <Text style={styles.label}>{t('TYPE_OF_HOUSE')}</Text>
           <Picker
             selectedValue={selectedProperty?.type}
             style={styles.picker}

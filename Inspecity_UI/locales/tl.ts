@@ -25,6 +25,9 @@ export default {
   NUMBER_HOUSE_FLOORS: "Bilang ng palapag ng bahay",
   ESTIMATED_LOT_AREA: "Ano ang tinatayang laki ng lote?",
   ESTIMATED_FLOOR_AREA: "Ano ang tinatayang laki ng palapag?",
+  ENTER_LOT_AREA: "Ilagay ang sukat ng lote",
+  ENTER_FLOOR_AREA: "Ilagay ang sukat ng sahig",
+
 
   PRIMARY_HOUSE_MATERIAL: "Pangunahing Materyales ng Bahay",
   SPECIFY_OTHER_HOUSE_TYPE: "Ilagay ang ibang uri ng bahay",

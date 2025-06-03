@@ -164,7 +164,7 @@ const GettingStarted3 = () => {
         >
           <View style={styles.pickerContainer}>
             <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-              <Picker.Item label="Type of House" value="" enabled={false} />
+              <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
               <Picker.Item label="Single-detached" value="single" />
               <Picker.Item label="Townhouse" value="town" />
               <Picker.Item label="Apartment" value="apartment" />
@@ -257,9 +257,9 @@ const GettingStarted3 = () => {
                   value={inputValue}
                   onChangeText={setInputValue}
                   placeholder={
-                    activeInput === 'numFloor' ? 'Enter number of floors' :
-                    activeInput === 'lotArea' ? 'Enter lot area' :
-                    activeInput === 'floorArea' ? 'Enter floor area' :
+                    activeInput === 'numFloor' ? t('NUMBER_HOUSE_FLOORS') :
+                    activeInput === 'lotArea' ? t('ENTER_LOT_AREA') :
+                    activeInput === 'floorArea' ? t('ENTER_FLOOR_AREA') :
                     'Specify other house type'
                   }
                   placeholderTextColor="#BBBBBB"

@@ -25,6 +25,8 @@ export default {
     NUMBER_HOUSE_FLOORS: "Number of house floors",
     ESTIMATED_LOT_AREA: "What is the estimated lot area?",
     ESTIMATED_FLOOR_AREA: "What is the estimated floor area?",
+    ENTER_LOT_AREA: "Enter lot area",
+    ENTER_FLOOR_AREA: "Enter floor area",
 
     PRIMARY_HOUSE_MATERIAL: "Primary Material of the House",
     SPECIFY_OTHER_HOUSE_TYPE: "Specify other house type",

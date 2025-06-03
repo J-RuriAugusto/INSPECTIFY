@@ -25,7 +25,9 @@ export default {
     NUMBER_HOUSE_FLOORS: "Gidaghanon sa mga andana sa balay",
     ESTIMATED_LOT_AREA: "Unsa ang gibanabana nga lot area?",
     ESTIMATED_FLOOR_AREA: "Unsa ang gibanabana nga floor area?",
-
+    ENTER_LOT_AREA: "Ibutang ang gilapdon sa yuta",
+    ENTER_FLOOR_AREA: "Ibutang ang gilapdon sa salog",
+    
     PRIMARY_HOUSE_MATERIAL: "Pangunang Materyales sa Balay",
     SPECIFY_OTHER_HOUSE_TYPE: "Ibutang ang laing klase sa balay",
     PRIMARY_ROOFING_MATERIAL: "Pangunang Materyales sa Atop",
