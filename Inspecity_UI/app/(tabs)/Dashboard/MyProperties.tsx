@@ -11,6 +11,7 @@ import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import useUserID from "../../useUserID";
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 interface Property {
@@ -264,7 +265,7 @@ const MyProperties = () => {
               otherCeilingMaterial: isStandardCeilingMaterial ? '' : backendCeilingMaterial,
               image: home.home_img 
                 ? { uri: home.home_img } 
-                : require('../../../assets/images/property.png'),
+                : require('../../../assets/images/inspectify_logo.png'),
             };
           }));
           
@@ -438,16 +439,119 @@ const MyProperties = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit Property</Text>
+          {/* Header with back and save icons */}
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => setEditModalVisible(false)}
+            >
+              <MaterialIcons name="arrow-back" size={24} color="#007BFF" />
+            </TouchableOpacity>
+            
+            <Text style={styles.modalTitle}>Edit Property</Text>
+            
+            <TouchableOpacity 
+              style={styles.saveIconButton} 
+              onPress={async () => {
+                try {
+                  if (!selectedProperty) return;
+                  
+                  let imageUrl = null;
+                  
+                  if (selectedProperty.image?.uri && !selectedProperty.image?.uri.includes('file://')) {
+                    imageUrl = selectedProperty.image.uri;
+                  } else if (selectedProperty.image?.uri) {
+                    imageUrl = await uploadImageToCloudinary(selectedProperty.image.uri);
+                  }
+                  
+                  const typeToSend = selectedProperty.type === 'other' 
+                    ? selectedProperty.otherType 
+                    : selectedProperty.type;
+                  const primaryMaterialToSend = selectedProperty.primaryMaterial === 'mixed' 
+                    ? selectedProperty.otherPrimaryMaterial 
+                    : selectedProperty.primaryMaterial;
+                  const roofingMaterialToSend = selectedProperty.roofingMaterial === 'other' 
+                    ? selectedProperty.otherRoofingMaterial 
+                    : selectedProperty.roofingMaterial;
+                  const flooringToSend = selectedProperty.flooringMaterial === 'other' 
+                    ? selectedProperty.otherFlooringMaterial 
+                    : selectedProperty.flooringMaterial;
+                  const wallMaterialToSend = selectedProperty.wallMaterial === 'other' 
+                    ? selectedProperty.otherWallMaterial 
+                    : selectedProperty.wallMaterial;
+                  const ceilingMaterialToSend = selectedProperty.ceilingMaterial === 'other' 
+                    ? selectedProperty.otherCeilingMaterial 
+                    : selectedProperty.ceilingMaterial;
+                  
+                  const response = await fetch(`https://flask-railway-sample-production.up.railway.app/homes/${selectedProperty.id}`, {
+                    method: 'PUT',
+                    headers: {
+                      'X-API-KEY': API_KEY,
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      latitude: selectedProperty.latitude,
+                      longitude: selectedProperty.longitude, 
+                      home_name: selectedProperty.name,
+                      home_age: selectedProperty.home_age,
+                      primary_home_use: selectedProperty.primaryUse,
+                      renovations: selectedProperty.renovations,
+                      type_of_home: typeToSend,
+                      num_floor: selectedProperty.num_floor,
+                      lot_area: selectedProperty.lot_area,
+                      floor_area: selectedProperty.floor_area,
+                      primary_home_material: primaryMaterialToSend,
+                      roof_material: roofingMaterialToSend,
+                      floor_material: flooringToSend,
+                      wall_material: wallMaterialToSend,
+                      ceiling_material: ceilingMaterialToSend,
+                      home_img: imageUrl || null,
+                    }),
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+                  
+                  const result = await response.json();
+                  console.log('Update successful:', result);
+                  
+                  setProperties(properties.map(prop => 
+                    prop.id === selectedProperty.id 
+                      ? { ...selectedProperty, image: imageUrl ? { uri: imageUrl } : selectedProperty.image }
+                      : prop
+                  ));
+                  
+                  setEditModalVisible(false);
+                  Alert.alert('Success', 'Property updated successfully');
+                } catch (error) {
+                  console.error('Error updating property:', error);
+                  Alert.alert('Error', 'Failed to update property. Please try again.');
+                }
+              }}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <ActivityIndicator color="#007BFF" />
+              ) : (
+                <MaterialIcons name="check" size={24} color="#007BFF" />
+              )}
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity onPress={() => pickImage()}>
+          {/* Image with edit icon */}
+          <TouchableOpacity onPress={() => pickImage()} style={styles.imageContainer}>
             <Image 
               source={selectedProperty?.image} 
               style={styles.modalImage} 
             />
-            <Text style={styles.changeImageText}>Change Image</Text>
+            <View style={styles.iconButton}>
+              <MaterialIcons name="edit" size={20} color="white" />
+            </View>
           </TouchableOpacity>
 
+          {/* All form fields */}
+          <Text style={styles.label}>Property Name</Text>
           <TextInput
             style={styles.input}
             value={selectedProperty?.name}
@@ -459,6 +563,7 @@ const MyProperties = () => {
             placeholder="Property Name"
           />
 
+          <Text style={styles.label}>Location</Text>
           <TextInput
             style={styles.input}
             value={selectedProperty?.location}
@@ -470,6 +575,7 @@ const MyProperties = () => {
             placeholder="Location"
           />
 
+          <Text style={styles.label}>Age of the House</Text>
           <TextInput
             style={styles.input}
             value={selectedProperty?.home_age}
@@ -482,6 +588,7 @@ const MyProperties = () => {
             keyboardType="numeric"
           />
 
+          <Text style={styles.label}>Primary Use of the House</Text>
           <TextInput
             style={styles.input}
             value={selectedProperty?.primaryUse}
@@ -493,6 +600,7 @@ const MyProperties = () => {
             placeholder="Primary use of the house (e.g., Residential, Rental, Commercial)"
           />
 
+          <Text style={styles.label}>Has the House Undergone Repairs?</Text>
           <TextInput
             style={styles.input}
             value={selectedProperty?.renovations}
@@ -503,19 +611,6 @@ const MyProperties = () => {
             }}
             placeholder="Has the house undergone repairs?"
           />
-
-          {/* {(selectedProperty?.repairs || "").toLowerCase() === 'yes' && (
-            <TextInput
-              style={styles.input}
-              value={selectedProperty?.repairDetails}
-              onChangeText={(text) => {
-                if (selectedProperty) {
-                  setSelectedProperty({ ...selectedProperty, repairDetails: text });
-                }
-              }}
-              placeholder="Specify repairs done"
-            />
-          )} */}
 
           <Text style={styles.label}>Type of House</Text>
           <Picker
@@ -884,14 +979,14 @@ const MyProperties = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B417D',
+    backgroundColor: '#FFFFFF',
     paddingTop: hp('6%'),
     paddingHorizontal: wp('5%'),
     paddingBottom: hp('4%')
   },
   title: {
     fontSize: wp('7.5%'),
-    color: '#FFFFFF',
+    color: '#05173F',
     fontFamily: 'Epilogue-Black',
     textAlign: 'center',
     marginBottom: hp('2.5%')
@@ -899,13 +994,18 @@ const styles = StyleSheet.create({
   propertyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#08294E',
+    backgroundColor: '#FFFFFF',
     borderRadius: wp('2.5%'),
     marginVertical: hp('0.8%'),
-    padding: 0
+    padding: 0,
+        shadowColor: '#000',
+        shadowOpacity: 1,
+        shadowRadius: 4,
+        elevation: 5,
+        width: wp('89.9%'),
   },
   propertyImage: {
-    width: wp('18%'),
+    width: wp('20%'),
     height: hp('10%'),
     borderRadius: wp('2.5%'),
     marginRight: wp('4%')
@@ -915,12 +1015,12 @@ const styles = StyleSheet.create({
   },
   propertyText: {
     fontSize: wp('4.5%'),
-    color: '#7DBAFF',
+    color: '#05173F',
     fontFamily: 'Epilogue-Bold'
   },
   propertyLocation: {
     fontSize: wp('3.5%'),
-    color: '#B0C4DE',
+    color: '#BBBBBB',
     fontFamily: 'Archivo-Regular'
   },
   swipeActions: {
@@ -955,7 +1055,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalContent: {
-    width: wp('75%'),
+    width: wp('95%'),
     backgroundColor: 'white',
     padding: wp('5%'),
     borderRadius: wp('2.5%'),
@@ -967,8 +1067,8 @@ const styles = StyleSheet.create({
     marginBottom: hp('1.2%')
   },
   modalImage: {
-    width: wp('25%'),
-    height: wp('25%'),
+    width: wp('40%'),
+    height: wp('40%'),
     borderRadius: wp('2.5%'),
     marginBottom: hp('1.5%')
   },
@@ -1000,10 +1100,10 @@ const styles = StyleSheet.create({
     fontSize: wp('4%')
   },
   addButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#08294E',
     padding: hp('1.5%'),
-    borderRadius: wp('1.5%'),
-    marginTop: -hp('12%'),
+    borderRadius: wp('5.5%'),
+    marginTop: -hp('15%'),
     alignSelf: 'center',
     width: wp('50%'),
     alignItems: 'center'
@@ -1025,6 +1125,38 @@ const styles = StyleSheet.create({
     marginTop: hp('1.5%'),
     alignSelf: 'flex-start'
   },
+  imageContainer: {
+  position: 'relative',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+iconButton: {
+  position: 'absolute',
+  bottom: 10,
+  right: 0,  // Changed from 10 to 30 to move left
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  borderRadius: 20,
+  padding: 8,
+},
+modalHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  marginBottom: 20,
+},
+backButton: {
+  padding: 10,
+},
+saveIconButton: {
+  padding: 10,
+},
+// modalTitle: {
+//   fontSize: wp('5%'),
+//   fontWeight: 'bold',
+//   flex: 1,
+//   textAlign: 'center',
+// },
 });
 
 export default MyProperties;

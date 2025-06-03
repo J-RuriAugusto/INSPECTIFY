@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Alert, BackHandler, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Video, ResizeMode } from 'expo-av';
+import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import useUserID from "./useUserID";
@@ -87,9 +87,9 @@ const LoadingScreen = () => {
     }
   };
 
-  const handlePlaybackStatusUpdate = async (status) => {
-    if (status.didJustFinish && !isNavigating) {
-      setIsNavigating(true); // avoid repeated calls
+  const handlePlaybackStatusUpdate = async (status: AVPlaybackStatus) => {
+    if ('didJustFinish' in status && status.didJustFinish && !isNavigating) {
+      setIsNavigating(true);
       if (userId) {
         await checkUserIdInDatabase(userId);
       } else {

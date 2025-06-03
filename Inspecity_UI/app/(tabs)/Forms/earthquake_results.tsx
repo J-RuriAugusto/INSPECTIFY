@@ -15,6 +15,7 @@ import { Animated } from 'react-native';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -42,8 +43,7 @@ const Results = () => {
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  const handlePositionChange = (position) => {
-    // Modalize passes the position directly as a string, not as an event
+  const handlePositionChange = (position: 'initial' | 'top') => {
     setIsModalOpen(position === 'top');
   };
 
@@ -204,7 +204,7 @@ const Results = () => {
 
         // Limit 5 results per category and keep track of the results per type
         const allPlaces = results.flatMap(res => res.data.results);
-        const groupedResults = {};
+        const groupedResults: { [key: string]: any[] } = {};
 
         types.forEach(type => {
           groupedResults[type] = allPlaces.filter(place =>
@@ -237,6 +237,44 @@ const Results = () => {
       } catch (err) {
         console.error(err);
         setError('Failed to fetch nearby critical facilities.');
+      }
+    };
+
+    const fetchEmergencyServices = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError('Location permission not granted');
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+        const radius = 5000; // 5km radius
+
+        // Fetch emergency services
+        const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=hospital|police|fire_station&key=${getCurrentApiKey()}`;
+        const data = await makeGoogleMapsApiCall(url);
+        
+        if (data.status === "OK") {
+          // Process the emergency services data
+          const services = data.results.map((place: any) => ({
+            name: place.name,
+            type: place.types[0],
+            location: place.geometry.location,
+            address: place.vicinity,
+            distance: calculateDistance(
+              latitude,
+              longitude,
+              place.geometry.location.lat,
+              place.geometry.location.lng
+            )
+          }));
+          // Update your state with services
+        }
+      } catch (error) {
+        console.error('Error fetching emergency services:', error);
+        setError('Failed to fetch emergency services');
       }
     };
 
@@ -696,7 +734,7 @@ const Results = () => {
                 )}
                 {facilities.map((facility, index) => (
                   <View key={index} style={styles.facilityItem}>
-                    <MaterialIcons name={facility.icon} size={24} color={facility.color} />
+                    <MaterialIcons name={facility.icon as any} size={24} color={facility.color} />
                     <View style={styles.facilityInfo}>
                       <Text style={styles.facilityText}>{facility.label}</Text>
                       <Text style={styles.distanceText}>
@@ -872,12 +910,10 @@ const styles = StyleSheet.create({
   collapsedHeader: {
     paddingTop: 10,
     paddingBottom: 10,
-  paddingTop: 10,
-  paddingBottom: 10,
-  marginBottom: 10,
-  alignItems: 'center',
-  borderBottomWidth: 2,
-  borderBottomColor: '#eee',
+    marginBottom: 10,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#eee',
 },
 collapsedLabel: {
   fontSize: 14,
@@ -951,10 +987,10 @@ actionButton: {
   borderRadius: 8,
   minWidth: 120,
 },
-// cancelButton: {
-//   backgroundColor: '#e0e0e0',
-//   marginRight: 8,
-// },
+cancelButton: {
+  backgroundColor: '#e0e0e0',
+  marginRight: 8,
+},
 actionButtonText: {
   color: '#fff',
   fontSize: 16,

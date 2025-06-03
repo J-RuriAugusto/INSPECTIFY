@@ -6,8 +6,7 @@ import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-
-const GOOGLE_MAPS_API_KEY = "AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi";
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../config/apiKeys';
 
 type Store = {
   id: string;
@@ -157,19 +156,18 @@ const NearbyShops = () => {
   const fetchNearbyStores = async (latitude: number, longitude: number) => {
     const radius = 5000; // 5km max radius for API
     const type = "hardware_store|home_goods_store|general_contractor|electrician|plumber|roofing_contractor|painter|locksmith|carpenter|landscaper|hvac_contractor";
-    const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
-
+    
     try {
-      const response = await fetch(url);
-      const data = await response.json();
+      // Fetch nearby places
+      const nearbyUrl = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${getCurrentApiKey()}`;
+      const data = await makeGoogleMapsApiCall(nearbyUrl);
 
       if (data.status === "OK") {
         const formattedStores = await Promise.all(
           data.results.map(async (place: any) => {
-            // Fetch additional place details (like phone, opening hours, etc.)
-            const detailsUrl = `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${place.place_id}&key=${GOOGLE_MAPS_API_KEY}`;
-            const detailsResponse = await fetch(detailsUrl);
-            const detailsData = await detailsResponse.json();
+            // Fetch additional place details
+            const detailsUrl = `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${place.place_id}&key=${getCurrentApiKey()}`;
+            const detailsData = await makeGoogleMapsApiCall(detailsUrl);
 
             // Calculate distance from user
             const distance = calculateDistance(
@@ -188,26 +186,25 @@ const NearbyShops = () => {
               },
               image:
                 place.photos && place.photos.length > 0
-                  ? `https://maps.gomaps.pro/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
+                  ? `https://maps.gomaps.pro/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${getCurrentApiKey()}`
                   : "https://via.placeholder.com/400",
               rating: place.rating || 0,
               address: place.vicinity || "No address available",
               phone: detailsData.result.formatted_phone_number || "No phone available",
               openingHours:
                 detailsData.result.opening_hours?.weekday_text || ["No hours available"],
-              distance: distance, // Store the distance
+              distance: distance,
             };
           })
         );
 
-        // Sort by distance automatically - this happens by default, without filtering
+        // Sort by distance automatically
         formattedStores.sort((a, b) => (a.distance || 0) - (b.distance || 0));
         setStores(formattedStores);
-      } else {
-        console.error("Error fetching places:", data.status);
       }
     } catch (error) {
-      console.error("Error fetching places:", error);
+      console.error("Error fetching stores:", error);
+      setStores([]);
     }
   };
 
@@ -387,12 +384,16 @@ const NearbyShops = () => {
             onPress={() => handleStoreSelect(store)}
           >
             <View style={{ alignItems: "center" }}>
-              {/* Custom Marker Icon */}
-              <Image
-                source={require("../../assets/images/store-icon.png")}
-                style={{ width: 40, height: 40 }}
-                resizeMode="contain"
-              />
+              {/* Location Icon Marker */}
+              <View style={{
+              backgroundColor: 'white',
+              borderRadius: 20,
+              padding: 5,
+              borderWidth: 2,
+              borderColor: '#007BFF'
+            }}>
+              <MaterialIcons name="location-pin" size={18.5} color="#007BFF" />
+            </View>
             </View>
           </Marker>
         ))}

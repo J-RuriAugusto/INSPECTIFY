@@ -8,6 +8,8 @@ export type SettingsType = {
   reportFormat: string;
   autoSave: boolean;
   backupLocation: string | null;
+  enableLocation: boolean;
+
 };
 
 // Corrected - single declaration with export
@@ -17,6 +19,7 @@ export const defaultSettings: SettingsType = {
   reportFormat: 'PDF',
   autoSave: true,
   backupLocation: null,
+  enableLocation: false,
 };
 
 // Create context

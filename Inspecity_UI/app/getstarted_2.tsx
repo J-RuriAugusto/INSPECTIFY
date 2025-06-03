@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  TextInput, 
+  Alert, 
+  Modal, 
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Keyboard
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { KeyboardAvoidingView, Platform, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -11,22 +25,99 @@ import { useTranslation } from '../hooks/useTranslation';
 const GettingStarted2 = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const [homeName, setHomeName] = useState(''); // State to store the home name
-  const [houseAge, setHouseAge] = useState(''); // State to store the age of the house
-  const [houseUse, setHouseUse] = useState(''); // State to store the primary use of the house
-  const [renovations, setRenovations] = useState(''); // State to store if the house underwent renovations
+  const [homeName, setHomeName] = useState('');
+  const [houseAge, setHouseAge] = useState('');
+  const [houseUse, setHouseUse] = useState('');
+  const [renovations, setRenovations] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [activeInput, setActiveInput] = useState<Field | null>(null);
+  const textInputRef = useRef<TextInput>(null);
+
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  // });
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setIsKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setIsKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
 
-  // Load custom fonts
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  });
+  useEffect(() => {
+    if (activeInput) {
+      // Small timeout to ensure modal is fully rendered before focusing
+      setTimeout(() => {
+        if (textInputRef.current) {
+          textInputRef.current.focus();
+        }
+      }, 100);
+    }
+  }, [activeInput]);
 
-  if (!fontsLoaded) {
-    return null; // Show nothing until fonts are loaded
-  }
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
+
+  type Field = 'homeName' | 'houseAge' | 'houseUse' | 'renovations';
+
+  const handleInputPress = (field: Field) => {
+    setActiveInput(field);
+    switch (field) {
+      case 'homeName':
+        setInputValue(homeName);
+        break;
+      case 'houseAge':
+        setInputValue(houseAge);
+        break;
+      case 'houseUse':
+        setInputValue(houseUse);
+        break;
+      case 'renovations':
+        setInputValue(renovations);
+        break;
+    }
+  };
+
+  const handleModalSubmit = () => {
+    // Update the correct value based on which input is active
+    switch (activeInput) {
+      case 'homeName':
+        setHomeName(inputValue);
+        break;
+      case 'houseAge':
+        setHouseAge(inputValue);
+        break;
+      case 'houseUse':
+        setHouseUse(inputValue);
+        break;
+      case 'renovations':
+        setRenovations(inputValue);
+        break;
+    }
+
+    // Close modal and keyboard simultaneously in the same frame
+    requestAnimationFrame(() => {
+      setActiveInput(null);    // Dismiss the modal
+      Keyboard.dismiss();      // Dismiss the keyboard
+    });
+  };
+
+
+
 
   const handleNavigateToGetStarted3 = () => {
     if (!homeName.trim()) {
@@ -39,63 +130,42 @@ const GettingStarted2 = () => {
       return;
     }
   
-    let age = parseInt(houseAge, 10);
+    const age = parseInt(houseAge, 10);
   
     if (isNaN(age) || age <= 0) {
       Alert.alert(t('ERROR'), t('ERROR_INVALID_AGE'));
       return;
     }
   
-    setHouseAge(age.toString()); // Ensure UI reflects parsed value
-  
     const homeData = JSON.stringify({ 
       homeName, 
       houseAge: age,
-      houseUse: houseUse.trim() !== "" ? houseUse : null, 
-      renovations: renovations.trim() !== "" ? renovations : null
+      houseUse: houseUse.trim() || null, 
+      renovations: renovations.trim() || null
     });
   
     router.push({
-      pathname: '/getstarted_3',
+      pathname: './getstarted_3',
       params: { homeData },
     });
   };
-  
-  
-  
-  
 
-  const currentStep = 2; // Current progress step
+  const currentStep = 2;
 
   return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-  behavior="height" // best for Android
-  keyboardVerticalOffset={Platform.OS === 'android' ? 20 : 0}
->
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-    <Animatable.View
-      style={styles.container}
-      animation="fadeIn"
-      duration={600}
-      easing="ease-out"
-    >
-      {/* Upper Blue Section */}
+<View style={styles.container}>
       <View style={styles.upperSection}>
-<Animatable.Image
-    animation="slideInRight"
-    duration={800}
-    easing="ease-out"
-    source={require('../assets/images/houseGS2.png')}
-    style={styles.image}
-    resizeMode="contain"
-  />
+        <Animatable.Image
+          animation="slideInRight"
+          duration={800}
+          easing="ease-out"
+          source={require('../assets/images/houseGS2.png')}
+          style={styles.image}
+          resizeMode="contain"
+        />
       </View>
 
-      {/* Lower White Section */}
       <View style={styles.lowerSection}>
-        {/* Custom Progress Bar */}
         <View style={styles.progressBar}>
           {Array.from({ length: 6 }).map((_, index) => (
             <View
@@ -112,64 +182,115 @@ const GettingStarted2 = () => {
         <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')}</Text>
         <Text style={styles.subtitle2}>{t('BASIC_HOME_DETAILS2')}</Text>
 
-        {/* Home Name Text Input */}
-        <TextInput
-          style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder={t('ENTER_HOME_NAME')}
-          placeholderTextColor="#BBBBBB"
-          value={homeName}
-          onChangeText={(text) => setHomeName(text)}
-        />
+        {/* Wrap just the form elements in ScrollView */}
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TouchableOpacity 
+          style={styles.textBox} 
+          onPress={() => handleInputPress('homeName')}
+        >
+          <Text style={homeName ? styles.inputText : styles.placeholderText}>
+            {homeName || 'Enter your home name'}
+          </Text>
+        </TouchableOpacity>
 
-        {/* House Age Text Input */}
-        <TextInput
-          style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder={t('ENTER_HOUSE_AGE')}
-          placeholderTextColor="#BBBBBB"
-          value={houseAge}
-          onChangeText={(text) => setHouseAge(text)}
-        />
+        <TouchableOpacity 
+          style={styles.textBox} 
+          onPress={() => handleInputPress('houseAge')}
+        >
+          <Text style={houseAge ? styles.inputText : styles.placeholderText}>
+            {houseAge || 'Enter the age of the house'}
+          </Text>
+        </TouchableOpacity>
 
-        {/* Primary Use Text Input */}
-        <TextInput
-          style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder={t('ENTER_PRIMARY_USE')}
-          placeholderTextColor="#BBBBBB"
-          value={houseUse}
-          onChangeText={(text) => setHouseUse(text)}
-        />
+        <TouchableOpacity 
+          style={styles.textBox} 
+          onPress={() => handleInputPress('houseUse')}
+        >
+          <Text style={houseUse ? styles.inputText : styles.placeholderText}>
+            {houseUse || 'Enter the primary use of the House'}
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.label}>{t('HAS_RENOVATIONS')}</Text>
         <Text style={styles.label}>{t('HAS_RENOVATIONS2')}</Text>
 
-        {/* Renovations Text Input */}
-        <TextInput
-          style={[styles.textBox, styles.lowerPlaceholder]}
-          placeholder={t('RENOVATIONS_GUIDE')}
-          placeholderTextColor="#BBBBBB"
-          value={renovations}
-          onChangeText={(text) => setRenovations(text)}
-        />
+        <TouchableOpacity 
+          style={styles.textBox} 
+          onPress={() => handleInputPress('renovations')}
+        >
+          <Text style={renovations ? styles.inputText : styles.placeholderText}>
+            {renovations || 'Yes/No, if yes, specify'}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
 
-        {/* Custom Button */}
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3}>
           <Text style={styles.buttonText}>{t('NEXT')}</Text>
         </TouchableOpacity>
       </View>
-    </Animatable.View>
-     </ScrollView>
-    </KeyboardAvoidingView>
-  </TouchableWithoutFeedback>
+
+      <Modal
+              visible={!!activeInput}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => {
+                setActiveInput(null);
+                Keyboard.dismiss();
+              }}
+            >
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.modalOverlay}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? -hp('15%') : 0}
+              >
+                <Pressable 
+                  style={styles.modalOverlay} 
+                  onPress={() => {
+                    setActiveInput(null);
+                    Keyboard.dismiss();
+                  }}
+                >
+                  <View style={[styles.modalContent, isKeyboardVisible && styles.modalContentKeyboardOpen]}>
+                    <View style={styles.modalinputRow}>
+                      <TextInput
+                        ref={textInputRef}
+                        style={styles.modalInput}
+                        value={inputValue}
+                        onChangeText={setInputValue}
+                        placeholder={
+                          activeInput === 'homeName' ? 'Enter your home name' :
+                          activeInput === 'houseAge' ? 'Enter the age of the house' :
+                          activeInput === 'houseUse' ? 'Enter the primary use of the House' :
+                          'Yes/No, if yes, specify'
+                        }
+                        placeholderTextColor="#BBBBBB"
+                        keyboardType={activeInput === 'houseAge' ? 'numeric' : 'default'}
+                      />
+                      <Pressable
+                        style={styles.submitIconButton}
+                        onPress={handleModalSubmit}
+                      >
+                        <MaterialIcons name="check-circle" size={wp('10%')} color="#0B417D" />
+                      </Pressable>
+                    </View>
+                  </View>
+                </Pressable>
+              </KeyboardAvoidingView>
+            </Modal>
+
+    </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   upperSection: {
-    flex: 0.0005,
+    flex: 1,
     backgroundColor: '#0B417D',
     justifyContent: 'center',
     alignItems: 'center',
@@ -179,7 +300,7 @@ const styles = StyleSheet.create({
     height: hp('50%'),
   },
   lowerSection: {
-    flex: 2,
+    flex: 1.1,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -207,23 +328,19 @@ const styles = StyleSheet.create({
     marginBottom: hp('1.2%'),
     fontFamily: 'Archivo-Regular',
     letterSpacing: wp('0.25%'),
-    marginTop: hp('-1.2%'),
   },
   label: {
     fontSize: wp('3.7%'),
     color: '#05173F',
     textAlign: 'center',
-    marginBottom: hp('0.7%'),
     fontFamily: 'Archivo-Regular',
     letterSpacing: wp('0.25%'),
-    marginTop: hp('-1.2%'),
   },
   progressBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: wp('90%'),
     marginBottom: hp('2%'),
-    marginTop: -hp('2.5%'),
   },
   progressStep: {
     width: wp('12%'),
@@ -238,32 +355,74 @@ const styles = StyleSheet.create({
   },
   textBox: {
     width: wp('80%'),
-    height: hp('4.5%'),
-    padding: wp('1%'),
+    height: hp('6%'),
     borderRadius: wp('10%'),
-    fontFamily: 'Archivo-Regular',
-    fontSize: wp('4%'),
-    textAlign: 'center',
-    textAlignVertical: 'center',
     backgroundColor: '#D9D9D9',
     marginBottom: hp('1.2%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputText: {
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    color: '#05173F',
+    textAlign: 'center',
+  },
+  placeholderText: {
+    fontFamily: 'Archivo-Regular',
+    fontSize: wp('3.5%'),
+    color: '#BBBBBB',
+    textAlign: 'center',
   },
   button: {
-    marginTop: hp('1%'),
-    backgroundColor: '#08294E',
     paddingVertical: hp('1.5%'),
     paddingHorizontal: wp('25%'),
+    backgroundColor: '#08294E',
     borderRadius: wp('8%'),
     alignItems: 'center',
+    marginTop: hp('1%'),
   },
   buttonText: {
     fontSize: wp('4.5%'),
     color: '#FFFFFF',
     fontFamily: 'Archivo-Bold',
   },
-  lowerPlaceholder: {
-    textAlignVertical: 'bottom',
-    paddingBottom: hp('0.7%'),
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    marginHorizontal: wp('5%'),
+    borderRadius: wp('5%'),
+    padding: wp('5%'),
+    backgroundColor: 'transparent',
+  },
+  modalContentKeyboardOpen: {
+    marginBottom: hp('-30%'),
+  },
+  modalinputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp('10%'),
+    paddingRight: wp('2%'),
+  },
+  modalInput: {
+    flex: 1,
+    borderWidth: 0,
+    borderRadius: wp('10%'),
+    padding: wp('4%'),
+    fontSize: wp('4%'),
+    fontFamily: 'Archivo-Regular',
+    backgroundColor: 'white',
+  },
+  submitIconButton: {
+    padding: wp('2%'),
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
 });
 

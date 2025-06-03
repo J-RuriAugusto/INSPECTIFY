@@ -14,6 +14,7 @@ import { WebView } from 'react-native-webview';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -511,8 +512,42 @@ const Results = () => {
       }
   };
 
+  const fetchFireStations = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Location permission not granted');
+        return;
+      }
 
-  
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      const radius = 5000; // 5km radius
+
+      const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=fire_station&key=${getCurrentApiKey()}`;
+      const data = await makeGoogleMapsApiCall(url);
+      
+      if (data.status === "OK") {
+        // Process the fire stations data
+        const fireStations = data.results.map((place: any) => ({
+          name: place.name,
+          location: place.geometry.location,
+          address: place.vicinity,
+          distance: calculateDistance(
+            latitude,
+            longitude,
+            place.geometry.location.lat,
+            place.geometry.location.lng
+          )
+        }));
+        // Update your state with fireStations
+      }
+    } catch (error) {
+      console.error('Error fetching fire stations:', error);
+      setError('Failed to fetch fire stations');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Background Video */}
@@ -823,10 +858,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 120,
   },
-  // cancelButton: {
-  //   backgroundColor: '#e0e0e0',
-  //   marginRight: 8,
-  // },
+  cancelButton: {
+    backgroundColor: '#e0e0e0',
+    marginRight: 8,
+  },
   actionButtonText: {
     color: '#fff',
     fontSize: 16,
