@@ -35,7 +35,7 @@ const Dashboard = () => {
   const router = useRouter();
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newReportName, setNewReportName] = useState('');
-  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const filteredReports = reportsTitleID.filter((report) => report.report_name.toLowerCase().includes(search.toLowerCase()));
 
   const handleRename = (reportId: string, newName: string) => {
@@ -48,7 +48,7 @@ const Dashboard = () => {
     // TODO: Optionally, add API call to persist the change
   };
 
-  const onRenameReport = (report: Reports) => {
+  const onRenameReport = (report: Report) => {
     setSelectedReportId(report.report_id);
     setNewReportName(report.report_name);
     setRenameModalVisible(true);
@@ -322,16 +322,25 @@ const Dashboard = () => {
   // Load saved bookmarks from AsyncStorage on focus
   useFocusEffect(
     useCallback(() => {
+      let isActive = true;
+
       const loadBookmarkedShops = async () => {
         try {
           const saved = await AsyncStorage.getItem('savedShops');
           const parsed = saved ? JSON.parse(saved) : [];
-          setSavedShops(parsed);
+          if (isActive) {
+            setSavedShops(parsed);
+          }
         } catch (error) {
           console.error('Failed to load saved shops:', error);
         }
       };
+
       loadBookmarkedShops();
+
+      return () => {
+        isActive = false;
+      };
     }, [])
   );
 

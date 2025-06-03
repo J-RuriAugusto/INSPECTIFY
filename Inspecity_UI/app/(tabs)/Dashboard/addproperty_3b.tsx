@@ -32,11 +32,11 @@ const GettingStarted3b = () => {
 
   const API_KEY = '***REMOVED***';
 
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
+  // });
 
   useEffect(() => {
     (async () => {
@@ -59,9 +59,9 @@ const GettingStarted3b = () => {
     })();
   }, []);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
@@ -98,11 +98,12 @@ const GettingStarted3b = () => {
 
     try {
       console.log(`sent: ${JSON.stringify(updatedHomeData)}`)
+
       const homeResponse = await fetch('https://flask-railway-sample-production.up.railway.app/homes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': API_KEY, // Add the API key header
+          'X-API-KEY': API_KEY,
         },
         body: JSON.stringify(updatedHomeData),
       });
@@ -110,10 +111,14 @@ const GettingStarted3b = () => {
       if (!homeResponse.ok) {
         throw new Error('Failed to create home');
       }
-  
-      console.log('Home created successfully');
-  
+
+      // ✅ Reset saved shops after successful home creation
+      await AsyncStorage.removeItem('savedShops'); // Reset when home changes
       router.push('/(tabs)/Dashboard/board');
+
+      console.log('Home created successfully');
+      router.push('/(tabs)/Dashboard/board');
+
     } catch (error) {
       Alert.alert(
         'Error',

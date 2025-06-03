@@ -23,15 +23,15 @@ const GettingStarted3b = () => {
   const [otherWall, setOtherWall] = useState('');
   const [otherCeiling, setOtherCeiling] = useState('');
 
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  // });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 

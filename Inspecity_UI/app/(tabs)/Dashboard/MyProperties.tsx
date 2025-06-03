@@ -1033,12 +1033,12 @@ backButton: {
 saveIconButton: {
   padding: 10,
 },
-modalTitle: {
-  fontSize: wp('5%'),
-  fontWeight: 'bold',
-  flex: 1,
-  textAlign: 'center',
-},
+// modalTitle: {
+//   fontSize: wp('5%'),
+//   fontWeight: 'bold',
+//   flex: 1,
+//   textAlign: 'center',
+// },
 });
 
 export default MyProperties;

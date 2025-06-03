@@ -27,11 +27,11 @@ const GettingStarted1 = () => {
 
 
   // Load custom fonts
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  // });
 
   const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
@@ -41,9 +41,9 @@ const GettingStarted1 = () => {
     opacity.value = withTiming(1, { duration: 1000, easing: Easing.ease });
   }, []);
 
-  if (!fontsLoaded) {
-    return null; // Show nothing until fonts are loaded
-  }
+  // if (!fontsLoaded) {
+  //   return null; // Show nothing until fonts are loaded
+  // }
 
   const handleNavigateToGetStarted = () => {
     router.push('/getstarted_2'); // Navigate to the next screen

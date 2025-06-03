@@ -26,16 +26,16 @@ const GettingStarted2 = () => {
   const [houseAge, setHouseAge] = useState('');
   const [houseUse, setHouseUse] = useState('');
   const [renovations, setRenovations] = useState('');
-  const [activeInput, setActiveInput] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const textInputRef = React.useRef(null);
+  const [activeInput, setActiveInput] = useState<Field | null>(null);
+  const textInputRef = useRef<TextInput>(null);
 
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  // });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -53,25 +53,39 @@ const GettingStarted2 = () => {
     };
   }, []);
 
+
   useEffect(() => {
-    if (activeInput && textInputRef.current) {
+    if (activeInput) {
+      // Small timeout to ensure modal is fully rendered before focusing
       setTimeout(() => {
-        textInputRef.current.focus();
+        if (textInputRef.current) {
+          textInputRef.current.focus();
+        }
       }, 100);
     }
   }, [activeInput]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
 
-  const handleInputPress = (field) => {
+  type Field = 'homeName' | 'houseAge' | 'houseUse' | 'renovations';
+
+  const handleInputPress = (field: Field) => {
     setActiveInput(field);
-    switch(field) {
-      case 'homeName': setInputValue(homeName); break;
-      case 'houseAge': setInputValue(houseAge); break;
-      case 'houseUse': setInputValue(houseUse); break;
-      case 'renovations': setInputValue(renovations); break;
+    switch (field) {
+      case 'homeName':
+        setInputValue(homeName);
+        break;
+      case 'houseAge':
+        setInputValue(houseAge);
+        break;
+      case 'houseUse':
+        setInputValue(houseUse);
+        break;
+      case 'renovations':
+        setInputValue(renovations);
+        break;
     }
   };
 
@@ -402,6 +416,10 @@ const styles = StyleSheet.create({
   },
   submitIconButton: {
     padding: wp('2%'),
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
 });
 

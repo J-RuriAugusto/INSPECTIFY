@@ -34,49 +34,54 @@ const GettingStarted3 = () => {
   const [otherMaterial, setOtherMaterial] = useState(''); // Separate state for other material
   const [otherHouseType, setOtherHouseType] = useState(''); // Separate state for other house type
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [activeInput, setActiveInput] = useState(null);
   const [inputValue, setInputValue] = useState('');
-  const textInputRef = useRef(null);
+  const [activeInput, setActiveInput] = useState<Field | null>(null);
+  const textInputRef = useRef<TextInput>(null);
 
-  const [fontsLoaded] = useFonts({
-    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  // });
 
-    useEffect(() => {
-      const keyboardDidShowListener = Keyboard.addListener(
-        'keyboardDidShow',
-        () => setIsKeyboardVisible(true)
-      );
-      const keyboardDidHideListener = Keyboard.addListener(
-        'keyboardDidHide',
-        () => setIsKeyboardVisible(false)
-      );
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setIsKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setIsKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   
-      return () => {
-        keyboardDidShowListener.remove();
-        keyboardDidHideListener.remove();
-      };
-    }, []);
-  
-    useEffect(() => {
-      if (activeInput && textInputRef.current) {
-        setTimeout(() => {
+  useEffect(() => {
+    if (activeInput) {
+      // Small timeout to ensure modal is fully rendered before focusing
+      setTimeout(() => {
+        if (textInputRef.current) {
           textInputRef.current.focus();
-        }, 100);
-      }
-    }, [activeInput]);
+        }
+      }, 100);
+    }
+  }, [activeInput]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
   : {};
+  
+  type Field = 'numFloor' | 'lotArea' | 'floorArea' | 'otherHouseType';
 
-  const handleInputPress = (field) => {
+  const handleInputPress = (field: Field) => {
     setActiveInput(field);
     switch(field) {
       case 'numFloor': 

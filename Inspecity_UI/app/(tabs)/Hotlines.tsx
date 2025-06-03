@@ -376,11 +376,11 @@ type Route = {
             indicatorStyle={styles.indicator}
             style={styles.tabBar}
             pressColor="#f0f0f0"
-            renderLabel={({ route, focused, color }: { route: Route; focused: boolean; color: string }) => (
-              <Text style={[styles.label, { color }]}>
-                {route.title}
-              </Text>
-            )}
+            // renderLabel={({ route, focused, color }: { route: Route; focused: boolean; color: string }) => (
+            //   <Text style={[styles.label, { color }]}>
+            //     {route.title}
+            //   </Text>
+            // )}
           />
         )}
         lazy

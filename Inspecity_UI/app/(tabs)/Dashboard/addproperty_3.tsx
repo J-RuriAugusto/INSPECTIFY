@@ -28,9 +28,9 @@ const GettingStarted3 = () => {
   const [selectedHouseType, setSelectedHouseType] = useState("");
   const [otherHouseType, setOtherHouseType] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [activeInput, setActiveInput] = useState(null);
+  const [activeInput, setActiveInput] = useState<Field | null>(null);
   const [inputValue, setInputValue] = useState('');
-  const textInputRef = useRef(null);
+  const textInputRef = useRef<TextInput>(null);
 
   const [fontsLoaded] = useFonts({
     'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
@@ -55,9 +55,12 @@ const GettingStarted3 = () => {
   }, []);
 
   useEffect(() => {
-    if (activeInput && textInputRef.current) {
+    if (activeInput) {
+      // Small timeout to ensure modal is fully rendered before focusing
       setTimeout(() => {
-        textInputRef.current.focus();
+        if (textInputRef.current) {
+          textInputRef.current.focus();
+        }
       }, 100);
     }
   }, [activeInput]);
@@ -70,7 +73,9 @@ const GettingStarted3 = () => {
     ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
     : {};
 
-  const handleInputPress = (field) => {
+  type Field = 'numFloor' | 'lotArea' | 'floorArea' | 'otherHouseType';
+
+  const handleInputPress = (field: Field) => {
     setActiveInput(field);
     switch(field) {
       case 'numFloor': 
