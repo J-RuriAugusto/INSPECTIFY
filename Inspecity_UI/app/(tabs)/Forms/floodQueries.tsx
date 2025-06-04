@@ -40,14 +40,20 @@ const Questions = () => {
 
   const handleAnswer = (answer: string) => {
       const currentIndex = questionIndex;
+      // Convert "I do not know" to "IDK" for storage
+      const storedAnswer = answer === 'I do not know' ? 'IDK' : answer;
 
       // Store answer at the original question index
       const updatedAnswers = [...answers];
-      updatedAnswers[currentIndex] = answer;
+      updatedAnswers[currentIndex] = storedAnswer;
       setAnswers(updatedAnswers);
 
       // Calculate score with the updated answers
-      const updatedScore = updatedAnswers.filter((ans) => ans === 'Yes').length;
+      const updatedScore = updatedAnswers.reduce((total, ans) => {
+        if (ans === 'Yes') return total + 1;
+        if (ans === 'IDK') return total + 0.5;
+        return total;
+      }, 0);
 
       // If this question was skipped before and now answered, remove from skipped
       if (skippedIndices.includes(currentIndex)) {

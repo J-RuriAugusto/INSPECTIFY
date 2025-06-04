@@ -107,7 +107,7 @@ const Results = () => {
 
         // Filter out any invalid answers (only allow 'Yes' and 'No')
         const validAnswers = answersArray.filter(answer => 
-          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no')
+          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no' || answer.toLowerCase() === 'idk')
         );
 
         if (validAnswers.length === 0) {

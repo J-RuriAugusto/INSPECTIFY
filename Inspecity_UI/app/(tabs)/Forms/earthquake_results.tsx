@@ -106,9 +106,9 @@ const Results = () => {
           throw new Error('Invalid answers format');
         }
 
-        // Filter out any invalid answers (only allow 'Yes' and 'No')
+        // Filter out any invalid answers (only allow 'Yes' and 'No', 'IDK')
         const validAnswers = answersArray.filter(answer => 
-          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no')
+          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no' || answer.toLowerCase() === 'idk')
         );
 
         if (validAnswers.length === 0) {
