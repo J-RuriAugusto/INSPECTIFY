@@ -38,11 +38,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}> {/* ✅ Gesture handler wrapper */}
-      <RootLayoutNav />
-    </GestureHandlerRootView>
-  );
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
