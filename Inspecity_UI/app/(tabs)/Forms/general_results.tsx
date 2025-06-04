@@ -14,7 +14,7 @@ import { WebView } from 'react-native-webview';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
-import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
+import { makeGoogleMapsApiCall, getCurrentApiKey, fetchNearbyPlaces } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -94,7 +94,7 @@ const Results = () => {
       try {
         await Promise.all([
           fetchRecommendation(),
-          fetchNearbyServices()
+          fetchNearbyFacilities()
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -164,58 +164,59 @@ const Results = () => {
       }
     };
 
-    const fetchNearbyServices = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setError('Location permission not granted');
-          return;
-        }
-
-        const location = await Location.getCurrentPositionAsync({});
-        const { latitude, longitude } = location.coords;
-        const radius = 5000; // 5km radius
-
-        // Fetch all relevant services
-        const types = [
-          'hospital',
-          'police',
-          'fire_station',
-          'school',
-          'community_center',
-          'local_government_office'
-        ].join('|');
-
-        const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${types}&key=${getCurrentApiKey()}`;
-        const data = await makeGoogleMapsApiCall(url);
+    const fetchNearbyFacilities = async () => {
+          try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+              setError('Location permission not granted');
+              return;
+            }
         
-        if (data.status === "OK") {
-          // Process the services data
-          const services = data.results.map((place: any) => ({
-            name: place.name,
-            type: place.types[0],
-            location: place.geometry.location,
-            address: place.vicinity,
-            distance: calculateDistance(
-              latitude,
-              longitude,
-              place.geometry.location.lat,
-              place.geometry.location.lng
-            )
-          }));
-          // Update your state with services
-          setFacilities(services.map((service: Service) => ({
-            icon: mapPlaceTypeToIcon([service.type]),  // pass an array here
-            color: '#4CAF50',
-            label: service.name,
-            distance: service.distance
-          })));
-        }
-      } catch (error) {
-        console.error('Error fetching nearby services:', error);
-        setError('Failed to fetch nearby services');
-      }
-    };
+            const location = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = location.coords;
+            const types = ['hospital', 'police', 'school', 'city_hall'];
+        
+            // Use the new fetchNearbyPlaces function
+            const results = await fetchNearbyPlaces(latitude, longitude, types);
+        
+            // Process the results (same as before)
+            const allPlaces = results.flatMap(res => res.results || []);
+            const groupedResults: { [key: string]: any[] } = {};
+        
+            types.forEach(type => {
+              groupedResults[type] = allPlaces.filter(place =>
+                place.types?.includes(type)
+              ).slice(0, 5); // Limit to 5 per type
+            });
+        
+            // Flatten the results and prepare the mapped data
+            const selected: Facility[] = [];
+            for (const type of types) {
+              const places = groupedResults[type];
+              places.forEach(place => {
+                const distance = calculateDistance(
+                  latitude,
+                  longitude,
+                  place.geometry.location.lat,
+                  place.geometry.location.lng
+                );
+                selected.push({
+                  icon: mapPlaceTypeToIcon(place.types || []),
+                  color: '#4CAF50',
+                  label: place.name,
+                  distance: distance
+                });
+              });
+            }
+            
+            // Sort facilities by distance
+            selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+            setFacilities(selected);
+          } catch (err) {
+            console.error(err);
+            setError('Failed to fetch nearby critical facilities.');
+          }
+        };
 
     fetchData();
   }, []);

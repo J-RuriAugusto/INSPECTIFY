@@ -15,7 +15,7 @@ import { Animated } from 'react-native';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
-import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
+import { makeGoogleMapsApiCall, getCurrentApiKey, fetchNearbyPlaces } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -62,7 +62,6 @@ const Results = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
 
   const API_KEY = '***REMOVED***'; // Flask
-  const GOOGLE_API_KEY = 'AlzaSy6s_Afq_l4rqY4n6ZnQdoN_nJri1UlL8gi'; // Replace with your actual Google Maps API Key
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in kilometers
@@ -184,34 +183,24 @@ const Results = () => {
           setError('Location permission not granted');
           return;
         }
-
+    
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
-
         const types = ['hospital', 'police', 'school', 'city_hall'];
-
-        // Fetch results for each type
-        const results = await Promise.all(types.map(type =>
-          axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
-            params: {
-              location: `${latitude},${longitude}`,
-              radius: 5000,
-              type,
-              key: GOOGLE_API_KEY,
-            },
-          })
-        ));
-
-        // Limit 5 results per category and keep track of the results per type
-        const allPlaces = results.flatMap(res => res.data.results);
+    
+        // Use the new fetchNearbyPlaces function
+        const results = await fetchNearbyPlaces(latitude, longitude, types);
+    
+        // Process the results (same as before)
+        const allPlaces = results.flatMap(res => res.results || []);
         const groupedResults: { [key: string]: any[] } = {};
-
+    
         types.forEach(type => {
           groupedResults[type] = allPlaces.filter(place =>
-            place.types.includes(type)
+            place.types?.includes(type)
           ).slice(0, 5); // Limit to 5 per type
         });
-
+    
         // Flatten the results and prepare the mapped data
         const selected: Facility[] = [];
         for (const type of types) {
@@ -231,6 +220,7 @@ const Results = () => {
             });
           });
         }
+        
         // Sort facilities by distance
         selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
         setFacilities(selected);

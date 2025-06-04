@@ -159,6 +159,7 @@ const NearbyShops = () => {
     
     try {
       // Fetch nearby places
+      console.log(getCurrentApiKey)
       const nearbyUrl = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${getCurrentApiKey()}`;
       const data = await makeGoogleMapsApiCall(nearbyUrl);
 

@@ -1,9 +1,16 @@
+import axios from 'axios';
+
 // Google Maps API Keys
 export const GOOGLE_MAPS_API_KEYS = [
-  "AlzaSyKapAZteq4AJlkV9U32P-AapJbxy3DGn_K",
-  "AlzaSypd9XXNxr7JR-diQ_lyTEmkOagqmjml0Rr",
-  "AlzaSy0Ty9_p9p53HvIzcwoKJijwamMNMQZ56DE",
-  "AlzaSyqTB97UDUvEnVnWruPtPewB8zpVbapB7oi",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
+  "***REMOVED***",
 ];
 
 // Keep track of current key index
@@ -65,3 +72,51 @@ export const makeGoogleMapsApiCall = async (url: string, maxRetries = GOOGLE_MAP
 
   throw new Error("All API keys have been exhausted");
 }; 
+
+export const fetchNearbyPlaces = async (
+  latitude: number,
+  longitude: number,
+  types: string[]
+) => {
+  let lastError: Error | null = null;
+  
+  // Try all keys in order
+  for (let i = 0; i < GOOGLE_MAPS_API_KEYS.length; i++) {
+    const currentKey = getCurrentApiKey();
+    
+    try {
+      const results = await Promise.all(types.map(type =>
+        axios.get('https://maps.gomaps.pro/maps/api/place/nearbysearch/json', {
+          params: {
+            location: `${latitude},${longitude}`,
+            radius: 5000,
+            type,
+            key: currentKey,
+          },
+        })
+      ));
+
+      // Check if any of the responses had errors
+      const hasErrors = results.some(result => 
+        result.data.status !== "OK" && result.data.status !== "ZERO_RESULTS"
+      );
+      
+      if (!hasErrors) {
+        return results.map(result => result.data);
+      }
+      
+      // If we got here, there were errors in some responses
+      lastError = new Error(
+        results.map(r => r.data.status + (r.data.error_message ? `: ${r.data.error_message}` : ''))
+          .join(' | ')
+      );
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+    }
+    
+    // Rotate to next key for next attempt
+    rotateToNextApiKey();
+  }
+
+  throw lastError || new Error("All API keys failed for nearby places search");
+};

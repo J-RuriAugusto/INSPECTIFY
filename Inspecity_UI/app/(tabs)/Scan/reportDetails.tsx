@@ -85,7 +85,7 @@ const ReportDetails = () => {
     if (recommendation.trim().startsWith("Error")) {
       return t('RECOMMENDATION_NOT_AVAILABLE') || "Recommendation is not available. Please try scanning the picture again later.";
     }
-    
+
     // Process the recommendation text to ensure proper line breaks
     return recommendation
       .replace(/\r\n/g, '\n') // Convert Windows line endings to Unix
@@ -181,25 +181,39 @@ const ReportDetails = () => {
           const processRecommendations = (text: string): string => {
             if (!text) return '';
             
-            // Normalize priority text
+            // First, normalize all priority text variations for all languages
             let processed = text
-              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, 'Priority 1 - Critical')
-              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, 'Priority 2 - Important')
-              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, 'Priority 3 - Preventive')
-              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4');
-
+              // English variations
+              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, "Priority 1")
+              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, "Priority 2")
+              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, "Priority 3")
+              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4')
+              // Tagalog variations
+              .replace(/Mataas na prayoridad|Prayoridad mataas|Prayoridad 1|Prayoridad isa/gi, "Priority 1")
+              .replace(/Katamtamang prayoridad|Prayoridad katamtaman|Prayoridad 2|Prayoridad dalawa/gi, "Priority 2")
+              .replace(/Mababang prayoridad|Prayoridad mababa|Prayoridad 3|Prayoridad tatlo/gi, "Priority 3")
+              // Cebuano variations
+              .replace(/Hataas nga prayoridad|Prayoridad hataas|Prayoridad 1|Prayoridad usa/gi, "Priority 1")
+              .replace(/Medium nga prayoridad|Prayoridad medium|Prayoridad 2|Prayoridad duha/gi, "Priority 2")
+              .replace(/Ubos nga prayoridad|Prayoridad ubos|Prayoridad 3|Prayoridad tulo/gi, "Priority 3");
+          
             // Split into sections based on priority
             const sections = processed.split(/(?=Priority \d+ -)/);
-
+          
             const processedSections = sections.map(section => {
-              // Extract header and subtext
-              const match = section.match(/^(Priority \d+ - [^:]+):?(.*)$/s);
+              // First, remove any duplicate priority text from the section
+              section = section.replace(/(Priority \d+ - [^:]+)(?:\s*-\s*\1)/g, '$1');
+              
+              // Then extract header and subtext
+              const match = section.match(/^(Priority \d+ - [^:]+)(?::\s*|\s+)(.*)$/s);
               if (match) {
                 const header = match[1].trim();
                 const subtext = match[2]
                   .replace(/^\s*:\s*/, '') // Remove leading colon and whitespace
-                  .replace(/^\s+/, ''); // Remove leading whitespace
-
+                  .replace(/^\s+/, '') // Remove leading whitespace
+                  .replace(/^Priority \d+ - [^:]+(?:\s*-\s*[^:]+)?:\s*/g, '') // Remove any duplicate priority text
+                  .replace(/(Priority \d+ - [^:]+)(?:\s*-\s*\1)/g, '$1'); // Remove any remaining duplicates
+          
                 // Only the header is a markdown header, subtext is normal
                 let result = `## ${header}\n`;
                 if (subtext) {
@@ -215,7 +229,7 @@ const ReportDetails = () => {
                 return section;
               }
             });
-
+          
             return processedSections
               .join('\n\n')
               .replace(/\n{3,}/g, '\n\n')
