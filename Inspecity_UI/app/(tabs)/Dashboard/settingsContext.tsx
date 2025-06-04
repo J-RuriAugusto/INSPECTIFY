@@ -90,3 +90,9 @@ export const SettingsProvider: React.FC<{children: React.ReactNode}> = ({ childr
 export const useSettings = () => {
   return useContext(SettingsContext);
 };
+
+// Add at the bottom of your file:
+export default function SettingsContextScreen() {
+  const { settings } = useSettings();
+  return null; // or render something appropriate
+}

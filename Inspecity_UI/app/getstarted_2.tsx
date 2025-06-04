@@ -155,7 +155,7 @@ const GettingStarted2 = () => {
   }
 
   return (
-<View style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.upperSection}>
         <Animatable.Image
           animation="slideInRight"
@@ -280,7 +280,6 @@ const GettingStarted2 = () => {
                 </Pressable>
               </KeyboardAvoidingView>
             </Modal>
-
     </View>
   );
 };

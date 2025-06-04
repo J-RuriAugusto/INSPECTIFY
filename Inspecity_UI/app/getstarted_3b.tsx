@@ -208,7 +208,7 @@ const GettingStarted3b = () => {
         {selectedCeiling === t('OTHERS') && (
           <TextInput
             style={styles.textBox}
-            placeholder={('SPECIFY_OTHER_CEILING_MATERIAL')}
+            placeholder={t('SPECIFY_OTHER_CEILING_MATERIAL')}
             placeholderTextColor="#BBBBBB"
             value={otherCeiling}
             onChangeText={(text) => setOtherCeiling(text)}
