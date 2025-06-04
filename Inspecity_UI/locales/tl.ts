@@ -198,7 +198,7 @@ export default {
   OUT_OF: "sa kabuuang ",
   QUESTIONS: "na mga tanong",
   PREVIEW_AND_SHARE: "Silipin at Ibahagi",
-  PREVIEW_RESULTS: "I-preview ang Mga Resulta",
+  PREVIEW_RESULTS: "Tingnan ang buong resulta",
   SWIPE_UP: "Mag-swipe pataas para sa mga rekomendasyon",
   RECOMMENDATIONS_AND_FACILITIES: "Mga Rekomendasyon at Kritikal na Pasilidad",
   CRITICAL_FACILITIES_NEAR: "Mga Kritikal na Pasilidad Malapit sa Iyo",

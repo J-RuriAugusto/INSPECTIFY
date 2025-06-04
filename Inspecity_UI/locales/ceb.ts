@@ -196,7 +196,7 @@ export default {
     OUT_OF: "gikan sa ",
     QUESTIONS: "ka mga pangutana",
     PREVIEW_AND_SHARE: "Tan-awa ug I-share",
-    PREVIEW_RESULTS: "Tan-awa ang mga Resulta",
+    PREVIEW_RESULTS: "Tan-awa ang tibuok resulta",
     SWIPE_UP: "I-swipe pataas para sa mga rekomendasyon",
     RECOMMENDATIONS_AND_FACILITIES: "Mga Rekomendasyon ug Kritikal nga mga Pasilidad",
     CRITICAL_FACILITIES_NEAR: "Kritikal nga mga Pasilidad Duol Nimo",
