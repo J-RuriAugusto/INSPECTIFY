@@ -196,7 +196,7 @@ export default {
     OUT_OF: "gikan sa ",
     QUESTIONS: "ka mga pangutana",
     PREVIEW_AND_SHARE: "Tan-awa ug I-share",
-    PREVIEW_RESULTS: "Tan-awa ang mga Resulta",
+    PREVIEW_RESULTS: "Tan-awa ang tibuok resulta",
     SWIPE_UP: "I-swipe pataas para sa mga rekomendasyon",
     RECOMMENDATIONS_AND_FACILITIES: "Mga Rekomendasyon ug Kritikal nga mga Pasilidad",
     CRITICAL_FACILITIES_NEAR: "Kritikal nga mga Pasilidad Duol Nimo",
@@ -223,7 +223,9 @@ export default {
     LOW_RISK: "Ubos nga Risgo",
     MODERATE_RISK: "Kasagarang Risgo",
     LOADING_YOUR_RESULTS: "Nag-loading sa imong mga resulta...",
-
+    HIGH_PREPARED: "Andam Kaayo",  
+    MODERATE_PREPARED: "Medyo Andam",  
+    LOW_PREPARED: "Dili Andam",  
 
     EARTHQUAKE_QUESTIONS: [
         "Duol ba ang inyong balay sa kilalang fault line? (Pananglitan: West Valley Fault, Central Cebu Fault)",

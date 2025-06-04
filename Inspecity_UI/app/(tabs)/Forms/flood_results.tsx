@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, ScrollView, Animated, Easing } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -53,10 +53,12 @@ const Results = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSheetVisible, setIsSheetVisible] = useState(false);
   const { t } = useTranslation();
   const { settings } = useSettings();
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(height)).current;
 
   const handlePositionChange = (position: 'initial' | 'top') => {
     setIsModalOpen(position === 'top');
@@ -611,6 +613,25 @@ const Results = () => {
     }
   };
 
+  const openSheet = () => {
+    setIsSheetVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 350,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeSheet = () => {
+    Animated.timing(slideAnim, {
+      toValue: height,
+      duration: 300,
+      easing: Easing.in(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => setIsSheetVisible(false));
+  };
+
   return (
     <View style={styles.container}>
       {/* Background Video */}
@@ -644,74 +665,92 @@ const Results = () => {
               />
             </View>
             <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
-                    
 
-
-            <Text style={styles.swipeUpLabel}>⬆ {t('SWIPE_UP')}</Text>
           </View>
+                    <TouchableOpacity style={styles.downloadButton} onPress={openSheet}>
+                      <MaterialIcons name="expand-less" size={20} color="#fff" />
+                      <Text style={styles.downloadButtonText}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+                    </TouchableOpacity>
 
-          {/* Always-Open Modal */}
-          <Modalize
-            ref={modalRef}
-            alwaysOpen={70}
-            modalStyle={styles.modal}
-            handleStyle={styles.handle}
-            modalHeight={height - 350}
-            panGestureEnabled
-            onPositionChange={handlePositionChange}
-            scrollViewProps={{
-              scrollEnabled: isModalOpen,
-              showsVerticalScrollIndicator: false,
-            }}
+          {/* Slide-up Modal */}
+          <Modal
+            visible={isSheetVisible}
+            animationType="none"
+            transparent
+            onRequestClose={closeSheet}
           >
-            {/* Collapsed visible header */}
-            <View style={styles.collapsedHeader}>
-              <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
-            </View>
-            <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
-              <MaterialIcons name="visibility" size={20} color="#fff" />
-              <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_SHARE')}</Text>
-            </TouchableOpacity>
-
-            {/* Expanded modal content */}
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
-              <View style={styles.recommendationContainer}>
-                <Markdown style={{
-                  body: styles.modalText,
-                  heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
-                  heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
-                  heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
-                  bullet_list: { marginBottom: 10 },
-                  list_item: { marginBottom: 5 },
-                  strong: { fontWeight: 'bold', color: '#2E86C1' },
-                  em: { fontStyle: 'italic', color: '#666' },
-                  link: { color: '#2E86C1', textDecorationLine: 'underline' },
-                }}>
-                  {recommendation}
-                </Markdown>
-              </View>
-
-              <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
-
-              <View style={styles.criticalFacilities}>
-                {facilities.length === 0 && (
-                  <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
-                )}
-                {facilities.map((facility, index) => (
-                  <View key={index} style={styles.facilityItem}>
-                    <MaterialIcons name={facility.icon} size={24} color={facility.color} />
-                    <View style={styles.facilityInfo}>
-                      <Text style={styles.facilityText}>{facility.label}</Text>
-                      <Text style={styles.distanceText}>
-                        {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
-                      </Text>
-                    </View>
+            <TouchableOpacity
+              style={styles.sheetBackdrop}
+              activeOpacity={1}
+              onPress={closeSheet}
+            />
+            <Animated.View
+              style={[
+                styles.sheetContainer,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <ScrollView>
+                <View style={styles.sheetHandle} />
+                <View style={styles.collapsedHeader}>
+                  <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+                </View>
+                {/* Expanded modal content */}
+                <View style={styles.modalContent}>
+              
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, paddingHorizontal: 10 }}>
+                    <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.downloadButton, { paddingVertical: 6, paddingHorizontal: 12, minWidth: 0, marginLeft: 10 }]}
+                      onPress={handlePreview}
+                    >
+                      <MaterialIcons name="visibility" size={20} color="#fff" />
+                      <Text style={[styles.actionButtonText, { fontSize: 14 }]}>{t('PREVIEW_AND_SHARE')}</Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
-              </View>
-            </View>
-          </Modalize>
+                  
+                  <View style={styles.recommendationContainer}>
+                    <Markdown style={{
+                      body: styles.modalText,
+                      heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
+                      heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
+                      heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
+                      bullet_list: { marginBottom: 10 },
+                      list_item: { marginBottom: 5 },
+                      strong: { fontWeight: 'bold', color: '#2E86C1' },
+                      em: { fontStyle: 'italic', color: '#666' },
+                      link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                    }}>
+                      {recommendation}
+                    </Markdown>
+                  </View>
+                  <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
+                  <View style={styles.criticalFacilities}>
+                    {facilities.length === 0 && (
+                      <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
+                    )}
+                    {facilities.map((facility, index) => (
+                      <View key={index} style={styles.facilityItem}>
+                        <MaterialIcons name={facility.icon} size={24} color={facility.color} />
+                        <View style={styles.facilityInfo}>
+                          <Text style={styles.facilityText}>{facility.label}</Text>
+                          <Text style={styles.distanceText}>
+                            {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+                {/* <TouchableOpacity
+                  style={[styles.actionButton, styles.cancelButton, { margin: 20 }]}
+                  onPress={closeSheet}
+                >
+                  <Text style={styles.actionButtonText}>{t('CLOSE')}</Text>
+                </TouchableOpacity> */}
+              </ScrollView>
+            </Animated.View>
+          </Modal>
 
           {/* Preview Modal */}
           <Modal
@@ -739,12 +778,12 @@ const Results = () => {
                 />
                 
                 <View style={styles.previewActions}>
-                  <TouchableOpacity 
+                  {/* <TouchableOpacity 
                     style={[styles.actionButton, styles.cancelButton]}
                     onPress={() => setIsPreviewVisible(false)}
                   >
                     <Text style={styles.actionButtonText}>{t('CANCEL')}</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   
                   <TouchableOpacity 
                     style={[styles.actionButton, styles.downloadButton]}
@@ -842,6 +881,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 6,
+    paddingHorizontal: 10,
   },
   modalText: {
     fontSize: 16,
@@ -889,6 +929,7 @@ const styles = StyleSheet.create({
   },
   criticalFacilities: {
     marginTop: 10,
+    paddingHorizontal: 10,
   },
   recommendationText: {
     fontSize: 14,
@@ -997,6 +1038,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#19477B',
     fontWeight: '600',
+  },
+  sheetBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 1,
+  },
+  sheetContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: height * 0.8,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    zIndex: 2,
+    paddingBottom: 20,
+    maxHeight: height * 0.9,
+  },
+  sheetHandle: {
+    width: 60,
+    height: 6,
+    backgroundColor: '#ccc',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginVertical: 10,
   },
 });
 
