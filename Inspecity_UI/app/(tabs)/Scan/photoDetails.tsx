@@ -483,11 +483,20 @@ const PhotoDetails = () => {
             
             // First, normalize all priority text variations
             let processed = text
+              // English variations
               .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, "Priority 1")
               .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, "Priority 2")
               .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, "Priority 3")
-              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4');
-
+              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4')
+              // Tagalog variations
+              .replace(/Mataas na prayoridad|Prayoridad mataas|Prayoridad 1|Prayoridad isa/gi, "Priority 1")
+              .replace(/Katamtamang prayoridad|Prayoridad katamtaman|Prayoridad 2|Prayoridad dalawa/gi, "Priority 2")
+              .replace(/Mababang prayoridad|Prayoridad mababa|Prayoridad 3|Prayoridad tatlo/gi, "Priority 3")
+              // Cebuano variations
+              .replace(/Hataas nga prayoridad|Prayoridad hataas|Prayoridad 1|Prayoridad usa/gi, "Priority 1")
+              .replace(/Medium nga prayoridad|Prayoridad medium|Prayoridad 2|Prayoridad duha/gi, "Priority 2")
+              .replace(/Ubos nga prayoridad|Prayoridad ubos|Prayoridad 3|Prayoridad tulo/gi, "Priority 3");
+          
             // Split into sections based on priority
             const sections = processed.split(/(?=Priority \d+ -)/);
 
