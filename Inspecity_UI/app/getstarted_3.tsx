@@ -159,16 +159,17 @@ const GettingStarted3 = () => {
   }
 
   return (
-<View style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.upperSection}>
-<Animatable.Image
-    animation="slideInRight"
-    duration={800}
-    easing="ease-out"
-    source={require('../assets/images/houseGS3.png')}
-    style={styles.image}
-    resizeMode="contain"
-  />      </View>
+        <Animatable.Image
+            animation="slideInRight"
+            duration={800}
+            easing="ease-out"
+            source={require('../assets/images/houseGS3.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+      </View>
 
       <View style={styles.lowerSection}>
         <View style={styles.progressBar}>
@@ -187,129 +188,127 @@ const GettingStarted3 = () => {
         <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')} {t('BASIC_HOME_DETAILS2')}</Text>
         {/* Scrollable form */}
         <ScrollView 
-                  style={styles.scrollView} 
-                  contentContainerStyle={styles.scrollContainer} 
-                  keyboardShouldPersistTaps="handled"
-                >
-                  <View style={styles.pickerContainer}>
-                    <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-                      <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
-                      <Picker.Item label="Single-detached" value="single" />
-                      <Picker.Item label="Townhouse" value="town" />
-                      <Picker.Item label="Apartment" value="apartment" />
-                      <Picker.Item label="Stilt house" value="stilt" />
-                      <Picker.Item label="Duplex" value="duplex" />
-                      <Picker.Item label="Others" value="others" />
-                    </Picker>
-                  </View>
-        
-                  {selectedHouseType === "others" && (
-                    <TouchableOpacity 
-                      style={styles.textBox1} 
-                      onPress={() => handleInputPress('otherHouseType')}
-                    >
-                      <Text style={otherHouseType ? styles.inputText : styles.placeholderText}>
-                        {otherHouseType || "Specify other house type"}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-        
-                  <View style={styles.inputRow}>
-                    <Text style={styles.label}>{t('NUMBER_HOUSE_FLOORS')}</Text>
-                    <TouchableOpacity 
-                      style={styles.textBox} 
-                      onPress={() => handleInputPress('numFloor')}
-                    >
-                      <Text style={numFloor ? styles.inputText : styles.placeholderText}>
-                        {numFloor || "(1, 2, 3, etc.)"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-        
-                  <View style={styles.inputRow}>
-                    <Text style={styles.label}>{t('ESTIMATED_LOT_AREA')}</Text>
-                    <TouchableOpacity 
-                      style={styles.textBox} 
-                      onPress={() => handleInputPress('lotArea')}
-                    >
-                      <Text style={lotArea ? styles.inputText : styles.placeholderText}>
-                        {lotArea || "sqm"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-        
-                  <View style={styles.inputRow}>
-                    <Text style={styles.label}>{t('ESTIMATED_FLOOR_AREA')}</Text>
-                    <TouchableOpacity 
-                      style={styles.textBox} 
-                      onPress={() => handleInputPress('floorArea')}
-                    >
-                      <Text style={floorArea ? styles.inputText : styles.placeholderText}>
-                        {floorArea || "sqm"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-        
+          style={styles.scrollView} 
+          contentContainerStyle={styles.scrollContainer} 
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+              <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
+              <Picker.Item label="Single-detached" value="single" />
+              <Picker.Item label="Townhouse" value="town" />
+              <Picker.Item label="Apartment" value="apartment" />
+              <Picker.Item label="Stilt house" value="stilt" />
+              <Picker.Item label="Duplex" value="duplex" />
+              <Picker.Item label="Others" value="others" />
+            </Picker>
+          </View>
 
+          {selectedHouseType === "others" && (
+            <TouchableOpacity 
+              style={styles.textBox1} 
+              onPress={() => handleInputPress('otherHouseType')}
+            >
+              <Text style={otherHouseType ? styles.inputText : styles.placeholderText}>
+                {otherHouseType || "Specify other house type"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>{t('NUMBER_HOUSE_FLOORS')}</Text>
+            <TouchableOpacity 
+              style={styles.textBox} 
+              onPress={() => handleInputPress('numFloor')}
+            >
+              <Text style={numFloor ? styles.inputText : styles.placeholderText}>
+                {numFloor || "(1, 2, 3, etc.)"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>{t('ESTIMATED_LOT_AREA')}</Text>
+            <TouchableOpacity 
+              style={styles.textBox} 
+              onPress={() => handleInputPress('lotArea')}
+            >
+              <Text style={lotArea ? styles.inputText : styles.placeholderText}>
+                {lotArea || "sqm"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>{t('ESTIMATED_FLOOR_AREA')}</Text>
+            <TouchableOpacity 
+              style={styles.textBox} 
+              onPress={() => handleInputPress('floorArea')}
+            >
+              <Text style={floorArea ? styles.inputText : styles.placeholderText}>
+                {floorArea || "sqm"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>{t('NEXT')}</Text>
         </TouchableOpacity>
-        {/* Modal for input */}
-              
+        {/* Modal for input */}  
       </View>
       <Modal
-              visible={!!activeInput}
-              transparent={true}
-              animationType="fade"
-              onRequestClose={() => {
-                setActiveInput(null);
-                Keyboard.dismiss();
-              }}
-            >
-              <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.modalOverlay}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? -hp('15%') : 0}
-              >
-                <Pressable 
-                  style={styles.modalOverlay} 
-                  onPress={() => {
-                    setActiveInput(null);
-                    Keyboard.dismiss();
-                  }}
+        visible={!!activeInput}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => {
+          setActiveInput(null);
+          Keyboard.dismiss();
+        }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? -hp('15%') : 0}
+        >
+          <Pressable 
+            style={styles.modalOverlay} 
+            onPress={() => {
+              setActiveInput(null);
+              Keyboard.dismiss();
+            }}
+          >
+            <View style={[styles.modalContent, isKeyboardVisible && styles.modalContentKeyboardOpen]}>
+              <View style={styles.modalinputRow}>
+                <TextInput
+                  ref={textInputRef}
+                  style={styles.modalInput}
+                  value={inputValue}
+                  onChangeText={setInputValue}
+                  placeholder={
+                    activeInput === 'numFloor' ? t('NUMBER_HOUSE_FLOORS') :
+                    activeInput === 'lotArea' ? t('ENTER_LOT_AREA') :
+                    activeInput === 'floorArea' ? t('ENTER_FLOOR_AREA') :
+                    'Specify other house type'
+                  }
+                  placeholderTextColor="#BBBBBB"
+                  keyboardType={
+                    activeInput === 'numFloor' || 
+                    activeInput === 'lotArea' || 
+                    activeInput === 'floorArea' ? 'numeric' : 'default'
+                  }
+                />
+                <Pressable
+                  style={styles.submitIconButton}
+                  onPress={handleModalSubmit}
                 >
-                  <View style={[styles.modalContent, isKeyboardVisible && styles.modalContentKeyboardOpen]}>
-                    <View style={styles.modalinputRow}>
-                      <TextInput
-                        ref={textInputRef}
-                        style={styles.modalInput}
-                        value={inputValue}
-                        onChangeText={setInputValue}
-                        placeholder={
-                          activeInput === 'numFloor' ? t('NUMBER_HOUSE_FLOORS') :
-                          activeInput === 'lotArea' ? t('ENTER_LOT_AREA') :
-                          activeInput === 'floorArea' ? t('ENTER_FLOOR_AREA') :
-                          'Specify other house type'
-                        }
-                        placeholderTextColor="#BBBBBB"
-                        keyboardType={
-                          activeInput === 'numFloor' || 
-                          activeInput === 'lotArea' || 
-                          activeInput === 'floorArea' ? 'numeric' : 'default'
-                        }
-                      />
-                      <Pressable
-                        style={styles.submitIconButton}
-                        onPress={handleModalSubmit}
-                      >
-                        <MaterialIcons name="check-circle" size={wp('10%')} color="#0B417D" />
-                      </Pressable>
-                    </View>
-                  </View>
+                  <MaterialIcons name="check-circle" size={wp('10%')} color="#0B417D" />
                 </Pressable>
-              </KeyboardAvoidingView>
-            </Modal>
+              </View>
+            </View>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 };

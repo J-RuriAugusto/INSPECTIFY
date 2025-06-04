@@ -40,6 +40,12 @@ interface GroupedResults {
   }>;
 }
 
+interface Service {
+  type: string;
+  name: string;
+  distance: number | null;
+}
+
 const Results = () => {
   const modalRef = useRef<Modalize>(null);
   const params = useLocalSearchParams();
@@ -200,8 +206,8 @@ const Results = () => {
             )
           }));
           // Update your state with services
-          setFacilities(services.map(service => ({
-            icon: mapPlaceTypeToIcon(service.type),
+          setFacilities(services.map((service: Service) => ({
+            icon: mapPlaceTypeToIcon([service.type]),  // pass an array here
             color: '#4CAF50',
             label: service.name,
             distance: service.distance

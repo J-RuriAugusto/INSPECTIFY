@@ -380,27 +380,27 @@ const Dashboard = () => {
           </Link>
         </View>
 
-              {/* Main Content */}
-      <View style={styles.headerTextContainer}>
-        <Text 
-          style={styles.title1}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}
-        >
-          {houseName}
-        </Text>
-        <Text 
-          style={styles.title2}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}
-        >
-          {location}
-        </Text>
-      </View>
+        {/* Main Content */}
+        <View style={styles.headerTextContainer}>
+          <Text 
+            style={styles.title1}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
+            {houseName}
+          </Text>
+          <Text 
+            style={styles.title2}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
+            {location}
+          </Text>
+        </View>
 
         {/* Search Bar */}
         <TextInput
