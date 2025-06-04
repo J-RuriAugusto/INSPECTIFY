@@ -37,47 +37,46 @@ const Questions = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  if (!fontsLoaded) return null;
 
-const handleAnswer = (answer: string) => {
-    const currentIndex = questionIndex;
+  const handleAnswer = (answer: string) => {
+      const currentIndex = questionIndex;
 
-    // Store answer at the original question index
-    const updatedAnswers = [...answers];
-    updatedAnswers[currentIndex] = answer;
-    setAnswers(updatedAnswers);
+      // Store answer at the original question index
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentIndex] = answer;
+      setAnswers(updatedAnswers);
 
-    // Calculate score with the updated answers
-    const updatedScore = updatedAnswers.filter((ans) => ans === 'Yes').length;
+      // Calculate score with the updated answers
+      const updatedScore = updatedAnswers.filter((ans) => ans === 'Yes').length;
 
-    console.log('Current answers before navigation:', updatedAnswers);
-    console.log('Stringified answers:', JSON.stringify(updatedAnswers));
-    console.log('Updated score:', updatedScore);
+      console.log('Current answers before navigation:', updatedAnswers);
+      console.log('Stringified answers:', JSON.stringify(updatedAnswers));
+      console.log('Updated score:', updatedScore);
 
-    // If this question was skipped before and now answered, remove from skipped
-    if (skippedIndices.includes(currentIndex)) {
-      setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
-    }
-
-    // Move to next question
-    const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
-    if (nextIndex !== -1) {
-      setQuestionIndex(nextIndex);
-    } else {
-      // If no more unanswered questions, check if skipped questions remain
-      if (skippedIndices.length > 0) {
-        setQuestionIndex(skippedIndices[0]);
-      } else {
-        // All done - navigate to results
-        router.push({
-          pathname: '/Forms/earthquake_results',
-          params: {
-            score: updatedScore.toString(),
-            answers: JSON.stringify(updatedAnswers),
-          },
-        });
+      // If this question was skipped before and now answered, remove from skipped
+      if (skippedIndices.includes(currentIndex)) {
+        setSkippedIndices(skippedIndices.filter((i) => i !== currentIndex));
       }
-    }
+
+      // Move to next question
+      const nextIndex = findNextUnansweredQuestion(currentIndex + 1, updatedAnswers, skippedIndices);
+      if (nextIndex !== -1) {
+        setQuestionIndex(nextIndex);
+      } else {
+        // If no more unanswered questions, check if skipped questions remain
+        if (skippedIndices.length > 0) {
+          setQuestionIndex(skippedIndices[0]);
+        } else {
+          // All done - navigate to results
+          router.push({
+            pathname: '/Forms/earthquake_results',
+            params: {
+              score: updatedScore.toString(),
+              answers: JSON.stringify(updatedAnswers),
+            },
+          });
+        }
+      }
   };
 
   // Helper to find next unanswered question index after current
@@ -129,6 +128,9 @@ const handleAnswer = (answer: string) => {
       }
     }
   };
+  
+  if (!fontsLoaded) return null;
+  
   return (
     <ImageBackground
       source={require('../../../assets/images/earthquake_bg.png')}

@@ -25,9 +25,7 @@ const ReportName = () => {
   const router = useRouter();
   const navigation = useNavigation();
 
-  if (!fontsLoaded) {
-    return null;
-  }
+
 
   const saveImageToStorage = async (uri: string) => {
     const filename = uri.split('/').pop();
@@ -110,6 +108,10 @@ const ReportName = () => {
       setIsUploading(false);
     }
   };
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

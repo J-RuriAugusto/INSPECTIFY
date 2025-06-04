@@ -8,8 +8,7 @@ export default {
   ENTER_HOME_NAME: "Ilagay ang pangalan ng iyong bahay",
   ENTER_HOUSE_AGE: "Ilagay ang edad ng bahay",
   ENTER_PRIMARY_USE: "Ilagay ang pangunahing gamit ng bahay",
-  HAS_RENOVATIONS: "Ang bahay ba ay sumailalim sa mga renovation",
-  HAS_RENOVATIONS2: "o pagkukumpuni?",
+  HAS_RENOVATIONS: "Ang bahay ba ay sumailalim sa mga renovation o pagkukumpuni?",
   RENOVATIONS_GUIDE: "Oo/Hindi, kung oo, ilahad",
   HOME_NAME_REQ: "Kinakailangan ang pangalan ng bahay.",
   HOUSE_AGE_REQ: "Kinakailangan ang edad ng bahay.",
@@ -179,7 +178,7 @@ export default {
   DELETE: "Burahin",
   EDIT: "Baguhin",
 
-  CHECK_DISASTER: "Suriin ang Iyong Kalamidad",
+  CHECK_DISASTER: "Suriin ang Iyong Paghahanda sa Sakuna",
   SELECT_DISASTER: "Pumili ng Kalamidad",
   FLOOD: "BAHA",
   EARTHQUAKE: "LINDOL",

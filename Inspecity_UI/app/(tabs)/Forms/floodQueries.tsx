@@ -38,8 +38,6 @@ const Questions = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  if (!fontsLoaded) return null;
-
   const handleAnswer = (answer: string) => {
       const currentIndex = questionIndex;
 
@@ -127,6 +125,8 @@ const Questions = () => {
       }
     };
 
+  if (!fontsLoaded) return null;
+  
   return (
     <ImageBackground
       source={require('../../../assets/images/flood_bg.png')}

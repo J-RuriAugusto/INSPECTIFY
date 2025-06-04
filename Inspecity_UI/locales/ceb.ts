@@ -8,8 +8,7 @@ export default {
     ENTER_HOME_NAME: "I-enter ang ngalan sa imong balay",
     ENTER_HOUSE_AGE: "I-enter ang edad sa balay",
     ENTER_PRIMARY_USE: "I-enter ang pangunang gamit sa balay",
-    HAS_RENOVATIONS: "Nakaagi ba ang balay og mga renovation",
-    HAS_RENOVATIONS2: "o pag-ayo?",
+    HAS_RENOVATIONS: "Nakaagi ba ang balay og mga renovation o pag-ayo?",
     RENOVATIONS_GUIDE: "Oo/Wala, kung oo, i-enter ang detalye",
     HOME_NAME_REQ: "Gikinahanglan ang ngalan sa balay.",
     HOUSE_AGE_REQ: "Gikinahanglan ang edad sa balay.",
@@ -177,7 +176,7 @@ export default {
     EDIT: "Usbon",
     DELETE: "I-papas",
 
-    CHECK_DISASTER: "Susiha ang Imong Kalamidad",
+    CHECK_DISASTER: "Susiha ang Imong Pagpangandam alang sa Kalamidad",
     SELECT_DISASTER: "Pilia ang Kalamidad",
     FLOOD: "BAHA",
     EARTHQUAKE: "LINOG",

@@ -34,11 +34,11 @@ const GettingStarted3b = () => {
 
   const API_KEY = '***REMOVED***';
 
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
+  });
 
   useEffect(() => {
     (async () => {
@@ -60,10 +60,6 @@ const GettingStarted3b = () => {
       }
     })();
   }, []);
-
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
@@ -131,6 +127,10 @@ const GettingStarted3b = () => {
   };
   
   const currentStep = 4;
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

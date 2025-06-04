@@ -24,15 +24,13 @@ const GettingStarted3b = () => {
   const [otherWall, setOtherWall] = useState('');
   const [otherCeiling, setOtherCeiling] = useState('');
 
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  });
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
@@ -70,6 +68,9 @@ const GettingStarted3b = () => {
   
   const currentStep = 4;
 
+  if (!fontsLoaded) {
+    return null;
+  } 
   return (
 <Animatable.View
       style={styles.container}
@@ -290,11 +291,10 @@ const styles = StyleSheet.create({
     paddingVertical: hp('1.5%'),
     paddingHorizontal: wp('25%'),
     backgroundColor: '#08294E',
-    padding: wp('3%'),
     borderRadius: wp('8%'),
     alignItems: 'center',
-    marginBottom: hp('3%'),
-    // marginHorizontal: wp('18%'),
+    marginTop: hp('1%'),
+    marginBottom: hp('2%')
   },
   buttonText: {
     color: '#FFFFFF',

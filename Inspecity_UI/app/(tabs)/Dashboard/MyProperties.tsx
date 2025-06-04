@@ -291,10 +291,6 @@ const MyProperties = () => {
     }, [userId]) // Add dependencies here
   );
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   // Update function parameters
   const handleEdit = (property: Property) => {
     setSelectedProperty(property);
@@ -387,6 +383,10 @@ const MyProperties = () => {
         <Text style={{ color: 'white' }}>{error}</Text>
       </View>
     );
+  }
+
+  if (!fontsLoaded) {
+    return null;
   }
 
   return (
