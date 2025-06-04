@@ -184,6 +184,12 @@ const Questions = () => {
             >
               <Text style={styles.optionText}>{t('NO')}</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={() => handleAnswer('I do not know')}
+            >
+              <Text style={styles.optionText}>{t('IDK')}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -278,18 +284,21 @@ questionContainer: {
     alignItems: 'center',
     gap: '8%',
     marginTop: '10%',
+    flexWrap: 'wrap',
   },
   optionButton: {
     backgroundColor: '#030F1C',
     paddingVertical: '5%',
-    paddingHorizontal: '40%',
+    // paddingHorizontal: '15%',
     borderRadius: 15,
+    width: 200,
   },
   optionText: {
     fontFamily: 'Epilogue-Bold',
     fontSize: 15,
     color: '#FFFFFF',
     textAlign: 'center',
+    paddingHorizontal: -10,
   },
   scrollContent: {
   paddingHorizontal: 10,

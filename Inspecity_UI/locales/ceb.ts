@@ -187,6 +187,7 @@ export default {
     SKIP: "LAKTAWAN",
     YES: "Oo",
     NO: "Dili",
+    IDK: "Wa ko kabalo",
     FLOOD_PREPAREDNESS_RESULT: "Resulta sa Pagpangandam sa Baha",
     EARTHQUAKE_PREPAREDNESS_RESULT: "Resulta sa Pagpangandam sa Linog",
     FIRE_PREPAREDNESS_RESULT: "Resulta sa Pagpangandam sa Sunog",

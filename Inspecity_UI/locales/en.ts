@@ -191,6 +191,7 @@ export default {
     SKIP: "SKIP",
     YES: "Yes",
     NO: "No",
+    IDK: "I don't know",
     FLOOD_PREPAREDNESS_RESULT: "Flood Preparedness Result",
     EARTHQUAKE_PREPAREDNESS_RESULT: "Earthquake Preparedness Result",
     FIRE_PREPAREDNESS_RESULT: "Fire Preparedness Result",

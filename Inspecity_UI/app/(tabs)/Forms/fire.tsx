@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: 'Epilogue-Bold',
-    fontSize: width * 0.04,
+    fontSize: width * 0.035,
     color: '#FFFFFF',
   },
 });
