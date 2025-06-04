@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, ScrollView, Animated, Easing } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -14,7 +14,7 @@ import { WebView } from 'react-native-webview';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
-import { makeGoogleMapsApiCall, getCurrentApiKey, fetchNearbyPlaces } from '../../../config/apiKeys';
+import { makeGoogleMapsApiCall, getCurrentApiKey } from '../../../config/apiKeys';
 
 const { height } = Dimensions.get('window');
 
@@ -40,12 +40,6 @@ interface GroupedResults {
   }>;
 }
 
-interface Service {
-  type: string;
-  name: string;
-  distance: number | null;
-}
-
 const Results = () => {
   const modalRef = useRef<Modalize>(null);
   const params = useLocalSearchParams();
@@ -57,8 +51,10 @@ const Results = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
   const { settings } = useSettings();
+  const [isSheetVisible, setIsSheetVisible] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(height)).current;
 
   const handlePositionChange = (position: 'initial' | 'top') => {
     setIsModalOpen(position === 'top');
@@ -71,9 +67,9 @@ const Results = () => {
   // };
 
   const getRiskLevel = () => {
-    if (numericScore <= 5) return { label: t('LOW_RISK'), color: '#F44336' };
-    if (numericScore <= 10) return { label: t('MODERATE_RISK'), color: '#FFC107' };
-    return { label: t('HIGH_RISK'), color: '#4CAF50' };
+    if (numericScore <= 5) return { label: t('LOW_PREPARED'), color: '#F44336' };
+    if (numericScore <= 10) return { label: t('MODERATE_PREPARED'), color: '#FFC107' };
+    return { label: t('HIGH_PREPARED'), color: '#4CAF50' };
   };
 
   const { label, color } = getRiskLevel();
@@ -94,7 +90,7 @@ const Results = () => {
       try {
         await Promise.all([
           fetchRecommendation(),
-          fetchNearbyFacilities()
+          fetchNearbyServices()
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -113,7 +109,7 @@ const Results = () => {
 
         // Filter out any invalid answers (only allow 'Yes' and 'No')
         const validAnswers = answersArray.filter(answer => 
-          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no' || answer.toLowerCase() === 'idk')
+          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no')
         );
 
         if (validAnswers.length === 0) {
@@ -164,59 +160,58 @@ const Results = () => {
       }
     };
 
-    const fetchNearbyFacilities = async () => {
-          try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-              setError('Location permission not granted');
-              return;
-            }
+    const fetchNearbyServices = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError('Location permission not granted');
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+        const radius = 5000; // 5km radius
+
+        // Fetch all relevant services
+        const types = [
+          'hospital',
+          'police',
+          'fire_station',
+          'school',
+          'community_center',
+          'local_government_office'
+        ].join('|');
+
+        const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${types}&key=${getCurrentApiKey()}`;
+        const data = await makeGoogleMapsApiCall(url);
         
-            const location = await Location.getCurrentPositionAsync({});
-            const { latitude, longitude } = location.coords;
-            const types = ['hospital', 'police', 'school', 'city_hall'];
-        
-            // Use the new fetchNearbyPlaces function
-            const results = await fetchNearbyPlaces(latitude, longitude, types);
-        
-            // Process the results (same as before)
-            const allPlaces = results.flatMap(res => res.results || []);
-            const groupedResults: { [key: string]: any[] } = {};
-        
-            types.forEach(type => {
-              groupedResults[type] = allPlaces.filter(place =>
-                place.types?.includes(type)
-              ).slice(0, 5); // Limit to 5 per type
-            });
-        
-            // Flatten the results and prepare the mapped data
-            const selected: Facility[] = [];
-            for (const type of types) {
-              const places = groupedResults[type];
-              places.forEach(place => {
-                const distance = calculateDistance(
-                  latitude,
-                  longitude,
-                  place.geometry.location.lat,
-                  place.geometry.location.lng
-                );
-                selected.push({
-                  icon: mapPlaceTypeToIcon(place.types || []),
-                  color: '#4CAF50',
-                  label: place.name,
-                  distance: distance
-                });
-              });
-            }
-            
-            // Sort facilities by distance
-            selected.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-            setFacilities(selected);
-          } catch (err) {
-            console.error(err);
-            setError('Failed to fetch nearby critical facilities.');
-          }
-        };
+        if (data.status === "OK") {
+          // Process the services data
+          const services = data.results.map((place: any) => ({
+            name: place.name,
+            type: place.types[0],
+            location: place.geometry.location,
+            address: place.vicinity,
+            distance: calculateDistance(
+              latitude,
+              longitude,
+              place.geometry.location.lat,
+              place.geometry.location.lng
+            )
+          }));
+          // Update your state with services
+          setFacilities(services.map(service => ({
+            icon: mapPlaceTypeToIcon(service.type),
+            color: '#4CAF50',
+            label: service.name,
+            distance: service.distance
+          })));
+        }
+      } catch (error) {
+        console.error('Error fetching nearby services:', error);
+        setError('Failed to fetch nearby services');
+      }
+    };
 
     fetchData();
   }, []);
@@ -464,7 +459,7 @@ const Results = () => {
           <div class="meta">
             <p><strong>${t('DATE_GENERATED')}:</strong> ${formattedCurrentDate}</p>
             <p><strong>${t('RISK_LEVEL')}:</strong> ${label}</p>
-            <p><strong>${t('SCORE')}:</strong> ${numericScore} ${t('OUT_OF')}15</p>
+            <p><strong>${t('SCORE')}:</strong> ${numericScore} ${t('OUT_OF')}16</p>
           </div>
 
           <div class="section">
@@ -602,12 +597,29 @@ const Results = () => {
       fontStyle: 'italic',
     },
   };
+  const openSheet = () => {
+      setIsSheetVisible(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 350,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    };
 
+    const closeSheet = () => {
+      Animated.timing(slideAnim, {
+        toValue: height,
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => setIsSheetVisible(false));
+    };
   return (
     <View style={styles.container}>
       {/* Background Video */}
       <Video
-        source={require('../../../assets/videos/houses4.mp4')}
+        source={require('../../../assets/videos/houses.mp4')}
         style={StyleSheet.absoluteFill}
         resizeMode={ResizeMode.COVER}
         shouldPlay
@@ -635,80 +647,77 @@ const Results = () => {
                 style={[styles.bar, { width: `${(numericScore / 16) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
-            <Text style={styles.swipeUpLabel}>⬆ {t('SWIPE_UP')}</Text>
+            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}16 {t('QUESTIONS')}</Text>
+                    
           </View>
 
-          {/* Always-Open Modal */}
-          <Modalize
-            ref={modalRef}
-            alwaysOpen={70}
-            modalStyle={styles.modal}
-            handleStyle={styles.handle}
-            modalHeight={height - 350}
-            panGestureEnabled
-            onPositionChange={handlePositionChange}
-            scrollViewProps={{
-              scrollEnabled: isModalOpen,
-              showsVerticalScrollIndicator: false,
-            }}
-          >
-            {/* Collapsed visible header */}
-            <View style={styles.collapsedHeader}>
-              <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
-            </View>
-                        <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
-                          <MaterialIcons name="visibility" size={20} color="#fff" />
-                          <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_SHARE')}</Text>
-                        </TouchableOpacity>
-            {/* Expanded modal content */}
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
-              <View style={styles.recommendationContainer}>
-                <Markdown style={{
-                  body: styles.modalText,
-                  heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
-                  heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
-                  heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
-                  bullet_list: { marginBottom: 10, paddingLeft: 20 },
-                  list_item: { marginBottom: 5 },
-                  strong: { fontWeight: 'bold', color: '#2E86C1' },
-                  em: { fontStyle: 'italic', color: '#666' },
-                  link: { color: '#2E86C1', textDecorationLine: 'underline' },
-                  paragraph: { marginBottom: 10, lineHeight: 24 },
-                  blockquote: { 
-                    borderLeftWidth: 4,
-                    borderLeftColor: '#2E86C1',
-                    paddingLeft: 10,
-                    marginVertical: 5,
-                    fontStyle: 'italic',
-                    color: '#666'
-                  }
-                }}>
-                  {recommendation}
-                </Markdown>
-              </View>
+          {/* Button to open sheet */}
+          <TouchableOpacity style={styles.downloadButton} onPress={openSheet}>
+            <MaterialIcons name="expand-less" size={20} color="#fff" />
+            <Text style={styles.downloadButtonText}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+          </TouchableOpacity>
 
-              <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
-
-              <View style={styles.criticalFacilities}>
-                {facilities.length === 0 && (
-                  <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
-                )}
-                {facilities.map((facility, index) => (
-                  <View key={index} style={styles.facilityItem}>
-                    <MaterialIcons name={facility.icon} size={24} color={facility.color} />
-                    <View style={styles.facilityInfo}>
-                      <Text style={styles.facilityText}>{facility.label}</Text>
-                      <Text style={styles.distanceText}>
-                        {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
-                      </Text>
-                    </View>
+          {/* Slide-up Modal */}
+          <Modal visible={isSheetVisible} animationType="none" transparent onRequestClose={closeSheet}>
+            <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={closeSheet} />
+            <Animated.View
+              style={[
+                styles.sheetContainer,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <ScrollView>
+                <View style={styles.sheetHandle} />
+                <View style={styles.collapsedHeader}>
+                  <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, paddingHorizontal: 10 }}>
+                  <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.downloadButton, { paddingVertical: 6, paddingHorizontal: 12, minWidth: 0, marginLeft: 10 }]}
+                    onPress={handlePreview}
+                  >
+                    <MaterialIcons name="visibility" size={20} color="#fff" />
+                    <Text style={[styles.actionButtonText, { fontSize: 14 }]}>{t('PREVIEW_AND_SHARE')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalContent}>
+                  <View style={styles.recommendationContainer}>
+                    <Markdown style={{
+                      body: styles.modalText,
+                      heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
+                      heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
+                      heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
+                      bullet_list: { marginBottom: 10, paddingLeft: 20 },
+                      list_item: { marginBottom: 5 },
+                      strong: { fontWeight: 'bold', color: '#2E86C1' },
+                      em: { fontStyle: 'italic', color: '#666' },
+                      link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                    }}>
+                      {recommendation}
+                    </Markdown>
                   </View>
-                ))}
-              </View>
-            </View>
-          </Modalize>
+                  <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
+                  <View style={styles.criticalFacilities}>
+                    {facilities.length === 0 && (
+                      <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
+                    )}
+                    {facilities.map((facility, index) => (
+                      <View key={index} style={styles.facilityItem}>
+                        <MaterialIcons name={facility.icon as any} size={24} color={facility.color} />
+                        <View style={styles.facilityInfo}>
+                          <Text style={styles.facilityText}>{facility.label}</Text>
+                          <Text style={styles.distanceText}>
+                            {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </ScrollView>
+            </Animated.View>
+          </Modal>
 
           {/* Preview Modal */}
           <Modal
@@ -737,17 +746,10 @@ const Results = () => {
                 
                 <View style={styles.previewActions}>
                   <TouchableOpacity 
-                    style={[styles.actionButton, styles.cancelButton]}
-                    onPress={() => setIsPreviewVisible(false)}
-                  >
-                    <Text style={styles.actionButtonText}>{t('CANCEL')}</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
                     style={[styles.actionButton, styles.downloadButton]}
                     onPress={handleDownload}
                   >
-                    <MaterialIcons name="share" size={20} color="#fff" />
+                    <MaterialIcons name="download" size={20} color="#fff" />
                     <Text style={styles.actionButtonText}>{t('SHARE_PDF')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -786,7 +788,7 @@ const styles = StyleSheet.create({
   barContainer: {
     width: '90%',
     height: 10,
-    backgroundColor: '#ffff',
+    backgroundColor: '#fff',
     borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 10,
@@ -801,7 +803,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 10,
-    marginTop:10,
+    marginTop: 10,
   },
   swipeUpLabel: {
     color: '#848484',
@@ -818,6 +820,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     width: 60,
   },
+  collapsedHeader: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#eee',
+  },
+  collapsedLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+  },
   modalContent: {
     paddingBottom: 100,
   },
@@ -826,13 +841,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 6,
+    paddingHorizontal: 10,
   },
   modalText: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: 'justify',
     color: '#333',
     marginBottom: 20,
+  },
+  recommendationContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   facilityItem: {
     flexDirection: 'row',
@@ -861,21 +887,9 @@ const styles = StyleSheet.create({
     color: '#666',
     fontStyle: 'italic',
   },
-  collapsedHeader: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginBottom: 10,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: '#eee',
-  },
-  collapsedLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#444',
-  },
   criticalFacilities: {
     marginTop: 10,
+    paddingHorizontal: 10,
   },
   recommendationText: {
     fontSize: 14,
@@ -949,7 +963,7 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   cancelButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#E55050',
     marginRight: 8,
   },
   actionButtonText: {
@@ -985,16 +999,35 @@ const styles = StyleSheet.create({
     color: '#19477B',
     fontWeight: '600',
   },
-  recommendationContainer: {
+  sheetBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 1,
+  },
+  sheetContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: height * 0.8,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    zIndex: 2,
+    paddingBottom: 20,
+    maxHeight: height * 0.9,
+  },
+  sheetHandle: {
+    width: 60,
+    height: 6,
+    backgroundColor: '#ccc',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginVertical: 10,
   },
 });
 

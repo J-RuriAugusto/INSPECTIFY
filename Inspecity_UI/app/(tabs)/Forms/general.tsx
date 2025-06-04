@@ -27,7 +27,7 @@ const General = () => {
   
   const acceptDisclaimer = () => {
     setModalVisible(false);
-    router.push('/(tabs)/Forms/earthquakeQueries');
+    router.push('/(tabs)/Forms/generalQueries');
   };
   
   if (!fontsLoaded) return null;

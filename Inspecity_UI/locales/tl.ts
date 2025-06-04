@@ -225,7 +225,9 @@ export default {
   LOW_RISK: "Mababang Panganib",
   MODERATE_RISK: "Katamtamang Panganib",
   LOADING_YOUR_RESULTS: "Nag-loading sa iyong mga resulta...",
-
+  HIGH_PREPARED: "Mahusay na Nakahanda",  
+  MODERATE_PREPARED: "Katamtamang Nakahanda",  
+  LOW_PREPARED: "Mababa ang Pagkahanda",  
 
 
   EARTHQUAKE_QUESTIONS: [

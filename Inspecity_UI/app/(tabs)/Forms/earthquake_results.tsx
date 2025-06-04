@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Platform, Modal, ScrollView } from 'react-native';
-import { Modalize } from 'react-native-modalize';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Platform, Modal, ScrollView, Easing } from 'react-native';
+import { Animated } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
@@ -11,7 +11,6 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { WebView } from 'react-native-webview';
-import { Animated } from 'react-native';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useSettings } from '../Dashboard/settingsContext';
 import Markdown from 'react-native-markdown-display';
@@ -19,29 +18,19 @@ import { makeGoogleMapsApiCall, getCurrentApiKey, fetchNearbyPlaces } from '../.
 
 const { height } = Dimensions.get('window');
 
-type MaterialIconName = 'local-hospital' | 'local-police' | 'school' | 'home-work' | 'location-on' | 'download' | 'sync' | 'close' | 'visibility';
-
-interface Facility {
-  icon: string;
-  color: string;
-  label: string;
-  distance?: number;
-}
-
 const Results = () => {
-  const modalRef = useRef<Modalize>(null);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
   const params = useLocalSearchParams();
   const scoreParam = Array.isArray(params.score) ? params.score[0] : params.score;
   const numericScore = parseInt(scoreParam || '0', 10);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSheetVisible, setIsSheetVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(height)).current;
   const { t } = useTranslation();
   const { settings } = useSettings();
-
-  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const handlePositionChange = (position: 'initial' | 'top') => {
     setIsModalOpen(position === 'top');
@@ -634,6 +623,25 @@ const Results = () => {
     },
   };
 
+    const openSheet = () => {
+      setIsSheetVisible(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 350,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    };
+  
+    const closeSheet = () => {
+      Animated.timing(slideAnim, {
+        toValue: height,
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => setIsSheetVisible(false));
+    };
+
   return (
     <View style={styles.container}>
       {/* Background Video */}
@@ -667,75 +675,76 @@ const Results = () => {
               />
             </View>
             <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
-                    
 
-            <Text style={styles.swipeUpLabel}>⬆ {t('SWIPE_UP')}</Text>
           </View>
 
-          {/* Always-Open Modal */}
-          <Modalize
-            ref={modalRef}
-            alwaysOpen={70}
-            modalStyle={styles.modal}
-            handleStyle={styles.handle}
-            panGestureEnabled
-            modalHeight={height - 350}
-            onPositionChange={handlePositionChange}
-            scrollViewProps={{
-              scrollEnabled: isModalOpen,
-              showsVerticalScrollIndicator: false,
-            }}
-          >
+          {/* Button to open sheet */}
+          <TouchableOpacity style={styles.downloadButton} onPress={openSheet}>
+            <MaterialIcons name="expand-less" size={20} color="#fff" />
+            <Text style={styles.downloadButtonText}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+          </TouchableOpacity>
 
-            {/* This section is always visible when modal is collapsed */}
-            <View style={styles.collapsedHeader}>
-              <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
-            </View>
-
-            <TouchableOpacity style={styles.downloadButton} onPress={handlePreview}>
-              <MaterialIcons name="visibility" size={20} color="#fff" />
-              <Text style={styles.downloadButtonText}>{t('PREVIEW_AND_SHARE')}</Text>
-            </TouchableOpacity>
-
-            {/* Full content shown when expanded */}
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
-              <View style={styles.recommendationContainer}>
-                <Markdown style={{
-                  body: styles.modalText,
-                  heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
-                  heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
-                  heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
-                  bullet_list: { marginBottom: 10, paddingLeft: 20 },
-                  list_item: { marginBottom: 5 },
-                  strong: { fontWeight: 'bold', color: '#2E86C1' },
-                  em: { fontStyle: 'italic', color: '#666' },
-                  link: { color: '#2E86C1', textDecorationLine: 'underline' },
-                }}>
-                  {recommendation}
-                </Markdown>
-              </View>
-
-              <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
-
-              <View style={styles.criticalFacilities}>
-                {facilities.length === 0 && (
-                  <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
-                )}
-                {facilities.map((facility, index) => (
-                  <View key={index} style={styles.facilityItem}>
-                    <MaterialIcons name={facility.icon as any} size={24} color={facility.color} />
-                    <View style={styles.facilityInfo}>
-                      <Text style={styles.facilityText}>{facility.label}</Text>
-                      <Text style={styles.distanceText}>
-                        {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
-                      </Text>
-                    </View>
+          {/* Slide-up Modal */}
+          <Modal visible={isSheetVisible} animationType="none" transparent onRequestClose={closeSheet}>
+            <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={closeSheet} />
+            <Animated.View
+              style={[
+                styles.sheetContainer,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <ScrollView>
+                <View style={styles.sheetHandle} />
+                <View style={styles.collapsedHeader}>
+                  <Text style={styles.collapsedLabel}>{t('RECOMMENDATIONS_AND_FACILITIES')}</Text>
+                </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, paddingHorizontal: 10 }}>
+                    <Text style={styles.modalTitle}>{t('RECOMMENDATIONS')}</Text>
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.downloadButton, { paddingVertical: 6, paddingHorizontal: 12, minWidth: 0, marginLeft: 10 }]}
+                      onPress={handlePreview}
+                    >
+                      <MaterialIcons name="visibility" size={20} color="#fff" />
+                      <Text style={[styles.actionButtonText, { fontSize: 14 }]}>{t('PREVIEW_AND_SHARE')}</Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
-              </View>
-            </View>
-          </Modalize>
+                <View style={styles.modalContent}>
+                  <View style={styles.recommendationContainer}>
+                    <Markdown style={{
+                      body: styles.modalText,
+                      heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: '#2E86C1' },
+                      heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#2E86C1' },
+                      heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#2E86C1' },
+                      bullet_list: { marginBottom: 10, paddingLeft: 20 },
+                      list_item: { marginBottom: 5 },
+                      strong: { fontWeight: 'bold', color: '#2E86C1' },
+                      em: { fontStyle: 'italic', color: '#666' },
+                      link: { color: '#2E86C1', textDecorationLine: 'underline' },
+                    }}>
+                      {recommendation}
+                    </Markdown>
+                  </View>
+                  <Text style={styles.modalTitle}>{t('CRITICAL_FACILITIES_NEAR')}</Text>
+                  <View style={styles.criticalFacilities}>
+                    {facilities.length === 0 && (
+                      <Text style={styles.recommendationText}>{t('NO_FACILITIES_FOUND')}</Text>
+                    )}
+                    {facilities.map((facility, index) => (
+                      <View key={index} style={styles.facilityItem}>
+                        <MaterialIcons name={facility.icon as any} size={24} color={facility.color} />
+                        <View style={styles.facilityInfo}>
+                          <Text style={styles.facilityText}>{facility.label}</Text>
+                          <Text style={styles.distanceText}>
+                            {facility.distance ? formatDistance(facility.distance) : 'Distance unknown'}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </ScrollView>
+            </Animated.View>
+          </Modal>
 
           {/* Preview Modal */}
           <Modal
@@ -763,13 +772,6 @@ const Results = () => {
                 />
                 
                 <View style={styles.previewActions}>
-                  <TouchableOpacity 
-                    style={[styles.actionButton, styles.cancelButton]}
-                    onPress={() => setIsPreviewVisible(false)}
-                  >
-                    <Text style={styles.actionButtonText}>{t('CANCEL')}</Text>
-                  </TouchableOpacity>
-                  
                   <TouchableOpacity 
                     style={[styles.actionButton, styles.downloadButton]}
                     onPress={handleDownload}
@@ -813,7 +815,7 @@ const styles = StyleSheet.create({
   barContainer: {
     width: '90%',
     height: 10,
-    backgroundColor: '#ffff',
+    backgroundColor: '#fff',
     borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 10,
@@ -828,7 +830,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 10,
-    marginTop:10,
+    marginTop: 10,
   },
   swipeUpLabel: {
     color: '#848484',
@@ -845,6 +847,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     width: 60,
   },
+  collapsedHeader: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#eee',
+  },
+  collapsedLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+  },
   modalContent: {
     paddingBottom: 100,
   },
@@ -853,13 +868,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 6,
+    paddingHorizontal: 10,
   },
   modalText: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: 'justify',
     color: '#333',
     marginBottom: 20,
+  },
+  recommendationContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   facilityItem: {
     flexDirection: 'row',
@@ -890,6 +916,7 @@ const styles = StyleSheet.create({
   },
   criticalFacilities: {
     marginTop: 10,
+    paddingHorizontal: 10,
   },
   recommendationText: {
     fontSize: 14,
@@ -897,20 +924,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  collapsedHeader: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginBottom: 10,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: '#eee',
-},
-collapsedLabel: {
-  fontSize: 14,
-  fontWeight: '600',
-  color: '#444',
-},
-
   downloadButton: {
     marginTop: -3,
     marginBottom: -3,
@@ -929,102 +942,120 @@ collapsedLabel: {
     fontSize: 12,
     fontWeight: '600',
   },
-
-modalOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-previewContainer: {
-  width: '90%',
-  height: '80%',
-  backgroundColor: 'white',
-  borderRadius: 12,
-  overflow: 'hidden',
-},
-previewHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: 16,
-  borderBottomWidth: 1,
-  borderBottomColor: '#eee',
-},
-previewTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#19477B',
-},
-closeButton: {
-  padding: 4,
-},
-webview: {
-  flex: 1,
-},
-previewActions: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  padding: 16,
-  borderTopWidth: 1,
-  borderTopColor: '#eee',
-},
-actionButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: 12,
-  borderRadius: 8,
-  minWidth: 120,
-},
-cancelButton: {
-  backgroundColor: '#e0e0e0',
-  marginRight: 8,
-},
-actionButtonText: {
-  color: '#fff',
-  fontSize: 16,
-  fontWeight: '600',
-  marginLeft: 8,
-},
-loadingContainer: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-},
-loadingContent: {
-  alignItems: 'center',
-  padding: 20,
-  borderRadius: 10,
-  backgroundColor: 'white',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-  elevation: 5,
-},
-loadingIcon: {
-  marginBottom: 10,
-  transform: [{ scale: 1 }],
-  opacity: 1,
-},
-loadingText: {
-  fontSize: 16,
-  color: '#19477B',
-  fontWeight: '600',
-},
-recommendationContainer: {
-  backgroundColor: '#fff',
-  borderRadius: 8,
-  padding: 16,
-  marginBottom: 16,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 3,
-},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  previewContainer: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  previewTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#19477B',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  webview: {
+    flex: 1,
+  },
+  previewActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    minWidth: 120,
+  },
+  cancelButton: {
+    backgroundColor: '#E55050',
+    marginRight: 8,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  },
+  loadingContent: {
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingIcon: {
+    marginBottom: 10,
+    transform: [{ scale: 1 }],
+    opacity: 1,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#19477B',
+    fontWeight: '600',
+  },
+  sheetBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 1,
+  },
+  sheetContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: height * 0.8,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    zIndex: 2,
+    paddingBottom: 20,
+    maxHeight: height * 0.9,
+  },
+  sheetHandle: {
+    width: 60,
+    height: 6,
+    backgroundColor: '#ccc',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
 });
 
 export default Results;

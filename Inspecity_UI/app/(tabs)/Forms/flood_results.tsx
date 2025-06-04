@@ -708,6 +708,7 @@ const Results = () => {
                       <Text style={[styles.actionButtonText, { fontSize: 14 }]}>{t('PREVIEW_AND_SHARE')}</Text>
                     </TouchableOpacity>
                   </View>
+                  
                   <View style={styles.recommendationContainer}>
                     <Markdown style={{
                       body: styles.modalText,
@@ -777,12 +778,12 @@ const Results = () => {
                 />
                 
                 <View style={styles.previewActions}>
-                  <TouchableOpacity 
+                  {/* <TouchableOpacity 
                     style={[styles.actionButton, styles.cancelButton]}
                     onPress={() => setIsPreviewVisible(false)}
                   >
                     <Text style={styles.actionButtonText}>{t('CANCEL')}</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   
                   <TouchableOpacity 
                     style={[styles.actionButton, styles.downloadButton]}

@@ -226,6 +226,10 @@ export default {
     HIGH_RISK: "High Risk",
     LOW_RISK: "Low Risk",
     MODERATE_RISK: "Moderate Risk",
+    HIGH_PREPARED: "Highly Prepared",
+    MODERATE_PREPARED: "Moderately Prepared",
+    LOW_PREPARED: "Low Prepared",
+    HIGH_RISK_DESCRIPTION: "You are at high risk of flooding. Immediate action is needed to improve your preparedness.",
     LOADING_YOUR_RESULTS: "Loading your results...",
 
     EARTHQUAKE_QUESTIONS: [
