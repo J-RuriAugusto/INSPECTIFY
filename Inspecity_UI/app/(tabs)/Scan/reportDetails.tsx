@@ -20,6 +20,22 @@ interface Recommendations {
   cebuano: string;
 }
 
+interface ReportData {
+  report_id?: number;
+  annotated_image?: string;
+  Condition?: string;
+  condition?: string;
+  Material?: string;
+  material?: string;
+  Material_age?: string | number;
+  material_age?: string | number;
+  Recommendations?: Recommendations;
+  recommendations?: Recommendations;
+  damage_types?: string[];
+  date_created?: string;
+  note?: string;
+}
+
 const ReportDetails = () => {
   const { t } = useTranslation();
   const { settings } = useSettings();
@@ -123,32 +139,130 @@ const ReportDetails = () => {
   );
 
   // Update the fetchReportDetails function
-  const fetchReportDetails = async (reportId:number) => {
+  const fetchReportDetails = async (reportId) => {
     try {
-      const response = await axios.get(`https://flask-railway-sample-production.up.railway.app/reports/${reportId}`, {
-        headers: {
-          'X-API-KEY': API_KEY,
-        },
-      });
+      const response = await axios.get(
+        `https://flask-railway-sample-production.up.railway.app/reports/${reportId}`,
+        {
+          headers: {
+            'X-API-KEY': API_KEY,
+            'Accept': 'application/json'
+          }
+        }
+      );
 
       if (response.data) {
-        setReportName(response.data.report_name)
-        setAnnotatedImage(response.data.annotated_image);
-        setCondition(t(response.data.condition) || response.data.condition);
-        setMaterial(t(response.data.material) || response.data.material);
-        setMaterialAge(response.data.material_age);
-        setRecommendations(t(response.data.recommendations) || response.data.recommendations);
-        setDamageTypes(
-          response.data.damage_types 
-            ? response.data.damage_types.map((damage: string) => t(damage) || damage)
-            : []
-        );
-        setDateCreated(response.data.date_created);
-        setNotes(response.data.note)
+        const reportData = response.data;
+        
+        // Set all the state values with proper fallbacks
+        setAnnotatedImage(reportData.annotated_image || '');
+        
+        // Handle condition with proper fallback
+        const condition = reportData.condition || 'No condition specified';
+        setCondition(t(condition) || condition);
+        
+        // Handle material with proper fallback
+        const material = reportData.material || 'Unknown';
+        setMaterial(t(material) || material);
+        
+        // Handle material age with proper conversion
+        const materialAge = reportData.material_age;
+        setMaterialAge(materialAge ? String(materialAge) : '');
+        
+        // Handle recommendations with proper structure
+        if (reportData.recommendations) {
+          const recommendations = reportData.recommendations;
+          
+          // Process each language's recommendations to add manual styling
+          const processRecommendations = (text) => {
+            if (!text) return '';
+            
+            // Normalize priority text
+            let processed = text
+              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, 'Priority 1 - Critical')
+              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, 'Priority 2 - Important')
+              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, 'Priority 3 - Preventive')
+              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4');
+
+            // Split into sections based on priority
+            const sections = processed.split(/(?=Priority \d+ -)/);
+
+            const processedSections = sections.map(section => {
+              // Extract header and subtext
+              const match = section.match(/^(Priority \d+ - [^:]+):?(.*)$/s);
+              if (match) {
+                const header = match[1].trim();
+                const subtext = match[2]
+                  .replace(/^\s*:\s*/, '') // Remove leading colon and whitespace
+                  .replace(/^\s+/, ''); // Remove leading whitespace
+
+                // Only the header is a markdown header, subtext is normal
+                let result = `## ${header}\n`;
+                if (subtext) {
+                  // Add bullet points to each line of subtext
+                  result += subtext
+                    .split('\n')
+                    .map(line => line.trim() ? `- ${line.trim()}` : '')
+                    .join('\n');
+                }
+                return result;
+              } else {
+                // Fallback: treat as normal text
+                return section;
+              }
+            });
+
+            return processedSections
+              .join('\n\n')
+              .replace(/\n{3,}/g, '\n\n')
+              .trim();
+          };
+          
+          setRecommendations({
+            english: processRecommendations(recommendations.english || ''),
+            tagalog: processRecommendations(recommendations.tagalog || ''),
+            cebuano: processRecommendations(recommendations.cebuano || '')
+          });
+        } else {
+          setRecommendations({
+            english: '',
+            tagalog: '',
+            cebuano: ''
+          });
+        }
+        
+        // Handle damage types with proper array structure
+        const damageTypes = Array.isArray(reportData.damage_types) 
+          ? reportData.damage_types.map((damage) => t(damage) || damage)
+          : [];
+        setDamageTypes(damageTypes);
+        
+        setDateCreated(reportData.date_created || '');
+        setNotes(reportData.note || '');
       }
     } catch (error) {
-      console.error('Error fetching report details: ', error);
-      Alert.alert(t('ERROR'), t('FAILED_FETCH_REPORT'));
+      console.error('Error fetching report details:', error);
+      let errorMessage = t('ERROR_FETCHING_REPORT');
+      
+      if (error.response) {
+        errorMessage = `Server error: ${error.response.status}`;
+        console.error('Error response:', error.response.data);
+        
+        if (error.response.data) {
+          console.error('Error details:', JSON.stringify(error.response.data, null, 2));
+        }
+      } else if (error.request) {
+        if (error.code === 'ECONNABORTED') {
+          errorMessage = t('REQUEST_TIMEOUT');
+        } else {
+          errorMessage = t('NO_SERVER_RESPONSE');
+        }
+        console.error('Request error:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      
+      Alert.alert(t('ERROR'), errorMessage);
     }
   };
 

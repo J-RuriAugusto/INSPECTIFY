@@ -399,92 +399,198 @@ const PhotoDetails = () => {
     }
   };
 
-  const createReport = async (imageUrl: string) => {
+  const createReport = async (imageUrl) => {
     try {
       // Convert homeId to a number
       const homeIdNumber = parseInt(homeId, 10);
     
-      // Log the data being sent
-      console.log("Sending datas:", {
+      // Prepare the request data exactly as expected by the backend
+      const requestData = {
         home_id: homeIdNumber,
-        report_name: reportName,
+        report_name: reportName || 'Untitled Report',
         url: imageUrl,
-        autosave: settings.autoSave,
-      });
+        autosave: settings.autoSave ? 1 : 0,
+        context: {
+          location: "University of the Philippines",
+          coordinates: "123.90467, 10.41196",
+          building_type: "Residential",
+          construction_date: "Unknown"
+        },
+        expected_response: {
+          condition: "",
+          material: "",
+          material_age: "",
+          recommendations: {
+            english: "",
+            tagalog: "",
+            cebuano: ""
+          },
+          damage_types: []
+        }
+      };
     
-      const response = await axios.post('https://flask-railway-sample-production.up.railway.app/createReport', {
-        home_id: homeIdNumber,
-        report_name: reportName,
-        url: imageUrl,
-        autosave: settings.autoSave,
-      }, {
+      // Log the data being sent
+      console.log("Sending data:", JSON.stringify(requestData, null, 2));
+    
+      const response = await axios({
+        method: 'post',
+        url: 'https://flask-railway-sample-production.up.railway.app/createReport',
+        data: requestData,
         headers: {
           'Content-Type': 'application/json',
           'X-API-KEY': API_KEY,
+          'Accept': 'application/json'
         },
+        timeout: 60000, // Increase timeout to 60 seconds
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
       });
-    
-      console.log("Response:", response.data);
-    
-      if (response.status === 200) {
-        setReportID(Number(response.data.report_id));
-        setAnnotatedImage(response.data.annotated_image);
-        setCondition(response.data.condition);
-        setMaterial(response.data.material);
-        setMaterialAge(response.data.material_age);
-        setRecommendations(response.data.recommendations || {
-          english: '',
-          tagalog: '',
-          cebuano: ''
-        })
-        setDamageTypes(response.data.damage_types || []);
-        setDateCreated(response.data.date_created);
-        setNotes(response.data.note);
-        if (!settings.autoSave){
-          setFormattedResponse(response.data.formatted_response);
-        }
-        setReportCreationFailed(false);
 
+      // Log the response for debugging
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
+      if (response.status === 200 && response.data) {
+        const reportData = response.data;
+        
+        // Set all the state values with proper fallbacks
+        setReportID(Number(reportData.report_id));
+        setAnnotatedImage(reportData.annotated_image || '');
+        
+        // Handle condition with proper fallback
+        const condition = reportData.condition || 'No condition specified';
+        setCondition(t(condition) || condition);
+        
+        // Handle material with proper fallback
+        const material = reportData.material || 'Unknown';
+        setMaterial(t(material) || material);
+        
+        // Handle material age with proper conversion
+        const materialAge = reportData.material_age;
+        setMaterialAge(materialAge ? String(materialAge) : '');
+        
+        // Handle recommendations with proper structure
+        if (reportData.recommendations) {
+          const recommendations = reportData.recommendations;
+          
+          // Process each language's recommendations to add manual styling
+          const processRecommendations = (text) => {
+            if (!text) return '';
+            
+            // First, normalize all priority text variations
+            let processed = text
+              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, "Priority 1 - Critical")
+              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, "Priority 2 - Important")
+              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, "Priority 3 - Preventive")
+              .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4');
+
+            // Split into sections based on priority
+            const sections = processed.split(/(?=Priority \d+ -)/);
+
+            const processedSections = sections.map(section => {
+              // First, remove any duplicate priority text from the section
+              section = section.replace(/(Priority \d+ - [^:]+)(?:\s*-\s*\1)/g, '$1');
+              
+              // Then extract header and subtext
+              const match = section.match(/^(Priority \d+ - [^:]+)(?::\s*|\s+)(.*)$/s);
+              if (match) {
+                const header = match[1].trim();
+                const subtext = match[2]
+                  .replace(/^\s*:\s*/, '') // Remove leading colon and whitespace
+                  .replace(/^\s+/, '') // Remove leading whitespace
+                  .replace(/^Priority \d+ - [^:]+(?:\s*-\s*[^:]+)?:\s*/g, '') // Remove any duplicate priority text
+                  .replace(/(Priority \d+ - [^:]+)(?:\s*-\s*\1)/g, '$1'); // Remove any remaining duplicates
+
+                // Only the header is a markdown header, subtext is normal
+                let result = `## ${header}\n`;
+                if (subtext) {
+                  // Add bullet points to each line of subtext
+                  result += subtext
+                    .split('\n')
+                    .map(line => line.trim() ? `- ${line.trim()}` : '')
+                    .join('\n');
+                }
+                return result;
+              } else {
+                // Fallback: treat as normal text
+                return section;
+              }
+            });
+
+            return processedSections
+              .join('\n\n')
+              .replace(/\n{3,}/g, '\n\n')
+              .trim();
+          };
+          
+          setRecommendations({
+            english: processRecommendations(recommendations.english || ''),
+            tagalog: processRecommendations(recommendations.tagalog || ''),
+            cebuano: processRecommendations(recommendations.cebuano || '')
+          });
+        } else {
+          setRecommendations({
+            english: '',
+            tagalog: '',
+            cebuano: ''
+          });
+        }
+        
+        // Handle damage types with proper array structure
+        const damageTypes = Array.isArray(reportData.damage_types) 
+          ? reportData.damage_types.map((damage) => t(damage) || damage)
+          : [];
+        setDamageTypes(damageTypes);
+        
+        setDateCreated(reportData.date_created || '');
+        setNotes(reportData.note || '');
+        
+        if (!settings.autoSave) {
+          setFormattedResponse(reportData.formatted_response || []);
+        }
+        
+        setReportCreationFailed(false);
         Alert.alert(t('SUCCESS'), t('REPORT_CREATED_SUCCESSFULLY'));
       } else {
-        setReportCreationFailed(true); // Set failure state
-        Alert.alert(
-          'Error', 
-          'Failed to create report',
-          [
-            { 
-              text: "Go Back", 
-              onPress: () => navigation.popToTop()
-            },
-            {
-              text: "Retry",
-              onPress: () => {
-                // Don't reupload image if it was successful
-                if (imageUrl) {
-                  createReport(imageUrl);
-                } else {
-                  uploadImageToCloudinary(photo);
-                }
-              }
-            }
-          ]
-        );
+        throw new Error(`Invalid response format: ${response.status}`);
       }
+
+      return response;
     } catch (error) {
       console.error('Error creating report: ', error);
-      setReportCreationFailed(true); // Set failure state
+      setReportCreationFailed(true);
+      
+      let errorMessage = t('ERROR_CREATING_REPORT');
+      if (error.response) {
+        errorMessage = `Server error: ${error.response.status}`;
+        console.error('Error response:', error.response.data);
+        
+        // Log more details about the error
+        if (error.response.data) {
+          console.error('Error details:', JSON.stringify(error.response.data, null, 2));
+        }
+      } else if (error.request) {
+        if (error.code === 'ECONNABORTED') {
+          errorMessage = t('REQUEST_TIMEOUT');
+        } else {
+          errorMessage = t('NO_SERVER_RESPONSE');
+        }
+        console.error('Request error:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      
       Alert.alert(
-        'Error', 
-        'An error occurred while creating the report',
+        t('ERROR'), 
+        errorMessage,
         [
           { 
-            text: "Go Back", 
+            text: t('GO_BACK'), 
             onPress: () => navigation.popToTop()
           },
           {
-            text: "Retry",
+            text: t('RETRY'),
             onPress: () => {
-              // Don't reupload image if it was successful
               if (imageUrl) {
                 createReport(imageUrl);
               } else {
