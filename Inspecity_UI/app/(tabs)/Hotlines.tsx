@@ -294,7 +294,7 @@ const EmergencyHotlines = () => {
     <View style={styles.tabContainer}>
       <FlatList
         data={favorites}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `${item.id}_${item.type}`}
         renderItem={({ item }) => renderItem({ 
           item, 
           showFavorite: !item.isCommon
@@ -335,7 +335,7 @@ const EmergencyHotlines = () => {
       ) : (
         <FlatList
           data={apiHotlines}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => `${item.id}_${item.type}`}
           renderItem={({ item }) => renderItem({ item })}
           ListEmptyComponent={
             <View style={styles.emptyState}>
