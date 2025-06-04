@@ -185,10 +185,10 @@ const GettingStarted2 = () => {
         <Text style={styles.subtitle2}>{t('BASIC_HOME_DETAILS2')}</Text>
 
         {/* Wrap just the form elements in ScrollView */}
-      <ScrollView 
+      {/* <ScrollView 
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-      >
+      > */}
         <TouchableOpacity 
           style={styles.textBox} 
           onPress={() => handleInputPress('homeName')}
@@ -225,7 +225,7 @@ const GettingStarted2 = () => {
             {renovations || t('RENOVATIONS_GUIDE')}
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+      {/* </ScrollView> */}
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3}>
           <Text style={styles.buttonText}>{t('NEXT')}</Text>
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#08294E',
     borderRadius: wp('8%'),
     alignItems: 'center',
-    marginTop: hp('1%'),
+    // marginTop: hp('1%'),
     marginBottom: hp('2%')
   },
   buttonText: {
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 0.3,
-    paddingBottom: 20,
+    // paddingBottom: wp('1%'),
     alignItems: 'center',
   },
 });

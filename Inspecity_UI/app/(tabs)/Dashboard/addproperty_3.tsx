@@ -157,11 +157,11 @@ const GettingStarted3 = () => {
         <Text style={styles.title1}>Tell Us About Your Home</Text>
         <Text style={styles.subtitle1}>Enter basic details about your home to begin.</Text>
         
-        <ScrollView 
+        {/* <ScrollView
           style={styles.scrollView} 
           contentContainerStyle={styles.scrollContainer} 
           keyboardShouldPersistTaps="handled"
-        >
+        > */}
           <View style={styles.pickerContainer}>
             <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
               <Picker.Item label={t('TYPE_OF_HOUSE')} value="" enabled={false} />
@@ -220,7 +220,7 @@ const GettingStarted3 = () => {
               </Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        {/* </ScrollView> */}
 
         <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted3b}>
           <Text style={styles.buttonText}>{t('NEXT')}</Text>
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     textAlign: 'auto',
   },
   scrollView: { width: '100%', height: '100%' },
-  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: 50 },
+  scrollContainer: { flexGrow: 1, alignItems: 'center', paddingBottom: wp('1%') },
   
   // Modal styles
   modalOverlay: {

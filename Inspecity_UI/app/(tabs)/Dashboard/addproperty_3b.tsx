@@ -139,137 +139,137 @@ const GettingStarted3b = () => {
       </View>
 
       <View style={styles.lowerSection}>
-      {/* <View style={styles.progressBar}>
-        {Array.from({ length: 6 }).map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.progressStep,
-              index < currentStep ? styles.progressStepActive : styles.progressStepInactive,
-            ]}
-          />
-        ))}
-      </View> */}
+        {/* <View style={styles.progressBar}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.progressStep,
+                index < currentStep ? styles.progressStepActive : styles.progressStepInactive,
+              ]}
+            />
+          ))}
+        </View> */}
 
-      <Text style={styles.title1}>{t('TELL_US_YOUR_HOME')}</Text>
-      <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')} {t('BASIC_HOME_DETAILS2')}</Text>
+        <Text style={styles.title1}>{t('TELL_US_YOUR_HOME')}</Text>
+        <Text style={styles.subtitle1}>{t('BASIC_HOME_DETAILS')} {t('BASIC_HOME_DETAILS2')}</Text>
 
-      {/* Scrollable form */}
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-        {/* House Type Dropdown */}
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
-            <Picker.Item label="Primary Material of the House" value="" enabled={false} />
-            <Picker.Item label="Reinforced concrete" value="reinforced" />
-            <Picker.Item label="Concrete hollow blocks" value="concrete" />
-            <Picker.Item label="Wood" value="wood" />
-            <Picker.Item label="Bamboo" value="bamboo" />
-            <Picker.Item label="Mixed materials" value="others" />
-          </Picker>
-        </View>
+        {/* Scrollable form */}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+          {/* House Type Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedHouseType} onValueChange={(itemValue) => setSelectedHouseType(itemValue)} style={styles.picker}>
+              <Picker.Item label="Primary Material of the House" value="" enabled={false} />
+              <Picker.Item label="Reinforced concrete" value="reinforced" />
+              <Picker.Item label="Concrete hollow blocks" value="concrete" />
+              <Picker.Item label="Wood" value="wood" />
+              <Picker.Item label="Bamboo" value="bamboo" />
+              <Picker.Item label="Mixed materials" value="others" />
+            </Picker>
+          </View>
 
-        {selectedHouseType === t('OTHERS') && (
-          <TextInput
-            style={styles.textBox}
-            placeholder={t('SPECIFY_OTHER_HOUSE_TYPE')}
-            placeholderTextColor="#BBBBBB"
-            value={otherHouseType}
-            onChangeText={(text) => setOtherHouseType(text)}
-          />
-        )}
+          {selectedHouseType === t('OTHERS') && (
+            <TextInput
+              style={styles.textBox}
+              placeholder={t('SPECIFY_OTHER_HOUSE_TYPE')}
+              placeholderTextColor="#BBBBBB"
+              value={otherHouseType}
+              onChangeText={(text) => setOtherHouseType(text)}
+            />
+          )}
 
-        {/* Roofing Material Dropdown */}
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedMaterial} onValueChange={(itemValue) => setSelectedMaterial(itemValue)} style={styles.picker}>
-            <Picker.Item label={t('PRIMARY_ROOFING_MATERIAL')} value="" enabled={false} />
-            <Picker.Item label="GI sheets (yero)" value="yero" />
-            <Picker.Item label="Clay tiles" value="clay" />
-            <Picker.Item label="Concrete slab" value="slab" />
-            <Picker.Item label="Nipa/ Bamboo" value="nipa" />
-            <Picker.Item label="Asphalt shingles" value="asphalt" />
-            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
-          </Picker>
-        </View>
+          {/* Roofing Material Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedMaterial} onValueChange={(itemValue) => setSelectedMaterial(itemValue)} style={styles.picker}>
+              <Picker.Item label={t('PRIMARY_ROOFING_MATERIAL')} value="" enabled={false} />
+              <Picker.Item label="GI sheets (yero)" value="yero" />
+              <Picker.Item label="Clay tiles" value="clay" />
+              <Picker.Item label="Concrete slab" value="slab" />
+              <Picker.Item label="Nipa/ Bamboo" value="nipa" />
+              <Picker.Item label="Asphalt shingles" value="asphalt" />
+              <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
+            </Picker>
+          </View>
 
-        {selectedMaterial === t('OTHERS') && (
-          <TextInput
-            style={styles.textBox}
-            placeholder={t('SPECIFY_OTHER_ROOFING_MATERIAL')}
-            placeholderTextColor="#BBBBBB"
-            value={otherMaterial}
-            onChangeText={(text) => setOtherMaterial(text)}
-          />
-        )}
+          {selectedMaterial === t('OTHERS') && (
+            <TextInput
+              style={styles.textBox}
+              placeholder={t('SPECIFY_OTHER_ROOFING_MATERIAL')}
+              placeholderTextColor="#BBBBBB"
+              value={otherMaterial}
+              onChangeText={(text) => setOtherMaterial(text)}
+            />
+          )}
 
-        {/* Flooring Material Dropdown */}
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedFlooring} onValueChange={(itemValue) => setSelectedFlooring(itemValue)} style={styles.picker}>
-            <Picker.Item label={t('FLOORING_MATERIAL')} value="" enabled={false} />
-            <Picker.Item label="Concrete" value="concrete" />
-            <Picker.Item label="Wood" value="wood" />
-            <Picker.Item label="Tiles" value="tiles" />
-            <Picker.Item label="Vinyl" value="vinyl" />
-            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
-          </Picker>
-        </View>
+          {/* Flooring Material Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedFlooring} onValueChange={(itemValue) => setSelectedFlooring(itemValue)} style={styles.picker}>
+              <Picker.Item label={t('FLOORING_MATERIAL')} value="" enabled={false} />
+              <Picker.Item label="Concrete" value="concrete" />
+              <Picker.Item label="Wood" value="wood" />
+              <Picker.Item label="Tiles" value="tiles" />
+              <Picker.Item label="Vinyl" value="vinyl" />
+              <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
+            </Picker>
+          </View>
 
-        {selectedFlooring === t('OTHERS') && (
-          <TextInput
-            style={styles.textBox}
-            placeholder={t('SPECIFY_OTHER_FLOORING_MATERIAL')}
-            placeholderTextColor="#BBBBBB"
-            value={otherFlooring}
-            onChangeText={(text) => setOtherFlooring(text)}
-          />
-        )}
+          {selectedFlooring === t('OTHERS') && (
+            <TextInput
+              style={styles.textBox}
+              placeholder={t('SPECIFY_OTHER_FLOORING_MATERIAL')}
+              placeholderTextColor="#BBBBBB"
+              value={otherFlooring}
+              onChangeText={(text) => setOtherFlooring(text)}
+            />
+          )}
 
-        {/* Wall Material Dropdown */}
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedWall} onValueChange={(itemValue) => setSelectedWall(itemValue)} style={styles.picker}>
-            <Picker.Item label={t('WALL_MATERIAL')} value="" enabled={false} />
-            <Picker.Item label="Concrete" value="concrete" />
-            <Picker.Item label="Wood" value="wood" />
-            <Picker.Item label="Bamboo" value="bamboo" />
-            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
-          </Picker>
-        </View>
+          {/* Wall Material Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedWall} onValueChange={(itemValue) => setSelectedWall(itemValue)} style={styles.picker}>
+              <Picker.Item label={t('WALL_MATERIAL')} value="" enabled={false} />
+              <Picker.Item label="Concrete" value="concrete" />
+              <Picker.Item label="Wood" value="wood" />
+              <Picker.Item label="Bamboo" value="bamboo" />
+              <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
+            </Picker>
+          </View>
 
-        {selectedWall === t('OTHERS') && (
-          <TextInput
-            style={styles.textBox}
-            placeholder={t('SPECIFY_OTHER_WALL_MATERIAL')}
-            placeholderTextColor="#BBBBBB"
-            value={otherWall}
-            onChangeText={(text) => setOtherWall(text)}
-          />
-        )}
+          {selectedWall === t('OTHERS') && (
+            <TextInput
+              style={styles.textBox}
+              placeholder={t('SPECIFY_OTHER_WALL_MATERIAL')}
+              placeholderTextColor="#BBBBBB"
+              value={otherWall}
+              onChangeText={(text) => setOtherWall(text)}
+            />
+          )}
 
-        {/* Ceiling Material Dropdown */}
-        <View style={styles.pickerContainer}>
-          <Picker selectedValue={selectedCeiling} onValueChange={(itemValue) => setSelectedCeiling(itemValue)} style={styles.picker}>
-            <Picker.Item label={t('CEILING_MATERIAL')} value="" enabled={false} />
-            <Picker.Item label="Gypsum board" value="gypsum" />
-            <Picker.Item label="Wood" value="wood" />
-            <Picker.Item label="PVC" value="pvc" />
-            <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
-          </Picker>
-        </View>
+          {/* Ceiling Material Dropdown */}
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={selectedCeiling} onValueChange={(itemValue) => setSelectedCeiling(itemValue)} style={styles.picker}>
+              <Picker.Item label={t('CEILING_MATERIAL')} value="" enabled={false} />
+              <Picker.Item label="Gypsum board" value="gypsum" />
+              <Picker.Item label="Wood" value="wood" />
+              <Picker.Item label="PVC" value="pvc" />
+              <Picker.Item label={t('OTHERS')} value={t('OTHERS')} />
+            </Picker>
+          </View>
 
-        {selectedCeiling === t('OTHERS') && (
-          <TextInput
-            style={styles.textBox}
-            placeholder={('SPECIFY_OTHER_CEILING_MATERIAL')}
-            placeholderTextColor="#BBBBBB"
-            value={otherCeiling}
-            onChangeText={(text) => setOtherCeiling(text)}
-          />
-        )}
-      </ScrollView>
+          {selectedCeiling === t('OTHERS') && (
+            <TextInput
+              style={styles.textBox}
+              placeholder={('SPECIFY_OTHER_CEILING_MATERIAL')}
+              placeholderTextColor="#BBBBBB"
+              value={otherCeiling}
+              onChangeText={(text) => setOtherCeiling(text)}
+            />
+          )}
+        </ScrollView>
 
-      
-      <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted4}>
-        <Text style={styles.buttonText}>{t('ADD_PROPERTY')}</Text>
-      </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.button} onPress={handleNavigateToGetStarted4}>
+          <Text style={styles.buttonText}>{t('ADD_PROPERTY')}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

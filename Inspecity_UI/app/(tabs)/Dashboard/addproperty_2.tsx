@@ -181,7 +181,6 @@ const GettingStarted2 = () => {
         </TouchableOpacity> */}
 
         <Text style={styles.label}>{t('HAS_RENOVATIONS')}</Text>
-        <Text style={styles.label}>{t('HAS_RENOVATIONS2')}</Text>
 
         <TouchableOpacity 
           style={[styles.textBox, styles.lowerPlaceholder]} 
