@@ -403,7 +403,7 @@ const PhotoDetails = () => {
     }
   };
 
-  const createReport = async (imageUrl) => {
+  const createReport = async (imageUrl: string) => {
     try {
       // Convert homeId to a number
       const homeIdNumber = parseInt(homeId, 10);
@@ -478,7 +478,7 @@ const PhotoDetails = () => {
           const recommendations = reportData.recommendations;
           
           // Process each language's recommendations to add manual styling
-          const processRecommendations = (text) => {
+          const processRecommendations = (text: string): string => {
             if (!text) return '';
             
             // First, normalize all priority text variations
@@ -542,7 +542,7 @@ const PhotoDetails = () => {
         
         // Handle damage types with proper array structure
         const damageTypes = Array.isArray(reportData.damage_types) 
-          ? reportData.damage_types.map((damage) => t(damage) || damage)
+          ? reportData.damage_types.map((damage: string) => t(damage) || damage)
           : [];
         setDamageTypes(damageTypes);
         
@@ -565,25 +565,32 @@ const PhotoDetails = () => {
       setReportCreationFailed(true);
       
       let errorMessage = t('ERROR_CREATING_REPORT');
-      if (error.response) {
-        errorMessage = `Server error: ${error.response.status}`;
-        console.error('Error response:', error.response.data);
-        
-        // Log more details about the error
-        if (error.response.data) {
-          console.error('Error details:', JSON.stringify(error.response.data, null, 2));
-        }
-      } else if (error.request) {
-        if (error.code === 'ECONNABORTED') {
-          errorMessage = t('REQUEST_TIMEOUT');
+      if (axios.isAxiosError(error)) {
+        // error is now typed as AxiosError
+        if (error.response) {
+          errorMessage = `Server error: ${error.response.status}`;
+          console.error('Error response:', error.response.data);
+
+          if (error.response.data) {
+            console.error('Error details:', JSON.stringify(error.response.data, null, 2));
+          }
+        } else if (error.request) {
+          if (error.code === 'ECONNABORTED') {
+            errorMessage = t('REQUEST_TIMEOUT');
+          } else {
+            errorMessage = t('NO_SERVER_RESPONSE');
+          }
+          console.error('Request error:', error.request);
         } else {
-          errorMessage = t('NO_SERVER_RESPONSE');
+          console.error('Error message:', error.message);
         }
-        console.error('Request error:', error.request);
-      } else {
+      } else if (error instanceof Error) {
+        // fallback for non-axios errors that are still Error objects
         console.error('Error message:', error.message);
-      }
-      
+      } else {
+        // unknown error type (string, object, etc)
+        console.error('Unknown error:', error);
+      }     
       Alert.alert(
         t('ERROR'), 
         errorMessage,

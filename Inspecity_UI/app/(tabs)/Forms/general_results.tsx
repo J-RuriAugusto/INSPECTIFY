@@ -40,6 +40,12 @@ interface GroupedResults {
   }>;
 }
 
+interface Service {
+  type: string;
+  name: string;
+  distance: number | null;
+}
+
 const Results = () => {
   const modalRef = useRef<Modalize>(null);
   const params = useLocalSearchParams();
@@ -198,8 +204,8 @@ const Results = () => {
             )
           }));
           // Update your state with services
-          setFacilities(services.map(service => ({
-            icon: mapPlaceTypeToIcon(service.type),
+          setFacilities(services.map((service: Service) => ({
+            icon: mapPlaceTypeToIcon([service.type]),  // pass an array here
             color: '#4CAF50',
             label: service.name,
             distance: service.distance
@@ -629,9 +635,6 @@ const Results = () => {
               />
             </View>
             <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
-                    
-
-
             <Text style={styles.swipeUpLabel}>⬆ {t('SWIPE_UP')}</Text>
           </View>
 

@@ -483,7 +483,7 @@ const Dashboard = () => {
             <MaterialIcons name="bookmark-border" size={48} color="#ccc" />
             <Text
               style={{
-                fontSize: wp('3.9%'),
+                fontSize: wp('3.8%'),
                 fontWeight: '600',
                 fontFamily: 'Archivo-Bold',
                 color: '#777',

@@ -52,7 +52,16 @@ export default function TabLayout() {
                 ]}
               />
             ),
-            tabBarLabel: renderTabLabel('Dashboard'),
+              tabBarLabel: ({ focused }) => (
+                <Text style={{
+                  color: '#000000',
+                  fontWeight: focused ? 'bold' : 'normal',
+                  fontSize: 12,
+                  marginTop: 5
+                }}>
+                  Dashboard
+                </Text>
+              ),
           }}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
@@ -78,7 +87,11 @@ export default function TabLayout() {
                 ]}
               />
             ),
-            tabBarLabel: renderTabLabel('Forms'),
+            tabBarLabel: ({ focused }) => (
+              <Text style={{ color: '#000000', fontWeight: focused ? 'bold' : 'normal', fontSize: 12, marginTop: 5 }}>
+                Forms
+              </Text>
+            ),
           }}
         />
 
@@ -102,7 +115,11 @@ export default function TabLayout() {
                 />
               </View>
             ),
-            tabBarLabel: renderTabLabel('Scan'),
+            tabBarLabel: ({ focused }) => (
+              <Text style={{ color: '#000000', fontWeight: focused ? 'bold' : 'normal', fontSize: 12, marginTop: 5 }}>
+                Scan
+              </Text>
+            ),
           }}
         />
 
@@ -119,7 +136,11 @@ export default function TabLayout() {
                 ]}
               />
             ),
-            tabBarLabel: renderTabLabel('Hotlines'),
+            tabBarLabel: ({ focused }) => (
+              <Text style={{ color: '#000000', fontWeight: focused ? 'bold' : 'normal', fontSize: 12, marginTop: 5 }}>
+                Hotlines
+              </Text>
+            ),
           }}
         />
 
@@ -134,7 +155,11 @@ export default function TabLayout() {
                 color={focused ? '#007aff' : '#000000'}
               />
             ),
-            tabBarLabel: renderTabLabel('Shops'),
+            tabBarLabel: ({ focused }) => (
+              <Text style={{ color: '#000000', fontWeight: focused ? 'bold' : 'normal', fontSize: 12, marginTop: 5 }}>
+                Shops
+              </Text>
+            ),
           }}
         />
       </Tabs>

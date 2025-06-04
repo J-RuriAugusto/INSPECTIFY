@@ -6,8 +6,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import useUserID from "./useUserID";
 import { useSettings } from '../app/(tabs)/Dashboard/settingsContext';
+import { useTranslation } from '../hooks/useTranslation';
 
 const LoadingScreen = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const video = useRef(null);
   const [isCheckingUser, setIsCheckingUser] = useState(false);
@@ -26,7 +28,7 @@ const LoadingScreen = () => {
           "No Internet Connection",
           "Please check your internet connection and try again.",
           [
-            { text: "OK", onPress: () => BackHandler.exitApp() }
+            { text: t('OK'), onPress: () => BackHandler.exitApp() }
           ]
         );
       }
@@ -55,7 +57,7 @@ const LoadingScreen = () => {
             "Service Unavailable",
             "The service is currently unavailable. Please try again later.",
             [
-              { text: "OK", onPress: () => BackHandler.exitApp() }
+              { text: t('OK'), onPress: () => BackHandler.exitApp() }
             ]
           );
           return;
@@ -79,7 +81,7 @@ const LoadingScreen = () => {
         "Error",
         "Failed to verify user. Please check your internet connection and try again.",
         [
-          { text: "OK", onPress: () => BackHandler.exitApp() }
+          { text: t('OK'), onPress: () => BackHandler.exitApp() }
         ]
       );
     } finally {

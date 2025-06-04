@@ -125,7 +125,7 @@ const ReportDetails = () => {
       if (reportID) {
         const fetchData = async () => {
           try {
-            await fetchReportDetails(reportID);
+            await fetchReportDetails(String(reportID));
             // await fetchNotes(reportID);
           } catch (error) {
             if (isActive) {
@@ -143,7 +143,7 @@ const ReportDetails = () => {
   );
 
   // Update the fetchReportDetails function
-  const fetchReportDetails = async (reportId) => {
+  const fetchReportDetails = async (reportId: string): Promise<void> => {
     try {
       const response = await axios.get(
         `https://flask-railway-sample-production.up.railway.app/reports/${reportId}`,
@@ -178,7 +178,7 @@ const ReportDetails = () => {
           const recommendations = reportData.recommendations;
           
           // Process each language's recommendations to add manual styling
-          const processRecommendations = (text) => {
+          const processRecommendations = (text: string): string => {
             if (!text) return '';
             
             // Normalize priority text
@@ -237,7 +237,7 @@ const ReportDetails = () => {
         
         // Handle damage types with proper array structure
         const damageTypes = Array.isArray(reportData.damage_types) 
-          ? reportData.damage_types.map((damage) => t(damage) || damage)
+          ? reportData.damage_types.map((damage: string) => t(damage) || damage)
           : [];
         setDamageTypes(damageTypes);
         
@@ -248,23 +248,32 @@ const ReportDetails = () => {
       console.error('Error fetching report details:', error);
       let errorMessage = t('ERROR_FETCHING_REPORT');
       
-      if (error.response) {
-        errorMessage = `Server error: ${error.response.status}`;
-        console.error('Error response:', error.response.data);
-        
-        if (error.response.data) {
-          console.error('Error details:', JSON.stringify(error.response.data, null, 2));
-        }
-      } else if (error.request) {
-        if (error.code === 'ECONNABORTED') {
-          errorMessage = t('REQUEST_TIMEOUT');
+      if (axios.isAxiosError(error)) {
+        // error is now typed as AxiosError
+        if (error.response) {
+          errorMessage = `Server error: ${error.response.status}`;
+          console.error('Error response:', error.response.data);
+
+          if (error.response.data) {
+            console.error('Error details:', JSON.stringify(error.response.data, null, 2));
+          }
+        } else if (error.request) {
+          if (error.code === 'ECONNABORTED') {
+            errorMessage = t('REQUEST_TIMEOUT');
+          } else {
+            errorMessage = t('NO_SERVER_RESPONSE');
+          }
+          console.error('Request error:', error.request);
         } else {
-          errorMessage = t('NO_SERVER_RESPONSE');
+          console.error('Error message:', error.message);
         }
-        console.error('Request error:', error.request);
-      } else {
+      } else if (error instanceof Error) {
+        // fallback for non-axios errors that are still Error objects
         console.error('Error message:', error.message);
-      }
+      } else {
+        // unknown error type (string, object, etc)
+        console.error('Unknown error:', error);
+      }   
       
       Alert.alert(t('ERROR'), errorMessage);
     }
