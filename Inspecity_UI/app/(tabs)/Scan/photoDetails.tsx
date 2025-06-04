@@ -727,14 +727,6 @@ const PhotoDetails = () => {
           hour12: true
         });
     
-        const formattedReportDate = dateCreated 
-          ? new Date(dateCreated).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })
-          : formattedCurrentDate;
-    
         const htmlContent = `
           <!DOCTYPE html>
           <html>
@@ -869,7 +861,7 @@ const PhotoDetails = () => {
     
               <div class="meta">
                 <p><strong>${t('REPORT_FOR')}</strong> ${escapeHTML(reportName || 'Untitled')}</p>
-                <p><strong>${t('DATE')}</strong> ${formattedReportDate}</p>
+                <p><strong>${t('DATE')}</strong> ${formattedCurrentDate}</p>
                 <p><strong>${t('LOCATION_S')}</strong> University of the Philippines</p>
                 <p><strong>${t('COORDINATES')}</strong> 123.90467, 10.41196</p>
               </div>
