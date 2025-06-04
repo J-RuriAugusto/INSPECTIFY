@@ -223,9 +223,9 @@ export default {
     LOW_RISK: "Ubos nga Risgo",
     MODERATE_RISK: "Kasagarang Risgo",
     LOADING_YOUR_RESULTS: "Nag-loading sa imong mga resulta...",
-    HIGH_PREPARED: "Hinungdanon nga Nakabantay",  
-    MODERATE_PREPARED: "Gikan sa Tungatunga nga Nakabantay",  
-    LOW_PREPARED: "Ubos nga Pagkabantay",  
+    HIGH_PREPARED: "Andam Kaayo",  
+    MODERATE_PREPARED: "Medyo Andam",  
+    LOW_PREPARED: "Dili Andam",  
 
     EARTHQUAKE_QUESTIONS: [
         "Duol ba ang inyong balay sa kilalang fault line? (Pananglitan: West Valley Fault, Central Cebu Fault)",
