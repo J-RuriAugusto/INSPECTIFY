@@ -483,9 +483,9 @@ const PhotoDetails = () => {
             
             // First, normalize all priority text variations
             let processed = text
-              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, "Priority 1 - Critical")
-              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, "Priority 2 - Important")
-              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, "Priority 3 - Preventive")
+              .replace(/Higher priority|High priority|Priority high|Priority 1|Priority one/gi, "Priority 1")
+              .replace(/Medium priority|Priority medium|Priority 2|Priority two/gi, "Priority 2")
+              .replace(/Lower priority|Priority low|Priority 3|Priority three/gi, "Priority 3")
               .replace(/Lowest priority|Priority lowest|Priority 4|Priority four/gi, 'Priority 4');
 
             // Split into sections based on priority
