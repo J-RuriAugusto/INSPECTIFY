@@ -5,8 +5,7 @@ import * as Location from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
-const GOOGLE_API_KEY = "***REMOVED***"; // Replace with your actual API key
+import { fetchNearbySearch, FetchPlaceDetails } from '../../config/apiKeys';
 
 // Common emergency numbers (always available)
 const COMMON_HOTLINES = [
@@ -82,9 +81,7 @@ const EmergencyHotlines = () => {
   // Fetch place details including phone number
   const fetchPlaceDetails = useCallback(async (placeId: string) => {
     try {
-      const response = await fetch(
-        `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${GOOGLE_API_KEY}`
-      );
+      const response = await FetchPlaceDetails(placeId)
       const data = await response.json();
       return data.status === "OK" ? data.result : null;
     } catch (error) {
@@ -111,9 +108,10 @@ const EmergencyHotlines = () => {
   
       const typeRequests = EMERGENCY_TYPES.map(async (emergencyType) => {
         try {
-          const searchResponse = await fetch(
-            `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&keyword=${emergencyType.keyword}&key=${GOOGLE_API_KEY}`
-          );
+          const searchResponse = await fetchNearbySearch(latitude, longitude, emergencyType.keyword)
+          // const searchResponse = await fetch(
+          //   `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&keyword=${emergencyType.keyword}&key=${GOOGLE_API_KEY}`
+          // );
           const searchData = await searchResponse.json();
   
           if (searchData.status !== "OK" || !searchData.results?.length) return [];
@@ -482,11 +480,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: wp(8),
   },
 
   loadingText: {
-    marginTop: hp(1),
-    color: '#666',
+    marginTop: hp(2),
+    color: '#0A4D95',
+    fontSize: wp(4.5),
+    textAlign: 'center',
+    fontFamily: 'Epilogue-Regular',
   },
 
   emptyState: {

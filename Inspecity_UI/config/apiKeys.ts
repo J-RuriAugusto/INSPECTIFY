@@ -120,3 +120,72 @@ export const fetchNearbyPlaces = async (
 
   throw lastError || new Error("All API keys failed for nearby places search");
 };
+
+
+export const FetchPlaceDetails = async (
+  placeId: string,
+  maxRetries = GOOGLE_MAPS_API_KEYS.length
+) => {
+  let currentKey = getCurrentApiKey();
+  let retryCount = 0;
+  let lastError: Error | null = null;
+
+  while (retryCount < maxRetries) {
+    try {
+      const url = `https://maps.gomaps.pro/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,vicinity&key=${currentKey}`;
+      console.log('Fetching place details with URL:', url);
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+      }
+      return response
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.log(`API Key ${currentKeyIndex + 1} error:`, lastError.message);
+    }
+
+    // Rotate to next key for next attempt
+    currentKey = rotateToNextApiKey();
+    retryCount++;
+  }
+
+  throw lastError || new Error("All API keys have been exhausted for place details");
+};
+
+
+export const fetchNearbySearch = async (
+  latitude: number,
+  longitude: number,
+  keyword: string,
+  maxRetries = GOOGLE_MAPS_API_KEYS.length
+) => {
+  let currentKey = getCurrentApiKey();
+  let retryCount = 0;
+  let lastError: Error | null = null;
+
+  while (retryCount < maxRetries) {
+    try {
+      const url = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=5000&keyword=${encodeURIComponent(keyword)}&key=${currentKey}`;
+      console.log('Fetching nearby search with URL:', url);
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.log(`API Key ${currentKeyIndex + 1} error:`, lastError.message);
+    }
+
+    // Rotate to next key for next attempt
+    currentKey = rotateToNextApiKey();
+    retryCount++;
+  }
+
+  throw lastError || new Error("All API keys have been exhausted for nearby search");
+};
