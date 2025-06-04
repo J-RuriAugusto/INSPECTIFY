@@ -26,7 +26,7 @@ export default {
     ESTIMATED_FLOOR_AREA: "Unsa ang gibanabana nga floor area?",
     ENTER_LOT_AREA: "Ibutang ang gilapdon sa yuta",
     ENTER_FLOOR_AREA: "Ibutang ang gilapdon sa salog",
-    
+
     PRIMARY_HOUSE_MATERIAL: "Pangunang Materyales sa Balay",
     SPECIFY_OTHER_HOUSE_TYPE: "Ibutang ang laing klase sa balay",
     PRIMARY_ROOFING_MATERIAL: "Pangunang Materyales sa Atop",
@@ -318,5 +318,7 @@ export default {
     ABOUT_INSPECTIFY: "Mahitungod sa Inspectify",
     INSPECTIFY_DETAILS: "Ang Inspectify makatabang sa pag-ila sa mga bitak sa balay gamit ang AI.",
     PRIVACY_POLICY: "Palisiya sa Pagkapribado",
-    PRIVACY_DETAILS: "Luwas ug segurado ang imong datos uban sa Inspectify."
+    PRIVACY_DETAILS: "Luwas ug segurado ang imong datos uban sa Inspectify.",
+
+    RECOMMENDATION_NOT_AVAILABLE: "Walay rekomendasyon nga magamit. Palihug sulayi pag-usab og scan sa hulagway unya."
 };

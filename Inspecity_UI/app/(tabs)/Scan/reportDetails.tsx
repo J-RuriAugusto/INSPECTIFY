@@ -82,6 +82,10 @@ const ReportDetails = () => {
       recommendation = recommendations.english;
     }
 
+    if (recommendation.trim().startsWith("Error")) {
+      return t('RECOMMENDATION_NOT_AVAILABLE') || "Recommendation is not available. Please try scanning the picture again later.";
+    }
+    
     // Process the recommendation text to ensure proper line breaks
     return recommendation
       .replace(/\r\n/g, '\n') // Convert Windows line endings to Unix
