@@ -584,7 +584,7 @@ const Results = () => {
                 style={[styles.bar, { width: `${(numericScore / 15) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15 {t('QUESTIONS')}</Text>
+            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}15</Text>
                     
           </View>
 

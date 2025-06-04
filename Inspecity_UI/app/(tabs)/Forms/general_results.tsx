@@ -109,7 +109,7 @@ const Results = () => {
 
         // Filter out any invalid answers (only allow 'Yes' and 'No')
         const validAnswers = answersArray.filter(answer => 
-          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no')
+          answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'no' || answer.toLowerCase() === 'idk')
         );
 
         if (validAnswers.length === 0) {
@@ -647,7 +647,7 @@ const Results = () => {
                 style={[styles.bar, { width: `${(numericScore / 16) * 100}%`, backgroundColor: color }]}
               />
             </View>
-            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}16 {t('QUESTIONS')}</Text>
+            <Text style={styles.score}>{t('YOU_ANSWERED_YES')}{numericScore} {t('OUT_OF')}16</Text>
                     
           </View>
 
