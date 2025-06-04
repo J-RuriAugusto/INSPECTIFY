@@ -34,11 +34,11 @@ const GettingStarted2 = () => {
   const [activeInput, setActiveInput] = useState<Field | null>(null);
   const textInputRef = useRef<TextInput>(null);
 
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -68,9 +68,7 @@ const GettingStarted2 = () => {
     }
   }, [activeInput]);
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+
 
   type Field = 'homeName' | 'houseAge' | 'houseUse' | 'renovations';
 
@@ -152,6 +150,10 @@ const GettingStarted2 = () => {
 
   const currentStep = 2;
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
 <View style={styles.container}>
       <View style={styles.upperSection}>
@@ -205,18 +207,16 @@ const GettingStarted2 = () => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
           style={styles.textBox} 
           onPress={() => handleInputPress('houseUse')}
         >
           <Text style={houseUse ? styles.inputText : styles.placeholderText}>
             {houseUse || t('ENTER_PRIMARY_USE')}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Text style={styles.label}>{t('HAS_RENOVATIONS')}</Text>
-        <Text style={styles.label}>{t('HAS_RENOVATIONS2')}</Text>
-
         <TouchableOpacity 
           style={styles.textBox} 
           onPress={() => handleInputPress('renovations')}
@@ -295,17 +295,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  image: {
-    width: wp('100%'),
-    height: hp('50%'),
-  },
   lowerSection: {
-    flex: 1.1,
+    flex: 1.05,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     padding: wp('5%'),
   },
+  image: {
+    width: wp('100%'),
+    height: hp('50%'),
+  },
+
   title1: {
     fontSize: wp('6%'),
     color: '#05173F',
@@ -334,7 +335,8 @@ const styles = StyleSheet.create({
     color: '#05173F',
     textAlign: 'center',
     fontFamily: 'Archivo-Regular',
-    letterSpacing: wp('0.25%'),
+    letterSpacing: wp('0.20%'),
+    padding: wp('3%'),
   },
   progressBar: {
     flexDirection: 'row',
@@ -381,6 +383,7 @@ const styles = StyleSheet.create({
     borderRadius: wp('8%'),
     alignItems: 'center',
     marginTop: hp('1%'),
+    marginBottom: hp('2%')
   },
   buttonText: {
     fontSize: wp('4.5%'),
@@ -406,7 +409,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: wp('10%'),
-    paddingRight: wp('2%'),
+    padding: wp('5%'),
   },
   modalInput: {
     flex: 1,
@@ -421,8 +424,9 @@ const styles = StyleSheet.create({
     padding: wp('2%'),
   },
   scrollContent: {
-    flexGrow: 1,
+    flexGrow: 0.3,
     paddingBottom: 20,
+    alignItems: 'center',
   },
 });
 

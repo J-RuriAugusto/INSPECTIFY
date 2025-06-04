@@ -7,21 +7,40 @@ import { useTranslation } from '../../../hooks/useTranslation';
 
 const AwarenessTool = () => {
   const { t } = useTranslation();
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-  //   'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+    'Epilogue-Medium': require('../../../assets/fonts/Epilogue-Medium.ttf'),
+  });
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title1}>{t('CHECK_DISASTER')}</Text>
-      <Text style={styles.title2}>{t('SELECT_DISASTER')}</Text>
+ <View style={styles.container}>
+      {/* Text Container */}
+      <View style={styles.textContainer}>
+        <Text 
+          style={styles.title1}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {t('CHECK_DISASTER')}
+        </Text>
+        <Text 
+          style={styles.title2}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {t('SELECT_DISASTER')}
+        </Text>
+      </View>
 
       {/* Button Containers */}
       <View style={styles.row}>
@@ -40,7 +59,7 @@ const AwarenessTool = () => {
               source={require('../../../assets/images/earthquake-icon.png')}
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>{t('EARTHQUAKE')}</Text>
+            <Text style={styles.buttonText3}>{t('EARTHQUAKE')}</Text>
           </TouchableOpacity>
         </Link>
       </View>
@@ -75,19 +94,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#FFFFFF',
-    paddingTop: hp('10%'), // replaces 80px
+    paddingTop: hp('10%'),
+  },
+  textContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: wp('5%'),
+    marginBottom: hp('2%'),
   },
   title1: {
-    fontSize: wp('8%'), // replaces 30px
+    fontSize: wp('8.5%'),
     color: '#000000',
     fontFamily: 'Epilogue-Black',
     textAlign: 'center',
+    maxWidth: '100%',
   },
   title2: {
-    fontSize: wp('5%'), // replaces 18px
+    fontSize: wp('5%'),
     color: '#4783C7',
     fontFamily: 'Epilogue-Medium',
-    marginBottom: hp('6%'), // replaces 40px
+    textAlign: 'center',
+    maxWidth: '100%',
+    marginTop: hp('1%'),
+    lineHeight: hp('3%'),
   },
   row: {
     backgroundColor: '#FFFFFF',
@@ -114,6 +144,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginTop: hp('1.2%'), // replaces 10px
     textAlign: 'center',
+    paddingLeft: wp('1.5%'),
+    paddingRight: wp('1.5%')
+
+  },
+    buttonText3: {
+    fontSize: wp('6.5%'), // replaces 25px
+    fontFamily: 'Epilogue-Black',
+    color: '#FFFFFF',
+    marginTop: hp('1.2%'), // replaces 10px
+    textAlign: 'center',
+    paddingLeft: wp('5.5%'),
+    paddingRight: wp('5.5%')
+
   },
   buttonText2: {
     fontSize: wp('6.5%'), // replaces 25px

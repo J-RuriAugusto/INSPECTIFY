@@ -38,8 +38,7 @@ const Questions = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  if (!fontsLoaded) return null;
-
+  
   const handleAnswer = (answer: string) => {
     const currentIndex = questionIndex;
 
@@ -101,7 +100,7 @@ const Questions = () => {
 
     console.log(`Skipped Question ${currentIndex + 1}`);
     console.log('Updated Answers:', updatedAnswers);
-
+    
     if (!skippedIndices.includes(currentIndex)) {
       setSkippedIndices([...skippedIndices, currentIndex]);
     }
@@ -126,7 +125,9 @@ const Questions = () => {
       }
     }
   };
-
+  
+  if (!fontsLoaded) return null;
+  
   return (
     <ImageBackground
       source={require('../../../assets/images/general_bg.png')}

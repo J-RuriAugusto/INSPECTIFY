@@ -20,16 +20,17 @@ const General = () => {
   const navigation = useNavigation();
   const router = useRouter();
   
-  if (!fontsLoaded) return null;
-
+  
   const handleStartPress = () => {
     setModalVisible(true);
   };
-
+  
   const acceptDisclaimer = () => {
     setModalVisible(false);
     router.push('/(tabs)/Forms/earthquakeQueries');
   };
+  
+  if (!fontsLoaded) return null;
 
   return (
     <ImageBackground

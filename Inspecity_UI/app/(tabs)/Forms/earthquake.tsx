@@ -20,8 +20,7 @@ const Earthquake = () => {
   const navigation = useNavigation();
   const router = useRouter();
   
-  if (!fontsLoaded) return null;
-
+  
   const handleStartPress = () => {
     setModalVisible(true);
   };
@@ -30,7 +29,9 @@ const Earthquake = () => {
     setModalVisible(false);
     router.push('/(tabs)/Forms/earthquakeQueries');
   };
-
+  
+  if (!fontsLoaded) return null;
+  
   return (
     <ImageBackground
       source={require('../../../assets/images/earthquake_bg.png')}

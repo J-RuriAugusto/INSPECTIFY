@@ -8,8 +8,7 @@ export default {
     ENTER_HOME_NAME: "Enter your home name",
     ENTER_HOUSE_AGE: "Enter the age of the house",
     ENTER_PRIMARY_USE: "Enter the primary use of the house",
-    HAS_RENOVATIONS: "Has the house undergone renovations",
-    HAS_RENOVATIONS2: "or repairs?",
+    HAS_RENOVATIONS: "Has the house undergone renovations or repairs?",
     RENOVATIONS_GUIDE: "Yes/No, if yes, specify",
     HOME_NAME_REQ: "Home name is required.",
     HOUSE_AGE_REQ: "House age is required.",
@@ -178,7 +177,7 @@ export default {
     DELETE: "Delete",
     EDIT: "Edit",
 
-    CHECK_DISASTER: "Check Your Disaster",
+    CHECK_DISASTER: "Check Your Disaster Preparedness",
     SELECT_DISASTER: "Select Disaster",
     FLOOD: "FLOOD",
     EARTHQUAKE: "EARTHQUAKE",

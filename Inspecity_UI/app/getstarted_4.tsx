@@ -14,15 +14,13 @@ const GettingStarted4 = () => {
   const router = useRouter();
 
   // Load custom fonts
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  });
 
-  // if (!fontsLoaded) {
-  //   return null; // Show nothing until fonts are loaded
-  // }
+
 
   const handleTurnOnLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -58,7 +56,9 @@ const GettingStarted4 = () => {
   };
 
   const currentStep = 5; // Current progress step
-
+  if (!fontsLoaded) {
+    return null; // Show nothing until fonts are loaded
+  }
   return (
 <Animatable.View
       style={styles.container}

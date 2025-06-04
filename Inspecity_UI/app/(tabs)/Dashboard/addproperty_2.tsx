@@ -33,11 +33,11 @@ const GettingStarted2 = () => {
   const textInputRef = useRef<TextInput>(null);
   
   // Load custom fonts
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../../../assets/fonts/Archivo-Bold.ttf'),
+  });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -65,11 +65,6 @@ const GettingStarted2 = () => {
       }, 100);
     }
   }, [activeInput]);
-
-
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
 
   type Field = 'homeName' | 'houseAge' | 'houseUse' | 'renovations';
 
@@ -135,6 +130,10 @@ const GettingStarted2 = () => {
     });
   };
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       {/* Upper Blue Section */}
@@ -172,14 +171,14 @@ const GettingStarted2 = () => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
           style={[styles.textBox, styles.lowerPlaceholder]} 
           onPress={() => handleInputPress('houseUse')}
         >
           <Text style={[styles.placeholderText, houseUse ? styles.filledText : null]}>
             {houseUse || t('ENTER_PRIMARY_USE')}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Text style={styles.label}>{t('HAS_RENOVATIONS')}</Text>
         <Text style={styles.label}>{t('HAS_RENOVATIONS2')}</Text>

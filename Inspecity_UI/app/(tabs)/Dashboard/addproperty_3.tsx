@@ -67,10 +67,6 @@ const GettingStarted3 = () => {
     }
   }, [activeInput]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   const parsedHomeData = homeData 
     ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
     : {};
@@ -146,6 +142,10 @@ const GettingStarted3 = () => {
       params: { homeData: JSON.stringify(updatedHomeData) },
     });
   };
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

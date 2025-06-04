@@ -40,11 +40,11 @@ const GettingStarted3 = () => {
   const [activeInput, setActiveInput] = useState<Field | null>(null);
   const textInputRef = useRef<TextInput>(null);
 
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
-  //   'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../assets/fonts/Archivo-Regular.ttf'),
+    'Archivo-Bold': require('../assets/fonts/Archivo-Bold.ttf'),
+  });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -73,9 +73,7 @@ const GettingStarted3 = () => {
     }
   }, [activeInput]);
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+
 
   const parsedHomeData = homeData 
   ? JSON.parse(Array.isArray(homeData) ? homeData[0] : homeData) 
@@ -155,6 +153,10 @@ const GettingStarted3 = () => {
   
 
   const currentStep = 3;
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
 <View style={styles.container}>

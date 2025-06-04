@@ -19,8 +19,6 @@ const Fire = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
-  
-  if (!fontsLoaded) return null;
 
   const handleStartPress = () => {
     setModalVisible(true);
@@ -30,6 +28,8 @@ const Fire = () => {
     setModalVisible(false);
     router.push('/(tabs)/Forms/fireQueries');
   };
+
+  if (!fontsLoaded) return null;
 
   return (
     <ImageBackground

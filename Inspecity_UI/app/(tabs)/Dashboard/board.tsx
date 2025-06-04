@@ -119,11 +119,11 @@ const Dashboard = () => {
     </TouchableOpacity>
   );
 
-  // const [fontsLoaded] = useFonts({
-  //   'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
-  //   'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
-  //   'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
-  // });
+  const [fontsLoaded] = useFonts({
+    'Epilogue-Black': require('../../../assets/fonts/Epilogue-Black.ttf'),
+    'Archivo-Regular': require('../../../assets/fonts/Archivo-Regular.ttf'),
+    'Epilogue-Bold': require('../../../assets/fonts/Epilogue-Bold.ttf'),
+  });
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -312,9 +312,7 @@ const Dashboard = () => {
   }, [userId]);
   
   
-  // if (!fontsLoaded) {
-  //   return null; 
-  // }
+
 
   // Inside your Dashboard component
   const [savedShops, setSavedShops] = useState<{ id: string; name: string; image: string }[]>([]);
@@ -356,6 +354,10 @@ const Dashboard = () => {
     router.push({ pathname: '/(tabs)/Scan/reportDetails', params: {report_id: id } });
   };
 
+    if (!fontsLoaded) {
+    return null; 
+  }
+
   return (
     <ScrollView
       refreshControl={
@@ -378,9 +380,27 @@ const Dashboard = () => {
           </Link>
         </View>
 
-        {/* Main Content */}
-        <Text style={styles.title1}>{houseName}</Text>
-        <Text style={styles.title2}>{location}</Text>
+              {/* Main Content */}
+      <View style={styles.headerTextContainer}>
+        <Text 
+          style={styles.title1}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {houseName}
+        </Text>
+        <Text 
+          style={styles.title2}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {location}
+        </Text>
+      </View>
 
         {/* Search Bar */}
         <TextInput
@@ -601,7 +621,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     paddingTop: hp('8%'),
-    paddingHorizontal: wp('6%'),
+    paddingHorizontal: wp('4%'),
     // paddingBottom: hp('1.8%'),
     width: '100%'
   },
@@ -618,21 +638,29 @@ const styles = StyleSheet.create({
     width: wp('8.5%'),
     height: wp('8.5%'),
   },
-  title1: {
-    fontSize: wp('6.5%'),
-    color: '#05173F',
-    fontFamily: 'Epilogue-Black',
-    alignSelf: 'center',
-    textAlign: 'center',
-  },
-  title2: {
-    fontSize: wp('4.5%'),
-    color: '#AFAFAF',
-    fontFamily: 'Archivo-Regular',
-    marginBottom: hp('1%'),
-    alignSelf: 'center',
-    textAlign: 'center',
-  },
+headerTextContainer: {
+  width: '100%',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: wp('2%'),
+  marginBottom: hp('1%'),
+  marginTop: hp('1%'),
+},
+title1: {
+  fontSize: wp('8.5%'),
+  color: '#05173F',
+  fontFamily: 'Epilogue-Black',
+  textAlign: 'center',
+  maxWidth: '95%',
+},
+title2: {
+  fontSize: wp('4.5%'),
+  color: '#AFAFAF',
+  fontFamily: 'Archivo-Regular',
+  textAlign: 'center',
+  maxWidth: '95%',
+  marginTop: hp('0.5%'),
+},
   title3: {
     fontSize: wp('4.8%'),
     color: '#071C34',
