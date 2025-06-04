@@ -321,6 +321,7 @@ export default {
   ABOUT_INSPECTIFY: "Tungkol sa Inspectify",
   INSPECTIFY_DETAILS: "Ang Inspectify ay tumutulong mag-detect ng mga bitak sa bahay gamit ang AI.",
   PRIVACY_POLICY: "Patakaran sa Privacy",
-  PRIVACY_DETAILS: "Ang iyong data ay ligtas at protektado sa Inspectify."
+  PRIVACY_DETAILS: "Ang iyong data ay ligtas at protektado sa Inspectify.",
 
+  RECOMMENDATION_NOT_AVAILABLE: "Walang rekomendasyon na available. Pakisubukang i-scan muli ang larawan mamaya.",
 };

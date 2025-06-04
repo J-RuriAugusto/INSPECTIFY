@@ -323,7 +323,7 @@ export default {
     PRIVACY_POLICY: "Privacy Policy",
     PRIVACY_DETAILS: "Your data is safe and secure with Inspectify.",
     
-
+    RECOMMENDATION_NOT_AVAILABLE: "Recommendation is not available. Please try scanning the picture again later.",
 };
 
 
