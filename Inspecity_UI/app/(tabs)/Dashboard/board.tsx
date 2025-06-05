@@ -393,7 +393,7 @@ const Dashboard = () => {
           </Text>
           <Text 
             style={styles.title2}
-            numberOfLines={1}
+            numberOfLines={2}
             ellipsizeMode="tail"
             adjustsFontSizeToFit
             minimumFontScale={0.8}
